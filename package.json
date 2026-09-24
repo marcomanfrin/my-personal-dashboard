@@ -1,0 +1,32 @@
+{
+  "name": "command",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm run dev -w @command/server\" \"npm run dev -w @command/web\"",
+    "build": "npm run build -w @command/server && npm run build -w @command/web",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write .",
+    "db:generate": "npm run db:generate -w @command/server",
+    "db:migrate": "npm run db:migrate -w @command/server",
+    "db:seed": "npm run db:seed -w @command/server",
+    "agent:token": "npm run agent:token -w @command/server --",
+    "user:create": "npm run user:create -w @command/server --",
+    "user:reset": "npm run user:reset -w @command/server --",
+    "dev:api": "npm run dev -w @command/server",
+    "dev:web": "npm run dev -w @command/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

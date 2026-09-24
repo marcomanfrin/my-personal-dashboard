@@ -1,0 +1,52 @@
+# Whole stack: `docker compose up -d --build`, then open http://localhost:8080
+# Secrets and settings come from .env (see .env.example); JWT_SECRET is required.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: command
+      POSTGRES_PASSWORD: command
+      POSTGRES_DB: command
+    ports:
+      # Also reachable from the host, for `npm run dev` and DB tools.
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U command"]
+      interval: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    env_file: .env
+    environment:
+      # Inside the compose network the database is `db`, not localhost.
+      DATABASE_URL: postgres://command:command@db:5432/command
+      HOST: 0.0.0.0
+      PORT: "3000"
+      CORS_ORIGIN: http://localhost:8080
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    ports:
+      # Agents call the API directly on :3000.
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

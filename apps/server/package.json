@@ -1,0 +1,40 @@
+{
+  "name": "@command/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/scripts/migrate.ts",
+    "db:seed": "tsx src/scripts/seed.ts",
+    "agent:token": "tsx src/scripts/agent-token.ts",
+    "user:create": "tsx src/scripts/user.ts",
+    "user:reset": "tsx src/scripts/user.ts --reset"
+  },
+  "dependencies": {
+    "@command/shared": "*",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/cors": "^11.0.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "drizzle-orm": "^0.44.0",
+    "fast-jwt": "^6.3.3",
+    "fastify": "^5.4.0",
+    "fastify-plugin": "^5.0.0",
+    "pg": "^8.16.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.0",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.15.0",
+    "drizzle-kit": "^0.31.0",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.0",
+    "vitest": "^3.2.0"
+  }
+}

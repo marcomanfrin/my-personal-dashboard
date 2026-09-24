@@ -1,0 +1,2294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Command, personal dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  try { var t = localStorage.getItem('cc-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+</script>
+<style>
+/* =========================================================================
+   DESIGN TOKENS
+   ========================================================================= */
+:root {
+  --font: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* light */
+  --bg: #f2f3f8;
+  --bg-glow-1: rgba(106, 88, 240, .07);
+  --bg-glow-2: rgba(15, 168, 148, .05);
+  --surface: #ffffff;
+  --surface-2: #f6f7fb;
+  --surface-3: #eceef6;
+  --line: rgba(20, 26, 60, .08);
+  --line-strong: rgba(20, 26, 60, .15);
+  --text: #151933;
+  --text-2: #555b7b;
+  --text-3: #8a8fab;
+  --accent: #6552ec;
+  --accent-soft: rgba(101, 82, 236, .10);
+  --accent-text: #5341dd;
+  --on-accent: #ffffff;
+  --crit: #e0334a;
+  --high: #d9701a;
+  --med: #b48a0c;
+  --low: #2f74db;
+  --g-blue: #4a67e8;
+  --dep: #d9687c;
+  --ok: #17966a;
+  --blocked: #7a6ea6;
+  --shadow: 0 1px 2px rgba(20, 26, 60, .04), 0 6px 20px rgba(20, 26, 60, .04);
+  --shadow-pop: 0 10px 40px rgba(20, 26, 60, .16);
+  --av-fg-l: 38%;
+  --scrim: rgba(12, 15, 30, .35);
+
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --gap: 14px;
+  --sidebar-w: 0px;
+  --topbar-h: 60px;
+  --bottomnav-h: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0e1c;
+    --bg-glow-1: rgba(128, 108, 255, .14);
+    --bg-glow-2: rgba(40, 200, 180, .07);
+    --surface: #131830;
+    --surface-2: #191f3b;
+    --surface-3: #222a50;
+    --line: rgba(160, 172, 235, .10);
+    --line-strong: rgba(160, 172, 235, .19);
+    --text: #e8eaf8;
+    --text-2: #a3a8c8;
+    --text-3: #6d7398;
+    --accent: #8e7fff;
+    --accent-soft: rgba(142, 127, 255, .15);
+    --accent-text: #b3a8ff;
+    --on-accent: #0b0e1c;
+    --crit: #ff5c6c;
+    --high: #ff9a48;
+    --med: #e9c350;
+    --low: #62a3ff;
+    --g-blue: #7d93ff;
+    --dep: #f07d92;
+    --ok: #40d396;
+    --blocked: #a298d0;
+    --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 8px 24px rgba(0, 0, 0, .18);
+    --shadow-pop: 0 18px 50px rgba(0, 0, 0, .5);
+    --av-fg-l: 74%;
+    --scrim: rgba(4, 6, 14, .6);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0e1c;
+  --bg-glow-1: rgba(128, 108, 255, .14);
+  --bg-glow-2: rgba(40, 200, 180, .07);
+  --surface: #131830;
+  --surface-2: #191f3b;
+  --surface-3: #222a50;
+  --line: rgba(160, 172, 235, .10);
+  --line-strong: rgba(160, 172, 235, .19);
+  --text: #e8eaf8;
+  --text-2: #a3a8c8;
+  --text-3: #6d7398;
+  --accent: #8e7fff;
+  --accent-soft: rgba(142, 127, 255, .15);
+  --accent-text: #b3a8ff;
+  --on-accent: #0b0e1c;
+  --crit: #ff5c6c;
+  --high: #ff9a48;
+  --med: #e9c350;
+  --low: #62a3ff;
+  --g-blue: #7d93ff;
+  --dep: #f07d92;
+  --ok: #40d396;
+  --blocked: #a298d0;
+  --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 8px 24px rgba(0, 0, 0, .18);
+  --shadow-pop: 0 18px 50px rgba(0, 0, 0, .5);
+  --av-fg-l: 74%;
+  --scrim: rgba(4, 6, 14, .6);
+}
+
+/* level + status colour hooks: set --c once, reuse everywhere */
+.lvl-critical { --c: var(--crit); }
+.lvl-high { --c: var(--high); }
+.lvl-medium { --c: var(--med); }
+.lvl-low { --c: var(--low); }
+.lvl-normal { --c: var(--text-3); }
+.lvl-upcoming { --c: var(--accent); }
+.st-success { --c: var(--ok); }
+.st-warning { --c: var(--med); }
+.st-error { --c: var(--crit); }
+.st-blocked { --c: var(--blocked); }
+.st-pending { --c: var(--text-3); }
+.st-done { --c: var(--ok); }
+.st-on-track { --c: var(--accent); }
+.st-at-risk { --c: var(--high); }
+.st-delayed { --c: var(--crit); }
+.st-not-started { --c: var(--text-3); }
+
+/* =========================================================================
+   BASE
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h) + 12px); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 500 14.5px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1;
+  overflow-x: hidden;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(900px 500px at 12% -10%, var(--bg-glow-1), transparent 70%),
+    radial-gradient(700px 500px at 100% 0%, var(--bg-glow-2), transparent 70%);
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; text-align: inherit; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { list-style: none; padding: 0; }
+svg.ic { width: 18px; height: 18px; flex: none; }
+.ic.sm { width: 15px; height: 15px; }
+.ic.xs { width: 13px; height: 13px; }
+.ic.rot { transform: rotate(-90deg); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* =========================================================================
+   APP SHELL
+   ========================================================================= */
+.app { position: relative; z-index: 1; display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100vh; }
+.main { min-width: 0; grid-column: 2; }
+
+/* sidebar ---------------------------------------------------------------- */
+.sidebar {
+  display: none;
+  position: sticky; top: env(safe-area-inset-top, 0px);
+  height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  flex-direction: column; gap: 6px;
+  padding: 18px 12px;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  backdrop-filter: blur(12px);
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); flex: none; }
+.brand-mark svg { width: 18px; height: 18px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-link {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  height: 40px; padding: 0 10px; border-radius: var(--r-sm);
+  color: var(--text-2); font-weight: 600; font-size: 14px;
+}
+.nav-link:hover { background: var(--surface-2); color: var(--text); }
+.nav-link[aria-current="true"] { background: var(--accent-soft); color: var(--accent-text); }
+.nav-link[aria-current="true"]::before { content: ""; position: absolute; left: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.nav-count { margin-left: auto; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 99px; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; background: var(--surface-3); color: var(--text-2); }
+.nav-count.hot { background: color-mix(in srgb, var(--crit) 16%, transparent); color: var(--crit); }
+.nav-count:empty { display: none; }
+.nav-sep { height: 1px; background: var(--line); margin: 10px 8px; }
+.side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+.side-profile { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); width: 100%; }
+.side-profile .who { min-width: 0; line-height: 1.25; }
+.side-profile .who b { display: block; font-size: 13.5px; }
+.side-profile .who span { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+/* rail (tablet) */
+@media (min-width: 768px) {
+  :root { --sidebar-w: 76px; }
+  .sidebar { display: flex; padding: 18px 12px; align-items: center; }
+  .sidebar .brand { padding: 4px 0 18px; }
+  .sidebar .brand-name, .sidebar .nav-label, .sidebar .who { display: none; }
+  .nav-link { width: 44px; height: 44px; justify-content: center; padding: 0; }
+  .nav-count { position: absolute; top: 3px; right: 1px; min-width: 16px; height: 16px; padding: 0 4px; font-size: 10px; margin: 0; }
+  .side-profile { padding: 6px; justify-content: center; }
+  .nav-link[aria-current="true"]::before { left: -16px; }
+}
+@media (min-width: 1200px) {
+  :root { --sidebar-w: 236px; }
+  .sidebar { align-items: stretch; padding: 18px 12px; }
+  .sidebar .brand { padding: 4px 8px 18px; }
+  .sidebar .brand-name, .sidebar .nav-label, .sidebar .who { display: block; }
+  .nav-link { width: auto; height: 40px; justify-content: flex-start; padding: 0 10px; }
+  .nav-count { position: static; min-width: 22px; height: 20px; padding: 0 6px; font-size: 11.5px; margin-left: auto; }
+  .side-profile { padding: 10px; justify-content: flex-start; }
+  .nav-link[aria-current="true"]::before { left: -12px; }
+}
+
+/* topbar ----------------------------------------------------------------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  height: var(--topbar-h);
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--line);
+}
+.topbar .brand { padding: 0; font-size: 15px; }
+.topbar-date { color: var(--text-2); font-weight: 600; font-size: 13.5px; display: none; white-space: nowrap; }
+.topbar-spacer { flex: 1; }
+.icon-btn {
+  position: relative; width: 38px; height: 38px; flex: none;
+  display: grid; place-items: center; border-radius: 10px;
+  color: var(--text-2);
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+.icon-btn.bordered { border: 1px solid var(--line); background: var(--surface); }
+.icon-btn .dot { position: absolute; top: 6px; right: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: var(--crit); color: #fff; font-size: 10px; font-weight: 800; display: grid; place-items: center; border: 2px solid var(--bg); }
+.avatar-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 50%, #2fd3bf)); color: #fff; flex: none; }
+
+.search { position: relative; display: none; flex: 1; max-width: 420px; }
+.search-field {
+  display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px;
+  border-radius: 11px; border: 1px solid var(--line); background: var(--surface);
+  color: var(--text-3);
+}
+.search-field:focus-within { border-color: color-mix(in srgb, var(--accent) 60%, transparent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search-field input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--text); font-weight: 500; }
+.search-field input::placeholder { color: var(--text-3); }
+.kbd { font-size: 11px; font-weight: 700; color: var(--text-3); border: 1px solid var(--line-strong); border-radius: 5px; padding: 1px 6px; }
+.search-close { display: none; }
+.search-toggle { display: grid; }
+
+/* mobile search overlay */
+.topbar.search-open .search { display: block; position: absolute; inset: 10px 10px auto 10px; max-width: none; }
+.topbar.search-open .search-close { display: grid; width: 30px; height: 30px; }
+.topbar.search-open .search .kbd { display: none; }
+
+@media (max-width: 359px) { .topbar { gap: 4px; padding: 0 10px; } .topbar .brand-name { display: none; } .topbar .icon-btn { width: 36px; } }
+@media (min-width: 768px) {
+  .topbar { padding: 0 24px; gap: 10px; }
+  .topbar .brand { display: none; }
+  .topbar-date { display: block; }
+  .search { display: block; }
+  .search-toggle { display: none; }
+  .topbar.search-open .search { position: relative; inset: auto; }
+  .topbar.search-open .search-close { display: none; }
+}
+
+/* popovers */
+.popover {
+  position: absolute; z-index: 40; top: calc(100% + 8px);
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: var(--r-md); box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+.search .popover { left: 0; right: 0; max-height: min(70vh, 460px); overflow-y: auto; }
+.notif-wrap { position: relative; }
+.notif-wrap .popover { right: -48px; width: min(360px, calc(100vw - 20px)); }
+@media (min-width: 768px) { .notif-wrap .popover { right: 0; } }
+.pop-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line); font-weight: 700; font-size: 13.5px; }
+.pop-head button { font-size: 12.5px; color: var(--accent-text); font-weight: 700; }
+.pop-group { padding: 8px 14px 4px; font-size: 12px; color: var(--text-3); font-weight: 700; }
+.pop-item { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding: 9px 14px; }
+.pop-item:hover, .pop-item.is-active { background: var(--surface-2); }
+.pop-item .ic { margin-top: 2px; color: var(--text-3); }
+.pop-item b { display: block; font-size: 13.5px; font-weight: 650; line-height: 1.35; }
+.pop-item span { font-size: 12.5px; color: var(--text-3); }
+.pop-empty { padding: 18px 14px; color: var(--text-3); font-size: 13.5px; }
+
+/* header greeting -------------------------------------------------------- */
+.hello { padding: 20px 16px 4px; max-width: 1680px; margin: 0 auto; }
+.hello h1 { font-size: clamp(22px, 5.4vw, 30px); line-height: 1.15; letter-spacing: -.025em; font-weight: 800; }
+.hello p { margin-top: 6px; color: var(--text-2); font-size: 14.5px; max-width: 70ch; }
+.hello p strong { color: var(--text); font-weight: 700; }
+@media (min-width: 768px) { .hello { padding: 26px 28px 6px; } }
+
+/* content + board ------------------------------------------------------- */
+.content { padding: 14px 12px calc(var(--bottomnav-h) + 28px); max-width: 1680px; margin: 0 auto; }
+@media (min-width: 400px) { .content { padding-left: 16px; padding-right: 16px; } }
+@media (min-width: 768px) { .content { padding: 18px 28px 48px; } :root { --gap: 18px; } }
+
+.board { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr); grid-auto-flow: row dense; }
+.board > * { min-width: 0; }
+@media (min-width: 768px) {
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .span-2 { grid-column: span 2; }
+}
+@media (min-width: 1200px) {
+  .board { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .area-attention { grid-column: span 7; order: 1; }
+  .area-kpis { grid-column: span 5; order: 2; }
+  .area-mail { grid-column: span 7; order: 3; }
+  .area-calendar { grid-column: span 5; order: 4; }
+  .area-github { grid-column: span 7; order: 5; }
+  .area-reminders { grid-column: span 5; order: 6; }
+  .area-gantt { grid-column: span 12; order: 7; }
+  .area-trello { grid-column: span 8; order: 8; }
+  .area-projects { grid-column: span 4; order: 9; }
+}
+
+/* =========================================================================
+   CARD
+   ========================================================================= */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  min-width: 0;
+  scroll-margin-top: calc(var(--topbar-h) + 12px);
+  transition: box-shadow .25s, border-color .25s;
+}
+.card.flash { border-color: color-mix(in srgb, var(--accent) 70%, transparent); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow); }
+.card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 14px 10px 16px; }
+.card-title { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 200px; }
+.card-ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--line); flex: none; }
+.card-title h2 { font-size: 15.5px; font-weight: 750; letter-spacing: -.01em; line-height: 1.25; }
+.card-sub { font-size: 12.5px; color: var(--text-3); font-weight: 600; }
+.card-sub b { color: var(--text-2); }
+.card-tools { display: flex; align-items: center; gap: 6px; margin-left: auto; min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+.card-body { padding: 0 16px 16px; min-width: 0; }
+.card.is-collapsed .card-head { padding-bottom: 14px; }
+@media (min-width: 768px) { .card-head { padding: 16px 16px 12px 18px; } .card-body { padding: 0 18px 18px; } }
+
+/* shared bits ------------------------------------------------------------ */
+.lamp { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--text-3)); flex: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c, var(--text-3)) 18%, transparent); }
+.lamp.pulse { animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 6%, transparent); } }
+.pill {
+  display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px;
+  border-radius: 99px; font-size: 11.5px; font-weight: 750; white-space: nowrap;
+  color: var(--c, var(--text-2)); background: color-mix(in srgb, var(--c, var(--text-3)) 13%, transparent);
+}
+.pill.quiet { color: var(--text-2); background: var(--surface-2); border: 1px solid var(--line); }
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-3); font-weight: 600; white-space: nowrap; }
+.tag .sw { width: 7px; height: 7px; border-radius: 2px; background: var(--c); }
+.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px -2px 10px; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+.chips::-webkit-scrollbar { display: none; }
+.chips.no-mask { -webkit-mask-image: none; mask-image: none; }
+.chip {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px;
+  border-radius: 99px; border: 1px solid var(--line); background: var(--surface-2);
+  font-size: 12.5px; font-weight: 650; color: var(--text-2);
+}
+.chip:hover { color: var(--text); border-color: var(--line-strong); }
+.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip .n { font-size: 11.5px; opacity: .7; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 38px; padding: 0 14px;
+  border-radius: 10px; font-weight: 700; font-size: 13.5px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text);
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.small { height: 32px; padding: 0 11px; font-size: 12.5px; }
+.link-btn { font-size: 13px; font-weight: 700; color: var(--accent-text); display: inline-flex; align-items: center; gap: 4px; padding: 8px 0 0; }
+.link-btn:hover { text-decoration: underline; }
+.select {
+  height: 32px; padding: 0 28px 0 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface-2);
+  font-size: 12.5px; font-weight: 650; color: var(--text-2); appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8fab' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; background-size: 14px;
+  max-width: 100%;
+}
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 650; color: var(--text-2); cursor: pointer; user-select: none; }
+.toggle input { appearance: none; width: 30px; height: 18px; border-radius: 99px; background: var(--surface-3); position: relative; cursor: pointer; margin: 0; border: 1px solid var(--line); }
+.toggle input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-3); transition: transform .15s; }
+.toggle input:checked { background: var(--accent); border-color: var(--accent); }
+.toggle input:checked::after { transform: translateX(12px); background: #fff; }
+.empty { padding: 22px 10px; text-align: center; color: var(--text-3); font-size: 13.5px; border: 1px dashed var(--line-strong); border-radius: var(--r-md); }
+.bar { height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 99px; background: var(--c, var(--accent)); }
+.avatar {
+  --h: 250;
+  width: 36px; height: 36px; border-radius: 11px; flex: none; display: grid; place-items: center;
+  font-size: 12.5px; font-weight: 800;
+  background: hsl(var(--h) 70% 55% / .15); color: hsl(var(--h) 60% var(--av-fg-l));
+}
+.muted { color: var(--text-3); }
+
+/* =========================================================================
+   ATTENTION
+   ========================================================================= */
+.attention { padding: 16px; }
+@media (min-width: 768px) { .attention { padding: 18px 20px 16px; } }
+.att-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.att-top h2 { font-size: 15.5px; font-weight: 750; display: flex; align-items: center; gap: 10px; }
+.att-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.att-count { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); text-align: left; }
+.att-count:hover { border-color: var(--line-strong); }
+.att-count[aria-pressed="true"] { border-color: color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 8%, var(--surface-2)); }
+.att-count .num { font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; display: flex; align-items: center; gap: 8px; }
+.att-count .lbl { font-size: 12.5px; color: var(--text-2); font-weight: 650; }
+.att-meter { display: flex; gap: 3px; height: 6px; margin: 12px 0 14px; }
+.att-meter span { flex: var(--w) 1 0; border-radius: 99px; background: var(--c); min-width: 6px; }
+.att-list { display: flex; flex-direction: column; }
+.att-item { display: flex; align-items: center; gap: 12px; padding: 10px 6px; margin: 0 -6px; border-radius: 10px; width: calc(100% + 12px); }
+.att-item + .att-item { border-top: 1px solid var(--line); }
+.att-item:hover { background: var(--surface-2); }
+.att-src { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
+.att-text { min-width: 0; flex: 1; }
+.att-text b { display: block; font-weight: 650; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.att-text span { display: block; font-size: 12.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.att-when { font-size: 12px; font-weight: 700; color: var(--c); white-space: nowrap; }
+.att-foot { display: flex; justify-content: space-between; align-items: center; }
+
+/* =========================================================================
+   KPI
+   ========================================================================= */
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; }
+@media (min-width: 560px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.kpi {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+  min-height: 104px; padding: 14px;
+  border-radius: 15px; border: 1px solid var(--line); background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.kpi:hover { border-color: var(--line-strong); }
+.kpi.signal::before {
+  content: ""; position: absolute; z-index: -1; inset: 0;
+  background: radial-gradient(160px 110px at 100% 0%, color-mix(in srgb, var(--c) 22%, transparent), transparent 70%);
+}
+.kpi-top { display: flex; align-items: center; justify-content: space-between; color: var(--text-3); }
+.kpi-top .ic { color: var(--c, var(--text-3)); }
+.kpi-num { font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.kpi-lbl { font-size: 12.5px; font-weight: 650; color: var(--text-2); line-height: 1.3; }
+.kpi-lbl small { display: block; color: var(--text-3); font-size: 11.5px; font-weight: 600; }
+
+/* =========================================================================
+   MAIL
+   ========================================================================= */
+.mail-list { display: flex; flex-direction: column; }
+.mail-row { position: relative; display: flex; align-items: flex-start; gap: 4px; border-radius: var(--r-md); }
+.mail-row + .mail-row { border-top: 1px solid var(--line); }
+.mail-row:hover { background: var(--surface-2); }
+.mail-main { flex: 1; min-width: 0; display: flex; gap: 12px; padding: 12px 6px 12px 8px; }
+.mail-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mail-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.mail-from { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mail-org { font-size: 12.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.mail-top time { margin-left: auto; font-size: 12px; color: var(--text-3); white-space: nowrap; font-weight: 600; }
+.mail-subject { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mail-row:not(.is-unread) .mail-subject { color: var(--text-2); font-weight: 550; }
+.mail-preview { font-size: 13px; color: var(--text-3); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.mail-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.mail-meta .due { font-size: 12px; font-weight: 700; color: var(--c, var(--text-2)); display: inline-flex; gap: 4px; align-items: center; }
+.unread-dot { position: absolute; left: -3px; top: 25px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.mail-done { margin: 10px 4px 0 0; opacity: 0; }
+.mail-row:hover .mail-done, .mail-done:focus-visible { opacity: 1; }
+@media (hover: none) { .mail-done { opacity: 1; } }
+.mail-done:hover { color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+
+/* =========================================================================
+   CALENDAR
+   ========================================================================= */
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg button { height: 26px; padding: 0 10px; border-radius: 7px; font-size: 12.5px; font-weight: 700; color: var(--text-3); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.timeline { position: relative; }
+.tl-item { display: grid; grid-template-columns: 48px 18px minmax(0, 1fr); gap: 0 8px; }
+.tl-time { padding-top: 11px; text-align: right; font-weight: 700; font-size: 13.5px; line-height: 1.2; }
+.tl-time small { display: block; font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+.tl-rail { position: relative; display: flex; justify-content: center; }
+.tl-rail::before { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.tl-item:first-child .tl-rail::before { top: 16px; }
+.tl-item:last-child .tl-rail::before { bottom: calc(100% - 16px); }
+.tl-dot { position: relative; margin-top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--c, var(--line-strong)); }
+.tl-body { display: block; width: 100%; margin: 4px 0; padding: 7px 10px; border-radius: 11px; border: 1px solid transparent; }
+.tl-body:hover { background: var(--surface-2); }
+.tl-title { font-weight: 650; font-size: 14px; display: flex; align-items: center; gap: 6px; line-height: 1.35; }
+.tl-title .ic { color: var(--high); }
+.tl-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 3px; }
+.tl-note { margin-top: 6px; font-size: 12.5px; font-weight: 700; color: var(--accent-text); }
+.tl-item.is-past { opacity: .5; }
+.tl-item.is-past .tl-dot { background: var(--line-strong); border-color: transparent; }
+.tl-item.is-now .tl-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.tl-item.is-now .tl-body { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.tl-item.is-next .tl-body { border-color: var(--line-strong); }
+.tl-item.is-next .tl-dot { border-color: var(--accent); }
+.tl-progress { margin-top: 8px; }
+.cal-day { font-size: 12.5px; font-weight: 750; color: var(--text-2); padding: 12px 0 4px; }
+.cal-day:first-child { padding-top: 0; }
+.cal-foot { margin-top: 10px; padding: 10px 12px; border-radius: 11px; background: var(--surface-2); font-size: 13px; color: var(--text-2); }
+.cat-meeting { --c: var(--accent); }
+.cat-focus { --c: #2fbfa9; }
+.cat-personal { --c: var(--text-3); }
+.cat-study { --c: var(--low); }
+.cat-deadline { --c: var(--high); }
+
+/* =========================================================================
+   GITHUB
+   ========================================================================= */
+.gh-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.gh-toolbar .chips { margin: -2px; flex: 1 1 200px; min-width: 0; }
+.gh-list { display: flex; flex-direction: column; }
+.gh-row + .gh-row { border-top: 1px solid var(--line); }
+.gh-main { width: 100%; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 12px; padding: 11px 8px; border-radius: var(--r-md); }
+.gh-main:hover { background: var(--surface-2); }
+.gh-state { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
+.gh-content { flex: 1; min-width: 0; }
+.gh-title { display: block; font-weight: 650; font-size: 14px; line-height: 1.35; }
+.gh-meta { display: block; font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.gh-meta .repo { color: var(--text-2); font-weight: 650; }
+.gh-side { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; flex-basis: 100%; padding-left: 42px; }
+@media (min-width: 640px) {
+  .gh-main { align-items: center; }
+  .gh-main { flex-wrap: nowrap; }
+  .gh-side { margin-top: 0; justify-content: flex-end; flex: none; flex-basis: auto; padding-left: 0; max-width: 45%; }
+  .gh-content { display: flex; flex-direction: column; }
+}
+
+/* =========================================================================
+   REMINDERS
+   ========================================================================= */
+.rem-list { display: flex; flex-direction: column; }
+.rem-row { display: flex; align-items: center; gap: 12px; padding: 9px 6px; border-radius: 10px; }
+.rem-row + .rem-row { border-top: 1px solid var(--line); }
+.rem-row:hover { background: var(--surface-2); }
+.check { appearance: none; margin: 0; flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line-strong); display: grid; place-items: center; cursor: pointer; background: var(--surface); }
+.check::after { content: ""; width: 10px; height: 6px; border: 2px solid transparent; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px, -1px); }
+.check:checked { background: var(--ok); border-color: var(--ok); }
+.check:checked::after { border-color: #fff; }
+.check:hover { border-color: var(--accent); }
+.rem-text { flex: 1; min-width: 0; }
+.rem-text label { display: block; font-weight: 600; font-size: 14px; cursor: pointer; line-height: 1.35; }
+.rem-sub { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+.rem-due { font-size: 12.5px; font-weight: 700; white-space: nowrap; color: var(--text-2); }
+.rem-due.overdue { color: var(--crit); }
+.rem-due.today { color: var(--accent-text); }
+.rem-row.is-done label { text-decoration: line-through; color: var(--text-3); }
+.rem-row.is-done .rem-due { color: var(--text-3); }
+.rem-add { display: flex; gap: 8px; margin-top: 12px; }
+.rem-add input[type="text"] { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); outline: 0; }
+.rem-add input[type="text"]:focus { border-color: color-mix(in srgb, var(--accent) 60%, transparent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.rem-add .select { height: 38px; }
+@media (max-width: 380px) { .rem-add { flex-wrap: wrap; } .rem-add input[type="text"] { flex-basis: 100%; } .rem-add .select, .rem-add .btn { flex: 1; } }
+
+/* =========================================================================
+   TRELLO / KANBAN
+   ========================================================================= */
+.kb { container-type: inline-size; container-name: kb; }
+.kb .seg { display: flex; width: 100%; margin-bottom: 12px; }
+.kb .seg button { flex: 1; min-width: 0; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
+.kb-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.kb-col { display: none; }
+.kb-col.is-active { display: block; }
+.kb-col-head { display: none; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 750; color: var(--text-2); padding: 2px 4px 8px; }
+.kb-col-head .n { color: var(--text-3); }
+.kb-cards { display: flex; flex-direction: column; gap: 8px; }
+.kb-card { width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); }
+.kb-card:hover { border-color: var(--line-strong); }
+.kb-title { font-weight: 650; font-size: 13.5px; line-height: 1.35; }
+.kb-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.kb-label { font-size: 11px; font-weight: 750; padding: 2px 7px; border-radius: 99px; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
+.kb-col[data-col="done"] .kb-title { color: var(--text-3); text-decoration: line-through; }
+@container kb (min-width: 620px) {
+  .kb .seg { display: none; }
+  .kb-cols { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kb-col { display: flex; flex-direction: column; padding: 10px; border-radius: 14px; background: color-mix(in srgb, var(--surface-2) 50%, transparent); border: 1px solid var(--line); }
+  .kb-col-head { display: flex; }
+  .kb-card { background: var(--surface); }
+}
+.lbl-hmi { --c: #2fbfa9; } .lbl-backend { --c: var(--accent); } .lbl-docs { --c: var(--low); }
+.lbl-robotics { --c: var(--high); } .lbl-ai { --c: #d465c9; } .lbl-devops { --c: var(--ok); }
+
+/* =========================================================================
+   GANTT
+   ========================================================================= */
+.gantt { display: flex; flex-direction: column; gap: 12px; }
+.g-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px 10px; flex-wrap: wrap; }
+.g-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn.warn { border-color: color-mix(in srgb, var(--high) 55%, transparent); color: var(--high); }
+.btn .badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--high); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+.g-legend { display: flex; gap: 6px 14px; flex-wrap: wrap; }
+.g-legend .st-on-track { --c: var(--g-blue); }
+.g-legend .dep-sw { width: 16px; height: 2px; background: var(--dep); border-radius: 2px; }
+.g-legend .dep-sw.bad { background: repeating-linear-gradient(90deg, var(--crit) 0 4px, transparent 4px 7px); }
+.g-list { display: flex; flex-direction: column; gap: 8px; }
+
+.g-scroll { margin: 0 -16px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); scrollbar-width: thin; }
+@media (min-width: 768px) { .g-scroll { margin: 0 -18px; } }
+.g-canvas { position: relative; --hatch: repeating-linear-gradient(135deg, color-mix(in srgb, var(--text) 11%, transparent) 0 1px, transparent 1px 9px); }
+.g-weeks, .g-days { display: flex; height: 42px; border-bottom: 1px solid var(--line); }
+.g-week { flex: none; width: calc(var(--dw) * 7); display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 14px; border-right: 1px solid var(--line); font-size: 13.5px; font-weight: 750; color: var(--text-2); white-space: nowrap; overflow: hidden; }
+.g-week small { font-size: 12px; color: var(--text-3); font-weight: 700; }
+.g-day { flex: none; width: var(--dw); display: grid; place-items: center; border-right: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--text-2); white-space: nowrap; overflow: hidden; }
+.g-day.we { background: var(--hatch); color: var(--text-3); }
+.g-day.today span { background: var(--accent); color: var(--on-accent); padding: 2px 8px; border-radius: 7px; font-weight: 800; }
+.g-plot { position: relative; background-image: linear-gradient(90deg, var(--line) 0 1px, transparent 1px); background-size: var(--dw) 100%; }
+.g-we { position: absolute; top: 0; bottom: 0; background: var(--hatch); }
+.g-now { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--accent); opacity: .75; z-index: 1; }
+.g-group { position: absolute; border: 1px dashed var(--line-strong); border-radius: 18px; background: color-mix(in srgb, var(--surface-2) 75%, transparent); }
+.g-deps { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; overflow: visible; }
+.g-deps path { fill: none; stroke: var(--dep); stroke-width: 1.6; }
+.g-deps path.bad { stroke: var(--crit); stroke-width: 2; stroke-dasharray: 5 4; }
+.gb, .gp { position: absolute; z-index: 3; height: 40px; overflow: clip; display: flex; align-items: center; text-align: left; color: var(--text); }
+.gb { border-radius: 20px; border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); background: color-mix(in srgb, var(--c) 14%, var(--surface)); }
+.gb:hover { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); }
+.gp { border-radius: 14px 14px 0 0; background: color-mix(in srgb, var(--c) 22%, var(--surface)); clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - 12px) calc(100% - 8px), 12px calc(100% - 8px), 0 100%); }
+.gp:hover { background: color-mix(in srgb, var(--c) 28%, var(--surface)); }
+.gb.st-on-track, .gp.st-on-track { --c: var(--g-blue); }
+.gb.st-not-started { border-style: dashed; }
+.gb-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: color-mix(in srgb, var(--c) 32%, var(--surface)); }
+.gp .gb-fill { background: color-mix(in srgb, var(--c) 36%, var(--surface)); }
+.gb-label { position: sticky; left: 0; z-index: 1; display: flex; align-items: center; gap: 10px; max-width: 100%; min-width: 0; padding: 0 12px 0 16px; white-space: nowrap; font-size: 14px; }
+.gp .gb-label { padding-bottom: 6px; gap: 8px; padding-left: 12px; }
+.gb-id { flex: none; font-weight: 650; color: color-mix(in srgb, var(--c) 78%, var(--text)); }
+.gb-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.gb.st-done .gb-id { text-decoration: line-through; }
+.gb.st-done .gb-title { color: var(--text-2); }
+.gp .ic { flex: none; color: var(--text-2); }
+.gtag { flex: none; font-size: 12px; font-weight: 650; padding: 2px 9px; border-radius: 7px; background: var(--surface); color: var(--text); border: 1px solid var(--line); line-height: 1.5; }
+.gtag.important { background: #7d1d5f; color: #fff; border-color: transparent; }
+.gtag.client { background: color-mix(in srgb, var(--low) 16%, var(--surface)); color: var(--low); border-color: transparent; }
+.gtag.health { color: var(--c); border-color: color-mix(in srgb, var(--c) 40%, transparent); }
+.g-mark { position: absolute; z-index: 3; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; transform: rotate(45deg); background: var(--surface); border: 2px solid var(--c); pointer-events: none; }
+.gm-item { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 13px; border: 1px solid var(--line); background: var(--surface-2); }
+.gm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.gm-project { font-size: 12px; color: var(--text-3); font-weight: 700; }
+.gm-title { font-weight: 700; font-size: 14.5px; line-height: 1.3; }
+.gm-range { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12px; font-weight: 700; color: var(--text-2); }
+.gm-track { position: relative; height: 10px; }
+.gm-track::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 2px; background: var(--line-strong); border-radius: 2px; }
+.gm-span { position: absolute; top: 2px; height: 6px; border-radius: 4px; background: var(--c); }
+.gm-today { position: absolute; top: -2px; width: 2px; height: 14px; margin-left: -1px; background: var(--accent); border-radius: 2px; }
+.gm-progress { display: flex; align-items: center; gap: 10px; }
+.gm-progress .bar { flex: 1; height: 8px; }
+.gm-progress b { font-size: 13px; }
+.gm-dep { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 5px; }
+
+/* =========================================================================
+   PROJECTS
+   ========================================================================= */
+.proj-list { display: flex; flex-direction: column; gap: 4px; }
+.proj { width: 100%; display: flex; flex-direction: column; gap: 7px; padding: 11px 8px; border-radius: 12px; }
+.proj:hover { background: var(--surface-2); }
+.proj + .proj { border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; }
+.proj-top { display: flex; align-items: center; gap: 10px; }
+.proj-top b { font-weight: 700; font-size: 14px; flex: 1; min-width: 0; }
+.proj-top .pct { font-size: 13px; font-weight: 800; }
+.proj-next { font-size: 12.5px; color: var(--text-3); }
+.proj-next b { color: var(--text-2); font-weight: 650; }
+
+/* =========================================================================
+   BOTTOM NAV (mobile)
+   ========================================================================= */
+.bottomnav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  padding: 6px 4px env(safe-area-inset-bottom, 0px);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+}
+.bn-link { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; min-height: 50px; justify-content: center; border-radius: 10px; color: var(--text-3); font-size: 10.5px; font-weight: 700; }
+.bn-link[aria-current="true"] { color: var(--accent-text); }
+.bn-link[aria-current="true"] .ic { stroke-width: 2.2; }
+.bn-link .nav-count { position: absolute; top: 2px; left: calc(50% + 4px); min-width: 16px; height: 16px; font-size: 10px; padding: 0 4px; margin: 0; }
+@media (min-width: 768px) { .bottomnav { display: none; } }
+
+/* =========================================================================
+   DRAWER, TOOLTIP, TOAST
+   ========================================================================= */
+.drawer-root { position: fixed; inset: 0; z-index: 60; }
+.drawer-backdrop { position: absolute; inset: 0; background: var(--scrim); animation: fade .2s ease; }
+.drawer {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 88dvh; max-height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--surface); border-top: 1px solid var(--line-strong);
+  border-radius: 20px 20px 0 0; box-shadow: var(--shadow-pop);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: sheet .25s cubic-bezier(.2,.8,.2,1);
+}
+@media (min-width: 768px) {
+  .drawer { left: auto; top: 0; bottom: 0; width: min(460px, 92vw); max-height: none; border-radius: 0; border-top: 0; border-left: 1px solid var(--line-strong); animation: slide .25s cubic-bezier(.2,.8,.2,1); padding-top: env(safe-area-inset-top, 0px); }
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes sheet { from { transform: translateY(40px); opacity: 0; } }
+@keyframes slide { from { transform: translateX(40px); opacity: 0; } }
+.drawer-head { display: flex; gap: 12px; align-items: flex-start; padding: 18px 18px 12px; border-bottom: 1px solid var(--line); }
+.drawer-head > div { flex: 1; min-width: 0; }
+.drawer-kicker { font-size: 12.5px; color: var(--text-3); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.drawer-head h2 { font-size: 18px; line-height: 1.3; font-weight: 800; letter-spacing: -.01em; margin-top: 4px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+.drawer-foot { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 18px 16px; border-top: 1px solid var(--line); }
+.drawer-foot:empty { display: none; }
+.kv { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 12px; font-size: 13.5px; }
+.kv dt { color: var(--text-3); font-weight: 650; }
+.kv dd { margin: 0; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.prose { font-size: 14px; line-height: 1.6; color: var(--text-2); white-space: pre-line; }
+.d-section h3 { font-size: 12.5px; color: var(--text-3); font-weight: 750; margin-bottom: 8px; }
+.file { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13px; font-weight: 600; }
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 0; }
+.check-row + .check-row { border-top: 1px solid var(--line); }
+.check-row .ic { color: var(--c); }
+.move-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.move-grid .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+
+.tooltip {
+  position: fixed; z-index: 80; pointer-events: none;
+  padding: 6px 9px; border-radius: 8px; max-width: 260px;
+  background: var(--text); color: var(--bg); font-size: 12px; font-weight: 650; line-height: 1.35;
+  box-shadow: var(--shadow-pop); opacity: 0; transition: opacity .12s;
+}
+.tooltip.show { opacity: 1; }
+.toast {
+  position: fixed; z-index: 70; left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px) + 14px);
+  display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 16px;
+  border-radius: 12px; background: var(--text); color: var(--bg); font-weight: 650; font-size: 13.5px;
+  box-shadow: var(--shadow-pop); max-width: calc(100vw - 24px); animation: sheet .2s ease;
+}
+.toast button { font-weight: 800; color: var(--bg); padding: 6px 10px; border-radius: 8px; background: color-mix(in srgb, var(--bg) 16%, transparent); }
+@media (min-width: 768px) { .toast { bottom: 24px; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============================== SIDEBAR ============================== -->
+  <aside class="sidebar" aria-label="Sections">
+    <div class="brand"><span class="brand-mark" data-slot="logo"></span><span class="brand-name">Command</span></div>
+    <nav class="nav" data-slot="sidenav"></nav>
+    <div class="side-foot">
+      <button class="side-profile" data-action="open-profile" data-tip-rail="Profile and data sources">
+        <span class="avatar-btn" data-bind="initials"></span>
+        <span class="who"><b data-bind="username"></b><span data-bind="role"></span></span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- ============================== HEADER ============================== -->
+    <header>
+      <div class="topbar" id="topbar">
+        <div class="brand"><span class="brand-mark" data-slot="logo"></span><span class="brand-name">Command</span></div>
+        <span class="topbar-date" data-bind="date-short"></span>
+        <div class="topbar-spacer"></div>
+        <div class="search" role="search">
+          <label class="search-field">
+            <span data-slot="icon-search"></span>
+            <span class="sr-only">Search everything</span>
+            <input id="search" type="search" autocomplete="off" placeholder="Search mail, PRs, tasks, events" aria-controls="search-results" aria-expanded="false">
+            <span class="kbd" aria-hidden="true">/</span>
+            <button type="button" class="icon-btn search-close" data-action="search-close" aria-label="Close search" data-slot="icon-x"></button>
+          </label>
+          <div class="popover" id="search-results" role="listbox" hidden></div>
+        </div>
+        <button class="icon-btn search-toggle" data-action="search-open" aria-label="Search" data-slot="icon-search"></button>
+        <div class="notif-wrap">
+          <button class="icon-btn" id="notif-btn" data-action="notif-toggle" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel" data-tip="Notifications"><span data-slot="icon-bell"></span><span class="dot" data-bind="notif-count" hidden></span></button>
+          <div class="popover" id="notif-panel" hidden></div>
+        </div>
+        <button class="icon-btn" data-action="theme-toggle" data-bind="theme-btn" aria-label="Switch theme"></button>
+        <button class="avatar-btn" data-action="open-profile" data-bind="initials" aria-label="Profile and data sources" data-tip="Profile and data sources"></button>
+      </div>
+      <div class="hello">
+        <h1 data-bind="greeting"></h1>
+        <p data-bind="day-status"></p>
+      </div>
+    </header>
+
+    <!-- ============================== BOARD =============================== -->
+    <main class="content" id="content">
+      <div class="board">
+        <section class="card attention area-attention span-2" id="overview" aria-labelledby="att-title"></section>
+        <section class="kpis area-kpis span-2" id="kpis" aria-label="Today at a glance"></section>
+        <section class="card area-mail span-2" id="mail" aria-labelledby="mail-title"></section>
+        <section class="card area-calendar" id="calendar" aria-labelledby="calendar-title"></section>
+        <section class="card area-reminders" id="reminders" aria-labelledby="reminders-title"></section>
+        <section class="card area-github span-2" id="github" aria-labelledby="github-title"></section>
+        <section class="card area-gantt span-2" id="gantt" aria-labelledby="gantt-title"></section>
+        <section class="card area-trello span-2" id="trello" aria-labelledby="trello-title"></section>
+        <section class="card area-projects span-2" id="projects" aria-labelledby="projects-title"></section>
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottomnav" aria-label="Sections" data-slot="bottomnav"></nav>
+</div>
+
+<div class="drawer-root" id="drawer" hidden>
+  <div class="drawer-backdrop" data-action="drawer-close"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title"></aside>
+</div>
+<div class="tooltip" id="tooltip" role="tooltip"></div>
+<div id="toast-root" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ==========================================================================
+   COMMAND: personal command center
+   --------------------------------------------------------------------------
+   The script is split into layers that map 1:1 to files in a real project:
+
+     1. config/         user-facing text, locale
+     2. types/          JSDoc typedefs (Email, CalendarEvent, PullRequest, ...)
+     3. mock/           fake data, one factory per source
+     4. data/           DataSource interface + MockDataSource  (swap here)
+     5. domain/         pure business logic: status, attention, KPIs
+     6. state/          tiny store + actions
+     7. ui/primitives   format helpers, icons, small building blocks
+     8. ui/components   one render function per widget
+     9. app/            layout, events, boot
+
+   UI components never touch mock data directly: they only read the store,
+   which is filled through `dataSource`. Replace MockDataSource with an
+   implementation that calls Gmail / Graph / GitHub / Trello and nothing
+   above layer 4 changes.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 1. CONFIG */
+const CONFIG = {
+  user: { name: 'Marco', initials: 'M', role: 'Automation & software, Sistec', githubLogin: 'marco-v' },
+  locale: 'en-US',
+  timeLocale: 'en-GB',
+  refreshMs: 60_000,
+  listPreview: 5,
+};
+
+/* ----------------------------------------------------------------- 2. TYPES */
+/** @typedef {'critical'|'high'|'medium'|'low'|'normal'} Priority */
+/** @typedef {'urgent'|'needs-reply'|'fyi'|'waiting'|'archived'} MailCategory */
+/**
+ * @typedef {Object} Email
+ * @property {string} id
+ * @property {{name:string, org:string, address:string}} from
+ * @property {string} subject
+ * @property {string} preview
+ * @property {string} body
+ * @property {Date} receivedAt
+ * @property {MailCategory} category
+ * @property {Priority} priority
+ * @property {string[]} attachments
+ * @property {Date=} deadline
+ * @property {boolean} read
+ * @property {boolean} done
+ */
+/**
+ * @typedef {Object} CalendarEvent
+ * @property {string} id
+ * @property {string} title
+ * @property {Date} start
+ * @property {Date} end
+ * @property {'meeting'|'focus'|'personal'|'study'|'deadline'} category
+ * @property {string=} location
+ * @property {string=} videoLink
+ * @property {boolean} important
+ * @property {string[]} attendees
+ * @property {string=} notes
+ */
+/**
+ * @typedef {Object} PullRequest
+ * @property {string} id
+ * @property {string} repo
+ * @property {number} number
+ * @property {string} title
+ * @property {string} author
+ * @property {'open'|'draft'|'blocked'|'changes-requested'} status
+ * @property {{total:number, passed:number, failed:number, pending:number, failedNames:string[]}} checks
+ * @property {boolean} reviewRequested
+ * @property {boolean} involved
+ * @property {Date} createdAt
+ * @property {Priority} priority
+ * @property {string=} blockedBy
+ */
+/**
+ * @typedef {Object} GithubIssue
+ * @property {string} id
+ * @property {'deploy'|'actions'|'bug'|'issue'|'security'} kind
+ * @property {string} repo
+ * @property {number=} number
+ * @property {string} title
+ * @property {string} detail
+ * @property {'error'|'warning'|'blocked'|'success'} state
+ * @property {Priority} level
+ * @property {Date} createdAt
+ * @property {boolean} acknowledged
+ */
+/**
+ * @typedef {Object} Reminder
+ * @property {string} id
+ * @property {string} title
+ * @property {Date} due
+ * @property {boolean} hasTime
+ * @property {Priority} priority
+ * @property {string} category
+ * @property {boolean} done
+ */
+/**
+ * @typedef {Object} Task  Trello card
+ * @property {string} id
+ * @property {string} title
+ * @property {'todo'|'doing'|'review'|'done'} column
+ * @property {string} board
+ * @property {string[]} labels
+ * @property {Date=} due
+ * @property {{done:number,total:number}=} checklist
+ */
+/** @typedef {{id:string, key:string, name:string, area:string, owner:string}} Project */
+/**
+ * @typedef {Object} GanttTask
+ * @property {string} id
+ * @property {string} projectId
+ * @property {string} key      ticket key, e.g. HMI-42
+ * @property {string[]} tags  e.g. Important, Star, Client
+ * @property {string} title
+ * @property {string} assignee
+ * @property {Date} start
+ * @property {Date} end
+ * @property {Date=} deadline
+ * @property {number} progress 0..100
+ * @property {string[]} dependsOn
+ */
+
+/* ------------------------------------------------------------------ 3. MOCK */
+const MIN = 60_000, HOUR = 3_600_000, DAY = 86_400_000;
+const minutesAgo = (m) => new Date(Date.now() - m * MIN);
+const inMinutes = (m) => new Date(Date.now() + m * MIN);
+/** A date `offset` days from today at h:m local time. */
+function onDay(offset, h = 0, m = 0) { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + offset); d.setHours(h, m, 0, 0); return d; }
+
+/** Ticket keys and tags as they would come from the company planning tool. */
+const GANTT_META = {
+  g1: ['HMI-41', []], g2: ['HMI-42', ['Important']], g3: ['HMI-43', ['Client']], gx1: ['HMI-39', []],
+  g4: ['AIS-4', ['Star']], g5: ['AIS-5', []], g6: ['PEL-17', ['Star']], g7: ['PEL-18', []], gx2: ['PEL-15', []],
+  g8: ['ATX-57', ['Important']], g9: ['UNI-9', []], g10: ['UNI-10', ['Star']],
+};
+const withGanttMeta = (list) => list.map((t) => ({ ...t, key: GANTT_META[t.id][0], tags: GANTT_META[t.id][1] }));
+
+const mock = {
+  /** @returns {Email[]} */
+  emails: () => [
+    { id: 'm1', from: { name: 'Luca Bortolan', org: 'Sistec AM', address: 'l.bortolan@sistec.example' },
+      subject: 'Line 3 HMI keeps losing the PLC connection',
+      preview: "Since this morning's update the production HMI on line 3 drops the TCP session every few minutes. Operators are working without alarms.",
+      body: "Hi Marco,\n\nsince this morning's update (build 5309.4.2) the production HMI on line 3 drops the TCP session with the PLC every 3 to 5 minutes. It reconnects on its own, but during the gap operators don't see alarms.\n\nLog from the panel attached. Can you take a look before the afternoon shift starts? If we need to roll back I have to tell the plant manager by 14:00.\n\nLuca",
+      receivedAt: minutesAgo(12), category: 'urgent', priority: 'critical', attachments: ['hmi-line3-0922.log'], deadline: inMinutes(150), read: false, done: false },
+    { id: 'm4', from: { name: 'Giulia Ferro', org: 'KUKA Italia', address: 'giulia.ferro@kuka.example' },
+      subject: 'KR 10 integration: confirm TCP payload spec',
+      preview: 'Attached the v3 interface spec. We need your confirmation on the frame layout and heartbeat interval before we lock the robot program.',
+      body: "Ciao Marco,\n\nattached is v3 of the interface spec for the KR 10 R1100 cell. Two open points:\n\n1. Frame layout for the position feedback (we moved the status word to byte 0).\n2. Heartbeat interval: 100 ms or 250 ms?\n\nWe'd like to lock the robot program tomorrow, so a reply by midday would help.\n\nGiulia",
+      receivedAt: minutesAgo(95), category: 'needs-reply', priority: 'high', attachments: ['KR10_interface_spec_v3.pdf'], deadline: onDay(1, 12, 0), read: false, done: false },
+    { id: 'm2', from: { name: 'Epicode Institute', org: 'University', address: 'no-reply@epicode.example' },
+      subject: 'Computer Vision project: submission closes Friday',
+      preview: 'Upload the final report and repository link before Friday 23:59. Late submissions move to the next session.',
+      body: "Reminder: the Computer Vision project submission window closes on Friday at 23:59.\n\nUpload the final report (PDF) and the repository link from the course page. Late submissions move to the next exam session.",
+      receivedAt: minutesAgo(64), category: 'needs-reply', priority: 'medium', attachments: [], deadline: onDay(3, 23, 59), read: true, done: false },
+    { id: 'm5', from: { name: 'Davide Zanon', org: 'Sistec', address: 'd.zanon@sistec.example' },
+      subject: 'Pellucida: Redis keyspace proposal',
+      preview: "I wrote down a first keyspace layout for tag values and alarm state. Would like your view before Thursday's review.",
+      body: "Hi Marco,\n\nI drafted a keyspace layout for Pellucida: one hash per device for tag values, streams for alarm history, pub/sub only for UI invalidation.\n\nCould you have a look before Thursday's architecture review? Mostly worried about TTLs on the alarm streams.\n\nDavide",
+      receivedAt: minutesAgo(180), category: 'needs-reply', priority: 'medium', attachments: ['pellucida-keyspace.md'], read: false, done: false },
+    { id: 'm3', from: { name: 'GitHub', org: 'sistec/hmi-5309', address: 'notifications@github.example' },
+      subject: 'PR #248 requires your review',
+      preview: 'dzanon requested your review on "MES order sync over OPC UA".',
+      body: 'dzanon requested your review on sistec/hmi-5309#248 "MES order sync over OPC UA".',
+      receivedAt: minutesAgo(125), category: 'fyi', priority: 'medium', attachments: [], read: true, done: false },
+    { id: 'm6', from: { name: 'Sara Pavan', org: 'Sistec PMO', address: 's.pavan@sistec.example' },
+      subject: 'Q4 Gantt baseline published',
+      preview: 'The Q4 baseline is live. Your HMI 5309 and Pellucida tasks were re-planned, please check the new dates.',
+      body: "Hi all,\n\nthe Q4 baseline is published in the planning tool. HMI 5309 FAT moved one week later, Pellucida API architecture got two more days.\n\nSara",
+      receivedAt: minutesAgo(300), category: 'fyi', priority: 'low', attachments: [], read: true, done: false },
+    { id: 'm7', from: { name: 'Elena Rossi', org: 'Machine Learning course', address: 'e.rossi@epicode.example' },
+      subject: 'Oral exam slots published',
+      preview: 'Slots for the October session are online. Book yours by Monday.',
+      body: 'Slots for the October oral exams are online on the course page. Book yours by Monday.',
+      receivedAt: minutesAgo(60 * 20), category: 'fyi', priority: 'low', attachments: [], read: true, done: false },
+    { id: 'm8', from: { name: 'Beckhoff Italia', org: 'Supplier', address: 'orders@beckhoff.example' },
+      subject: 'Order 45021: panel PCs ship next week',
+      preview: 'Waiting on the tracking number. Two CP6606 units confirmed for Monday dispatch.',
+      body: 'Order 45021: two CP6606 panel PCs are confirmed for dispatch on Monday. Tracking number to follow.',
+      receivedAt: minutesAgo(60 * 26), category: 'waiting', priority: 'normal', attachments: [], read: true, done: false },
+    { id: 'm9', from: { name: 'Andrea Marin', org: 'Sistec Sales', address: 'a.marin@sistec.example' },
+      subject: 'HMI 5310 offer sent to the client',
+      preview: 'Offer is out. Waiting for their sign-off before we plan engineering hours.',
+      body: 'The HMI 5310 offer is out. Waiting for the client to sign off before we plan engineering hours.',
+      receivedAt: minutesAgo(60 * 48), category: 'waiting', priority: 'normal', attachments: ['Offer_HMI5310.pdf'], read: true, done: false },
+    { id: 'm10', from: { name: 'Docker', org: 'Billing', address: 'billing@docker.example' },
+      subject: 'Your Docker subscription renews in 14 days',
+      preview: 'No action needed if your payment method is up to date.',
+      body: 'Your Docker Pro subscription renews in 14 days. No action needed if your payment method is up to date.',
+      receivedAt: minutesAgo(60 * 30), category: 'fyi', priority: 'low', attachments: [], read: true, done: false },
+    { id: 'm11', from: { name: 'AWS', org: 'Billing', address: 'billing@aws.example' },
+      subject: 'Your August invoice is available',
+      preview: 'Invoice for account sistec-dev is ready to download.',
+      body: 'The August invoice for account sistec-dev is ready.',
+      receivedAt: minutesAgo(60 * 24 * 6), category: 'archived', priority: 'normal', attachments: [], read: true, done: true },
+  ],
+
+  /** @returns {CalendarEvent[]} */
+  calendar: () => [
+    { id: 'e1', title: 'Team stand-up', start: onDay(0, 9, 0), end: onDay(0, 9, 15), category: 'meeting', videoLink: 'Teams', important: false, attendees: ['Automation team'] },
+    { id: 'e2', title: 'Code review: Pellucida API', start: onDay(0, 10, 30), end: onDay(0, 11, 15), category: 'focus', location: 'Room Adige', important: false, attendees: ['Davide Zanon'] },
+    { id: 'e3', title: 'Lunch', start: onDay(0, 13, 0), end: onDay(0, 14, 0), category: 'personal', important: false, attendees: [] },
+    { id: 'e4', title: 'AI strategy meeting', start: onDay(0, 14, 30), end: onDay(0, 15, 30), category: 'meeting', location: 'Room Brenta', important: true, attendees: ['Sara Pavan', 'CTO office'], notes: 'Bring the AI tools evaluation matrix.' },
+    { id: 'e5', title: 'HMI 5309 client call', start: onDay(0, 16, 0), end: onDay(0, 16, 30), category: 'meeting', videoLink: 'Teams', important: true, attendees: ['Luca Bortolan', 'Client plant manager'] },
+    { id: 'e6', title: 'Study: neural networks', start: onDay(0, 18, 0), end: onDay(0, 19, 30), category: 'study', important: false, attendees: [], notes: 'Chapter 6, backprop exercises.' },
+    { id: 'e7', title: 'Sprint planning, Atix', start: onDay(1, 9, 30), end: onDay(1, 10, 30), category: 'meeting', videoLink: 'Teams', important: false, attendees: ['Atix team'] },
+    { id: 'e8', title: 'KUKA integration workshop', start: onDay(1, 15, 0), end: onDay(1, 17, 0), category: 'meeting', location: 'Sistec lab, line 3', important: true, attendees: ['Giulia Ferro', 'Robotics team'] },
+    { id: 'e9', title: '1:1 with Sara', start: onDay(2, 11, 0), end: onDay(2, 11, 30), category: 'meeting', location: 'Room Piave', important: false, attendees: ['Sara Pavan'] },
+    { id: 'e10', title: 'Pellucida architecture review', start: onDay(2, 15, 0), end: onDay(2, 16, 0), category: 'meeting', location: 'Room Adige', important: false, attendees: ['Davide Zanon', 'Federico Basso'] },
+    { id: 'e11', title: 'CV project submission', start: onDay(3, 23, 0), end: onDay(3, 23, 59), category: 'deadline', important: true, attendees: [] },
+    { id: 'e12', title: 'HMI 5309 FAT dry run', start: onDay(6, 8, 30), end: onDay(6, 17, 30), category: 'meeting', location: 'Sistec lab, line 3', important: true, attendees: ['Luca Bortolan'] },
+  ],
+
+  /** @returns {PullRequest[]} */
+  pulls: () => [
+    { id: 'p1', repo: 'sistec/hmi-5309', number: 248, title: 'MES order sync over OPC UA', author: 'dzanon', status: 'open',
+      checks: { total: 14, passed: 14, failed: 0, pending: 0, failedNames: [] }, reviewRequested: true, involved: true, createdAt: minutesAgo(125), priority: 'high' },
+    { id: 'p2', repo: 'sistec/pellucida', number: 91, title: 'Redis pub/sub for tag updates', author: 'fbasso', status: 'open',
+      checks: { total: 18, passed: 16, failed: 2, pending: 0, failedNames: ['TagCacheTests', 'lint'] }, reviewRequested: true, involved: true, createdAt: minutesAgo(60 * 26), priority: 'medium' },
+    { id: 'p3', repo: 'sistec/atix-backend', number: 57, title: 'SLA escalation for stale tickets', author: 'marco-v', status: 'blocked', blockedBy: '#55 schema migration',
+      checks: { total: 9, passed: 5, failed: 0, pending: 4, failedNames: [] }, reviewRequested: false, involved: true, createdAt: minutesAgo(60 * 72), priority: 'medium' },
+    { id: 'p4', repo: 'sistec/sistec-skills', number: 23, title: 'Add codesys-review skill', author: 'edallaval', status: 'open',
+      checks: { total: 6, passed: 6, failed: 0, pending: 0, failedNames: [] }, reviewRequested: true, involved: true, createdAt: minutesAgo(60 * 50), priority: 'low' },
+    { id: 'p5', repo: 'marco-v/cv-plant-disease', number: 12, title: 'ViT pipeline with mixup augmentation', author: 'marco-v', status: 'draft',
+      checks: { total: 4, passed: 3, failed: 1, pending: 0, failedNames: ['pytest (3.11)'] }, reviewRequested: false, involved: true, createdAt: minutesAgo(300), priority: 'medium' },
+    { id: 'p6', repo: 'sistec/hmi-5309', number: 251, title: 'Fix alarm banner layout on 1024x768 panels', author: 'fbasso', status: 'changes-requested',
+      checks: { total: 14, passed: 14, failed: 0, pending: 0, failedNames: [] }, reviewRequested: false, involved: true, createdAt: minutesAgo(35), priority: 'low' },
+  ],
+
+  /** @returns {GithubIssue[]} */
+  issues: () => [
+    { id: 'i1', kind: 'deploy', repo: 'sistec/hmi-5309', title: 'Production deploy failed: image push timed out', detail: 'Workflow deploy-prod #412 stopped at "push image" after 10 min. The line 3 hotfix is not live.', state: 'error', level: 'critical', createdAt: minutesAgo(40), acknowledged: false },
+    { id: 'i2', kind: 'actions', repo: 'sistec/pellucida', title: 'build-and-test failed on main', detail: '3 tests failing in TagCacheTests after merge of #89.', state: 'error', level: 'high', createdAt: minutesAgo(25), acknowledged: false },
+    { id: 'i3', kind: 'bug', repo: 'sistec/atix-backend', number: 142, title: 'NullPointerException when reassigning a closed ticket', detail: 'Assigned to you. Reported by support, 4 occurrences today.', state: 'error', level: 'medium', createdAt: minutesAgo(60 * 7), acknowledged: false },
+    { id: 'i4', kind: 'issue', repo: 'sistec/hmi-5309', number: 310, title: 'Alarm banner overlaps footer on 1024x768 panels', detail: 'Assigned to you. Fix in progress in #251.', state: 'warning', level: 'low', createdAt: minutesAgo(60 * 30), acknowledged: false },
+    { id: 'i5', kind: 'actions', repo: 'marco-v/cv-plant-disease', title: 'nightly-train waiting for runner', detail: 'Self-hosted runner gpu-01 has been offline for 9 hours.', state: 'blocked', level: 'medium', createdAt: minutesAgo(60 * 9), acknowledged: false },
+    { id: 'i6', kind: 'security', repo: 'sistec/sistec-skills', title: '3 vulnerable dependencies', detail: 'Dependabot: 1 moderate, 2 low. Upgrade paths available.', state: 'warning', level: 'low', createdAt: minutesAgo(60 * 50), acknowledged: false },
+  ],
+
+  /** @returns {Reminder[]} */
+  reminders: () => [
+    { id: 'r1', title: 'Send project update to Sistec AM', due: onDay(0, 17, 0), hasTime: true, priority: 'high', category: 'Work', done: false },
+    { id: 'r2', title: 'Review AI policy document', due: onDay(0, 23, 59), hasTime: false, priority: 'medium', category: 'Work', done: false },
+    { id: 'r3', title: 'Submit August expense report', due: onDay(-1, 23, 59), hasTime: false, priority: 'medium', category: 'Work', done: false },
+    { id: 'r4', title: 'Renew marco-v.dev domain', due: onDay(1, 23, 59), hasTime: false, priority: 'medium', category: 'Personal', done: false },
+    { id: 'r5', title: 'Study neural networks, chapter 6', due: onDay(1, 23, 59), hasTime: false, priority: 'medium', category: 'University', done: false },
+    { id: 'r6', title: 'Book car service', due: onDay(3, 23, 59), hasTime: false, priority: 'low', category: 'Personal', done: false },
+    { id: 'r7', title: 'Update CODESYS license', due: onDay(-1, 23, 59), hasTime: false, priority: 'low', category: 'Work', done: true },
+  ],
+
+  /** @returns {Task[]} */
+  trello: () => [
+    { id: 't1', title: 'Implement API authentication', column: 'todo', board: 'Atix Backend', labels: ['backend'], due: onDay(2, 18), checklist: { done: 1, total: 5 } },
+    { id: 't2', title: 'Update Pellucida documentation', column: 'todo', board: 'Pellucida', labels: ['docs'], checklist: { done: 0, total: 3 } },
+    { id: 't3', title: 'Export alarm texts for translation', column: 'todo', board: 'HMI 5309', labels: ['hmi'], due: onDay(4, 18) },
+    { id: 't4', title: 'HMI refactoring: alarm manager', column: 'doing', board: 'HMI 5309', labels: ['hmi'], due: onDay(1, 18), checklist: { done: 3, total: 6 } },
+    { id: 't5', title: 'KUKA TCP client retry logic', column: 'doing', board: 'HMI 5309', labels: ['robotics'], checklist: { done: 2, total: 4 } },
+    { id: 't6', title: 'AI dashboard prototype', column: 'review', board: 'AI Strategy', labels: ['ai'] },
+    { id: 't7', title: 'sistec-skills marketplace README', column: 'review', board: 'Tooling', labels: ['docs'] },
+    { id: 't8', title: 'Set up CI/CD for atix-backend', column: 'done', board: 'Atix Backend', labels: ['devops'] },
+    { id: 't9', title: 'Docker Compose dev environment', column: 'done', board: 'Tooling', labels: ['devops'] },
+  ],
+
+  /** @returns {Project[]} */
+  projects: () => [
+    { id: 'hmi', key: 'HMI', name: 'HMI 5309', area: 'Sistec', owner: 'Luca Bortolan' },
+    { id: 'pel', key: 'PEL', name: 'Pellucida', area: 'Sistec', owner: 'Davide Zanon' },
+    { id: 'ai', key: 'AIS', name: 'AI Strategy', area: 'Sistec', owner: 'Sara Pavan' },
+    { id: 'atix', key: 'ATX', name: 'Atix Backend', area: 'Sistec', owner: 'Marco' },
+    { id: 'uni', key: 'UNI', name: 'University', area: 'Epicode', owner: 'Marco' },
+  ],
+
+  /** Company Gantt: includes tasks of other people, filtered in the domain layer. @returns {GanttTask[]} */
+  gantt: () => withGanttMeta([
+    { id: 'g1', projectId: 'hmi', title: 'PLC tag mapping', assignee: 'Marco', start: onDay(-20), end: onDay(-9), progress: 100, dependsOn: [] },
+    { id: 'g2', projectId: 'hmi', title: 'MES integration', assignee: 'Marco', start: onDay(-5), end: onDay(6), deadline: onDay(6), progress: 70, dependsOn: ['g1'] },
+    { id: 'g3', projectId: 'hmi', title: 'FAT preparation', assignee: 'Marco', start: onDay(7), end: onDay(14), deadline: onDay(15), progress: 0, dependsOn: ['g2'] },
+    { id: 'gx1', projectId: 'hmi', title: 'Electrical panel wiring', assignee: 'Luca Bortolan', start: onDay(-10), end: onDay(4), progress: 60, dependsOn: [] },
+    { id: 'g4', projectId: 'ai', title: 'AI tools evaluation', assignee: 'Marco', start: onDay(-10), end: onDay(4), progress: 50, dependsOn: [] },
+    { id: 'g5', projectId: 'ai', title: 'AI usage policy draft', assignee: 'Marco', start: onDay(3), end: onDay(12), progress: 0, dependsOn: ['g4'] },
+    { id: 'g6', projectId: 'pel', title: 'API architecture', assignee: 'Marco', start: onDay(-6), end: onDay(9), progress: 30, dependsOn: [] },
+    { id: 'g7', projectId: 'pel', title: 'Redis strategy PoC', assignee: 'Marco', start: onDay(5), end: onDay(18), progress: 0, dependsOn: ['g6'] },
+    { id: 'gx2', projectId: 'pel', title: 'UI component library', assignee: 'Federico Basso', start: onDay(-3), end: onDay(12), progress: 20, dependsOn: [] },
+    { id: 'g8', projectId: 'atix', title: 'SLA escalation module', assignee: 'Marco', start: onDay(-9), end: onDay(-1), deadline: onDay(-1), progress: 60, dependsOn: [] },
+    { id: 'g9', projectId: 'uni', title: 'Spring Boot project', assignee: 'Marco', start: onDay(-15), end: onDay(3), deadline: onDay(3), progress: 80, dependsOn: [] },
+    { id: 'g10', projectId: 'uni', title: 'CV project final report', assignee: 'Marco', start: onDay(-8), end: onDay(3), deadline: onDay(3), progress: 60, dependsOn: [] },
+  ]),
+};
+
+/* ------------------------------------------------------------------ 4. DATA */
+/**
+ * DataSource contract. A real implementation (Gmail/Graph, Google/Outlook
+ * Calendar, GitHub REST/GraphQL, Trello, company planning API) must return
+ * the same shapes. Components never know which one is plugged in.
+ * @typedef {Object} DataSource
+ * @property {() => Promise<Email[]>} getEmails
+ * @property {() => Promise<CalendarEvent[]>} getEvents
+ * @property {() => Promise<PullRequest[]>} getPullRequests
+ * @property {() => Promise<GithubIssue[]>} getIssues
+ * @property {() => Promise<Reminder[]>} getReminders
+ * @property {() => Promise<Task[]>} getTasks
+ * @property {() => Promise<Project[]>} getProjects
+ * @property {(assignee:string) => Promise<GanttTask[]>} getGanttFor
+ * @property {Record<string,string>} sources  label of each backing system
+ */
+const latency = (v) => new Promise((r) => setTimeout(() => r(v), 60));
+
+/** @type {DataSource} */
+const MockDataSource = {
+  sources: { Mail: 'Mock (Gmail / Outlook)', Calendar: 'Mock (Google / Outlook Calendar)', GitHub: 'Mock (GitHub API)', Trello: 'Mock (Trello API)', Gantt: 'Mock (company planning)', Reminders: 'Mock (local)' },
+  getEmails: () => latency(mock.emails()),
+  getEvents: () => latency(mock.calendar()),
+  getPullRequests: () => latency(mock.pulls()),
+  getIssues: () => latency(mock.issues()),
+  getReminders: () => latency(mock.reminders()),
+  getTasks: () => latency(mock.trello()),
+  getProjects: () => latency(mock.projects()),
+  getGanttFor: (assignee) => latency(mock.gantt().filter((t) => t.assignee === assignee)),
+};
+
+/** Swap this line to go live: const dataSource = new LiveDataSource(credentials); */
+const dataSource = MockDataSource;
+
+/* ---------------------------------------------------------------- 5. DOMAIN */
+const LEVEL_RANK = { critical: 0, high: 1, medium: 2, low: 3, normal: 4 };
+const LEVEL_LABEL = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low', normal: 'Normal' };
+const now = () => new Date();
+const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const dayDiff = (d, ref = now()) => Math.round((startOfDay(d) - startOfDay(ref)) / DAY);
+const isToday = (d) => dayDiff(d) === 0;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const byLevel = (a, b) => LEVEL_RANK[a] - LEVEL_RANK[b];
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const daysBetween = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / DAY);
+/** Dependencies whose successor starts on or before the predecessor's last day. */
+function depConflicts(s) {
+  const out = new Set();
+  for (const t of s.gantt) for (const d of t.dependsOn) { const p = find(s.gantt, d); if (p && startOfDay(t.start) <= startOfDay(p.end)) out.add(`${t.id}<${d}`); }
+  return out;
+}
+
+const MAIL_ACTION = new Set(['urgent', 'needs-reply']);
+const needsAction = (e) => !e.done && MAIL_ACTION.has(e.category);
+
+/** Gantt status from dates and progress. */
+function ganttStatus(t) {
+  const n = now();
+  if (t.progress >= 100) return 'done';
+  if (t.end < startOfDay(n)) return 'delayed';
+  if (t.start > n && t.progress === 0) return 'not-started';
+  const expected = clamp((n - t.start) / (t.end - t.start), 0, 1) * 100;
+  return t.progress < expected - 15 ? 'at-risk' : 'on-track';
+}
+const STATUS_LABEL = { done: 'Done', 'on-track': 'On track', 'at-risk': 'At risk', delayed: 'Delayed', 'not-started': 'Not started' };
+const STATUS_RANK = { delayed: 0, 'at-risk': 1, 'on-track': 2, 'not-started': 3, done: 4 };
+
+function reminderState(r) {
+  if (r.done) return 'done';
+  const d = dayDiff(r.due);
+  if (d < 0 || (r.hasTime && r.due < now())) return 'overdue';
+  return d === 0 ? 'today' : 'upcoming';
+}
+
+function prState(p) {
+  if (p.status === 'blocked') return 'blocked';
+  if (p.checks.failed > 0) return 'error';
+  if (p.checks.pending > 0) return 'pending';
+  if (p.status === 'changes-requested') return 'warning';
+  return 'success';
+}
+function prLevel(p) {
+  const ageH = (now() - p.createdAt) / HOUR;
+  if (p.reviewRequested && (p.priority === 'high' || ageH > 72)) return 'high';
+  if (p.reviewRequested || p.checks.failed > 0) return 'medium';
+  return 'low';
+}
+
+/** Aggregate per-project numbers from the personal Gantt. */
+function projectSummaries(s) {
+  return s.projects.map((p) => {
+    const tasks = s.gantt.filter((t) => t.projectId === p.id);
+    const weight = tasks.reduce((a, t) => a + (t.end - t.start), 0) || 1;
+    const progress = Math.round(tasks.reduce((a, t) => a + t.progress * (t.end - t.start), 0) / weight);
+    const statuses = tasks.map(ganttStatus);
+    const health = statuses.sort((a, b) => STATUS_RANK[a] - STATUS_RANK[b])[0] || 'on-track';
+    const next = tasks.filter((t) => t.progress < 100).sort((a, b) => a.end - b.end)[0];
+    return { ...p, tasks, progress, health: health === 'not-started' ? 'on-track' : health, next, open: tasks.filter((t) => t.progress < 100).length };
+  }).filter((p) => p.tasks.length);
+}
+
+/**
+ * The attention engine: every source contributes items with a level.
+ * Everything visible in "Resolve first", the counters, the bell and the
+ * header sentence comes from here, so priorities are consistent.
+ */
+function attentionItems(s) {
+  const items = [];
+  for (const e of s.emails) if (needsAction(e)) items.push({
+    key: 'mail:' + e.id, level: e.priority === 'normal' ? 'low' : e.priority, source: 'Mail', icon: 'mail',
+    title: e.subject, context: `${e.from.name}, ${e.from.org}`,
+    when: e.deadline ? dueText(e.deadline, true) : relPast(e.receivedAt), sort: e.deadline || e.receivedAt,
+    open: { type: 'email', id: e.id } });
+  for (const i of s.issues) if (!i.acknowledged && i.state !== 'success' && i.level !== 'low') items.push({
+    key: 'issue:' + i.id, level: i.level, source: 'GitHub', icon: ISSUE_ICON[i.kind],
+    title: i.title, context: i.repo, when: relPast(i.createdAt), sort: i.createdAt, open: { type: 'issue', id: i.id } });
+  for (const p of s.pulls) if (p.reviewRequested) items.push({
+    key: 'pr:' + p.id, level: prLevel(p), source: 'GitHub', icon: 'pr',
+    title: `Review #${p.number}: ${p.title}`, context: p.repo, when: relPast(p.createdAt), sort: p.createdAt, open: { type: 'pr', id: p.id } });
+  for (const r of s.reminders) {
+    const st = reminderState(r);
+    if (st === 'overdue') items.push({ key: 'rem:' + r.id, level: 'high', source: 'Reminder', icon: 'checkSquare', title: r.title, context: r.category, when: 'Overdue', sort: r.due, open: { type: 'reminder', id: r.id } });
+    else if (st === 'today') items.push({ key: 'rem:' + r.id, level: r.priority === 'high' ? 'high' : 'medium', source: 'Reminder', icon: 'checkSquare', title: r.title, context: r.category, when: dueText(r.due, r.hasTime), sort: r.due, open: { type: 'reminder', id: r.id } });
+  }
+  for (const t of s.gantt) {
+    const st = ganttStatus(t);
+    const proj = s.projects.find((p) => p.id === t.projectId);
+    if (st === 'delayed') items.push({ key: 'gantt:' + t.id, level: 'high', source: 'Plan', icon: 'gantt', title: `${t.title} is past its end date`, context: `${proj.name}, ${t.progress}% done`, when: 'Delayed', sort: t.end, open: { type: 'gantt', id: t.id } });
+    else if (st === 'at-risk') items.push({ key: 'gantt:' + t.id, level: 'medium', source: 'Plan', icon: 'gantt', title: `${t.title} is behind schedule`, context: `${proj.name}, ${t.progress}% done`, when: 'At risk', sort: t.end, open: { type: 'gantt', id: t.id } });
+  }
+  return items.sort((a, b) => byLevel(a.level, b.level) || a.sort - b.sort);
+}
+
+/** Upcoming = what arrives in the next 48h and doesn't need action yet. */
+function upcomingItems(s) {
+  const n = now(), horizon = new Date(+n + 2 * DAY);
+  const ev = s.events.filter((e) => e.start > n && e.start < horizon).map((e) => ({ key: 'ev:' + e.id, level: 'upcoming', source: 'Calendar', icon: 'calendar', title: e.title, context: e.location || e.videoLink || CAT_LABEL[e.category], when: dueText(e.start, true), sort: e.start, open: { type: 'event', id: e.id } }));
+  const rem = s.reminders.filter((r) => reminderState(r) === 'upcoming' && r.due < horizon).map((r) => ({ key: 'rem:' + r.id, level: 'upcoming', source: 'Reminder', icon: 'checkSquare', title: r.title, context: r.category, when: dueText(r.due, r.hasTime), sort: r.due, open: { type: 'reminder', id: r.id } }));
+  return [...ev, ...rem].sort((a, b) => a.sort - b.sort);
+}
+
+function kpis(s) {
+  const n = now();
+  const remindersToday = s.reminders.filter((r) => reminderState(r) === 'today').length;
+  const overdue = s.reminders.filter((r) => reminderState(r) === 'overdue').length + s.gantt.filter((t) => ganttStatus(t) === 'delayed').length;
+  const mailAction = s.emails.filter(needsAction);
+  const prs = s.pulls.filter((p) => p.reviewRequested).length;
+  const meetings = s.events.filter((e) => e.category === 'meeting' && e.end > n && e.start < new Date(+n + DAY)).length;
+  const active = projectSummaries(s).filter((p) => p.progress < 100).length;
+  return [
+    { id: 'tasks', label: 'Tasks due today', value: remindersToday, target: 'reminders', icon: 'checkSquare', level: remindersToday ? 'medium' : null },
+    { id: 'mail', label: 'Emails to act on', value: mailAction.length, target: 'mail', icon: 'mail', level: mailAction.some((e) => e.priority === 'critical') ? 'critical' : mailAction.length ? 'medium' : null },
+    { id: 'prs', label: 'PRs to review', value: prs, target: 'github', icon: 'pr', level: prs ? 'medium' : null },
+    { id: 'meet', label: 'Meetings', sub: 'next 24h', value: meetings, target: 'calendar', icon: 'calendar', level: null },
+    { id: 'overdue', label: 'Overdue', sub: 'tasks and plan', value: overdue, target: 'reminders', icon: 'flag', level: overdue ? 'high' : null },
+    { id: 'proj', label: 'Active projects', value: active, target: 'projects', icon: 'folder', level: null },
+  ];
+}
+
+/* ----------------------------------------------------------------- 6. STATE */
+const store = {
+  /** @type {any} */ state: null,
+  listeners: new Set(),
+  set(s) { this.state = s; this.emit(); },
+  update(fn) { fn(this.state); this.emit(); },
+  emit() { for (const l of this.listeners) l(this.state); },
+  subscribe(l) { this.listeners.add(l); },
+};
+
+function initialUi() {
+  let collapsed = {};
+  try { collapsed = JSON.parse(localStorage.getItem('cc-collapsed') || '{}'); } catch (e) { collapsed = {}; }
+  return {
+    mailFilter: 'action', calTab: 'today', ghTab: 'prs', ghFilter: 'all', ghSort: 'priority',
+    remShowDone: false, trelloCol: 'doing', ganttProject: 'all', ganttView: 'timeline', ganttZoom: 'week', ganttCollapsed: {}, attFilter: 'all',
+    expanded: {}, collapsed, drawer: null, notifSeen: new Set(),
+  };
+}
+
+const find = (list, id) => list.find((x) => x.id === id);
+const actions = {
+  markEmailDone(id) {
+    let prev;
+    store.update((s) => { const e = find(s.emails, id); prev = { category: e.category, done: e.done }; e.done = true; e.read = true; e.category = 'archived'; });
+    toast('Marked as done', () => store.update((s) => Object.assign(find(s.emails, id), prev)));
+  },
+  moveEmail(id, category) { store.update((s) => { const e = find(s.emails, id); e.category = category; e.done = category === 'archived'; }); toast(`Moved to ${MAIL_CAT_LABEL[category]}`); },
+  markEmailRead(id) { store.update((s) => { find(s.emails, id).read = true; }); },
+  toggleReminder(id) {
+    let done;
+    store.update((s) => { const r = find(s.reminders, id); r.done = !r.done; done = r.done; });
+    if (done) toast('Reminder completed', () => store.update((s) => { find(s.reminders, id).done = false; }));
+  },
+  addReminder(title, when) {
+    const due = when === 'tomorrow' ? onDay(1, 23, 59) : when === 'week' ? onDay(6, 23, 59) : onDay(0, 23, 59);
+    store.update((s) => { s.reminders.push({ id: 'r' + Date.now(), title, due, hasTime: false, priority: 'normal', category: 'Inbox', done: false }); });
+    toast('Reminder added');
+  },
+  moveTask(id, column) { store.update((s) => { find(s.trello, id).column = column; }); toast(`Moved to ${COLUMNS.find((c) => c.id === column).label}`); },
+  markReviewed(id) {
+    store.update((s) => { find(s.pulls, id).reviewRequested = false; });
+    toast('Review marked as done', () => store.update((s) => { find(s.pulls, id).reviewRequested = true; }));
+  },
+  ackIssue(id) {
+    store.update((s) => { find(s.issues, id).acknowledged = true; });
+    toast('Acknowledged', () => store.update((s) => { find(s.issues, id).acknowledged = false; }));
+  },
+  /** Push every task that starts before its predecessor ends; keeps durations. */
+  recalcGantt() {
+    const snapshot = store.state.gantt.map((t) => ({ id: t.id, start: t.start, end: t.end }));
+    const moved = new Set();
+    store.update((s) => {
+      for (let pass = 0; pass < s.gantt.length; pass++) {
+        let changed = false;
+        for (const t of s.gantt) for (const d of t.dependsOn) {
+          const p = find(s.gantt, d); if (!p) continue;
+          const min = addDays(startOfDay(p.end), 1);
+          if (startOfDay(t.start) < min) { const dur = daysBetween(t.start, t.end); t.start = min; t.end = addDays(min, dur); moved.add(t.id); changed = true; }
+        }
+        if (!changed) break;
+      }
+    });
+    if (!moved.size) { toast('Schedule already respects all dependencies'); return; }
+    const names = [...moved].map((id) => find(store.state.gantt, id).key).join(', ');
+    toast(`Rescheduled ${names}`, () => store.update((s) => snapshot.forEach((x) => Object.assign(find(s.gantt, x.id), { start: x.start, end: x.end }))));
+  },
+  setUi(patch) { store.update((s) => Object.assign(s.ui, patch)); },
+  toggleCollapse(id) {
+    store.update((s) => { s.ui.collapsed[id] = !s.ui.collapsed[id]; });
+    try { localStorage.setItem('cc-collapsed', JSON.stringify(store.state.ui.collapsed)); } catch (e) {}
+  },
+  toggleExpand(id) { store.update((s) => { s.ui.expanded[id] = !s.ui.expanded[id]; }); },
+  openDrawer(type, id) {
+    if (type === 'email') { const e = find(store.state.emails, id); if (e) e.read = true; }
+    if (type === 'reminder') { closePopovers(); goTo('reminders'); return; }
+    store.update((s) => { s.ui.drawer = { type, id }; });
+  },
+  closeDrawer() { store.update((s) => { s.ui.drawer = null; }); },
+};
+
+/* -------------------------------------------------------- 7. UI PRIMITIVES */
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtTime = (d) => d.toLocaleTimeString(CONFIG.timeLocale, { hour: '2-digit', minute: '2-digit' });
+const fmtShort = (d) => d.toLocaleDateString(CONFIG.locale, { month: 'short', day: 'numeric' });
+const fmtWeekday = (d) => d.toLocaleDateString(CONFIG.locale, { weekday: 'short' });
+const fmtLong = (d) => d.toLocaleDateString(CONFIG.locale, { weekday: 'long', month: 'long', day: 'numeric' });
+function fmtDuration(ms) { const m = Math.round(ms / MIN); if (m < 60) return `${m}m`; const h = Math.floor(m / 60), r = m % 60; return r ? `${h}h ${r}m` : `${h}h`; }
+function relPast(d) {
+  const m = Math.round((now() - d) / MIN);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24 && isToday(d)) return `${h}h ago`;
+  const dd = -dayDiff(d);
+  if (dd <= 1) return 'Yesterday';
+  if (dd < 7) return `${dd}d ago`;
+  return fmtShort(d);
+}
+function ageShort(d) { const m = Math.round((now() - d) / MIN); if (m < 60) return `${m}m`; const h = Math.round(m / 60); return h < 48 ? `${h}h` : `${Math.round(h / 24)}d`; }
+function dueText(d, hasTime) {
+  const dd = dayDiff(d), t = hasTime ? ` ${fmtTime(d)}` : '';
+  if (dd < 0) return dd === -1 ? 'Yesterday' : `${-dd}d overdue`;
+  if (dd === 0) { const mins = Math.round((d - now()) / MIN); if (hasTime && mins > 0 && mins < 180) return `In ${fmtDuration(mins * MIN)}`; return hasTime ? `Today${t}` : 'Today'; }
+  if (dd === 1) return `Tomorrow${t}`;
+  if (dd < 7) return `${fmtWeekday(d)}${t}`;
+  return fmtShort(d);
+}
+function hue(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+const initialsOf = (name) => name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+
+const ICONS = {
+  home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+  pr: '<circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v7.2M18 15.6V9a3 3 0 0 0-3-3h-4"/><path d="m13 3.5-2.5 2.5L13 8.5"/>',
+  git: '<circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4.3-6.5 3.3-11.3 7"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  checkSquare: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m8 12 3 3 5-6"/>',
+  kanban: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8.5 8v5M12 8v8.5M15.5 8v3"/>',
+  gantt: '<path d="M4 5.5h8M8 10.5h10M6 15.5h7M11 20h9"/>',
+  folder: '<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  bell: '<path d="M6 8.5a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15 6 8.5"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.5 12h2M19.5 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  clip: '<path d="m20.5 11.5-8.2 8.2a5 5 0 0 1-7.1-7.1l8.3-8.2a3.3 3.3 0 0 1 4.7 4.7l-8.3 8.2a1.7 1.7 0 0 1-2.4-2.4l7.6-7.5"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  video: '<rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  alert: '<path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  xCircle: '<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
+  checkCircle: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 10"/>',
+  ban: '<circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/>',
+  pending: '<circle cx="12" cy="12" r="9" stroke-dasharray="2.5 3"/><path d="M12 8v4l2.5 1.5"/>',
+  rocket: '<path d="M5 15c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9A2.2 2.2 0 0 0 5 15z"/><path d="m12 15-3-3a22 22 0 0 1 2-4A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5"/>',
+  play: '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5 3.5-5 3.5z"/>',
+  bug: '<rect x="7" y="7" width="10" height="13" rx="5"/><path d="M12 11v9M3 13h4M17 13h4M4.5 7.5 7 9M19.5 7.5 17 9M4.5 19.5 7 18M19.5 19.5 17 18M9.5 4.5 10.5 6.5M14.5 4.5l-1 2"/>',
+  dot: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/>',
+  shield: '<path d="M12 3 4.5 6v5.5c0 4.8 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.7 7.5-9.5V6z"/><path d="M12 8v4M12 15.5h.01"/>',
+  chevronDown: '<path d="m6 9 6 6 6-6"/>',
+  chevronRight: '<path d="m9 6 6 6-6 6"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  archive: '<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/>',
+  flag: '<path d="M5 21V4M5 4h11.5l-2 4 2 4H5"/>',
+  link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
+  hourglass: '<path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.5 3.5 5.2"/>',
+  refresh: '<path d="M20 11a8 8 0 0 0-14.9-3.5M4 13a8 8 0 0 0 14.9 3.5"/><path d="M4 4v4h4M20 20v-4h-4"/>',
+  logo: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2" opacity=".55"/><rect x="4" y="13" width="7" height="7" rx="2" opacity=".55"/><circle cx="16.5" cy="16.5" r="3.5"/>',
+};
+const ISSUE_ICON = { deploy: 'rocket', actions: 'play', bug: 'bug', issue: 'dot', security: 'shield' };
+function icon(name, cls = '') {
+  return `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+}
+const pill = (level, text) => `<span class="pill lvl-${level}">${esc(text ?? LEVEL_LABEL[level])}</span>`;
+const lamp = (level, pulse = false) => `<span class="lamp lvl-${level}${pulse ? ' pulse' : ''}" aria-hidden="true"></span>`;
+const STATE_ICON = { success: 'checkCircle', error: 'xCircle', warning: 'alert', blocked: 'ban', pending: 'pending' };
+const STATE_LABEL = { success: 'Passing', error: 'Failing', warning: 'Warning', blocked: 'Blocked', pending: 'Pending' };
+const stateBadge = (state, text) => `<span class="pill st-${state}">${icon(STATE_ICON[state], 'xs')}${esc(text ?? STATE_LABEL[state])}</span>`;
+const chip = (action, value, label, count, pressed) =>
+  `<button class="chip" data-action="${action}" data-value="${esc(value)}" aria-pressed="${pressed}">${esc(label)}${count != null ? ` <span class="n">${count}</span>` : ''}</button>`;
+const seg = (action, options, current, label) =>
+  `<div class="seg" role="group" aria-label="${esc(label)}">${options.map((o) => `<button data-action="${action}" data-value="${o.id}" aria-pressed="${o.id === current}">${esc(o.label)}${o.count != null ? ` ${o.count}` : ''}</button>`).join('')}</div>`;
+const moreBtn = (id, total, shown, s) => total > shown || s.ui.expanded[id]
+  ? `<button class="link-btn" data-action="expand" data-id="${id}" aria-expanded="${!!s.ui.expanded[id]}">${s.ui.expanded[id] ? 'Show less' : `Show all ${total}`}</button>` : '';
+const take = (list, id, s) => (s.ui.expanded[id] ? list : list.slice(0, CONFIG.listPreview));
+
+function Card(s, { id, title, iconName, sub = '', tools = '', body }) {
+  const collapsed = !!s.ui.collapsed[id];
+  return `
+  <header class="card-head">
+    <div class="card-title">
+      <span class="card-ic">${icon(iconName)}</span>
+      <div><h2 id="${id}-title">${title}</h2>${sub ? `<p class="card-sub">${sub}</p>` : ''}</div>
+    </div>
+    <div class="card-tools">${collapsed ? '' : tools}
+      <button class="icon-btn" data-action="collapse" data-id="${id}" aria-expanded="${!collapsed}" aria-controls="${id}-body" aria-label="${collapsed ? 'Expand' : 'Collapse'} ${esc(title)}" data-tip="${collapsed ? 'Expand' : 'Collapse'}">${icon('chevronDown', collapsed ? 'rot' : '')}</button>
+    </div>
+  </header>
+  <div class="card-body" id="${id}-body"${collapsed ? ' hidden' : ''}>${collapsed ? '' : body}</div>`;
+}
+
+/* -------------------------------------------------------- 8. UI COMPONENTS */
+
+/* Attention ---------------------------------------------------------------- */
+function AttentionPanel(s) {
+  const items = attentionItems(s);
+  const upcoming = upcomingItems(s);
+  const crit = items.filter((i) => i.level === 'critical');
+  const act = items.filter((i) => i.level === 'high');
+  const f = s.ui.attFilter;
+  const list = f === 'urgent' ? crit : f === 'action' ? act : f === 'upcoming' ? upcoming : items;
+  const shown = take(list, 'att', s);
+  const levels = ['critical', 'high', 'medium', 'low'];
+  const meter = [...levels.map((l) => ({ l, n: items.filter((i) => i.level === l).length })), { l: 'upcoming', n: upcoming.length }].filter((x) => x.n);
+  const counter = (id, n, label, lvl) =>
+    `<button class="att-count lvl-${lvl}" data-action="att-filter" data-value="${id}" aria-pressed="${f === id}">
+      <span class="num">${n ? lamp(lvl, lvl === 'critical') : ''}${n}</span><span class="lbl">${label}</span></button>`;
+  return `
+    <div class="att-top">
+      <h2 id="att-title">Attention required</h2>
+      ${f !== 'all' ? `<button class="link-btn" style="padding:0" data-action="att-filter" data-value="all">Show everything</button>` : ''}
+    </div>
+    <div class="att-counts">
+      ${counter('urgent', crit.length, 'Urgent', 'critical')}
+      ${counter('action', act.length, 'Need action', 'high')}
+      ${counter('upcoming', upcoming.length, 'Upcoming, 48h', 'upcoming')}
+    </div>
+    <div class="att-meter" aria-hidden="true">${meter.map((x) => `<span class="lvl-${x.l}" style="--w:${x.n}"></span>`).join('')}</div>
+    <ul class="att-list" aria-label="Items sorted by priority">
+      ${shown.map((i) => `<li><button class="att-item lvl-${i.level}" data-action="open" data-type="${i.open.type}" data-id="${i.open.id}">
+          <span class="att-src">${icon(i.icon, 'sm')}</span>
+          <span class="att-text"><b>${esc(i.title)}</b><span>${esc(i.source)}: ${esc(i.context)}</span></span>
+          <span class="att-when">${esc(i.when)}</span></button></li>`).join('') || `<li class="empty">Nothing here. You're clear.</li>`}
+    </ul>
+    <div class="att-foot">${moreBtn('att', list.length, shown.length, s)}</div>`;
+}
+
+/* KPIs --------------------------------------------------------------------- */
+function KpiGrid(s) {
+  return kpis(s).map((k) => `
+    <a class="kpi ${k.level ? `signal lvl-${k.level}` : ''}" href="#${k.target}" data-action="goto" data-target="${k.target}" aria-label="${k.value} ${esc(k.label)}${k.sub ? ', ' + k.sub : ''}. Go to section">
+      <span class="kpi-top">${icon(k.icon, 'sm')}${k.level ? lamp(k.level) : ''}</span>
+      <span class="kpi-num">${k.value}</span>
+      <span class="kpi-lbl">${esc(k.label)}${k.sub ? `<small>${esc(k.sub)}</small>` : ''}</span>
+    </a>`).join('');
+}
+
+/* Mail --------------------------------------------------------------------- */
+const MAIL_CAT_LABEL = { urgent: 'Urgent', 'needs-reply': 'Needs reply', fyi: 'FYI', waiting: 'Waiting', archived: 'Archived' };
+const MAIL_FILTERS = [
+  { id: 'action', label: 'Needs action', test: needsAction },
+  { id: 'urgent', label: 'Urgent', test: (e) => e.category === 'urgent' },
+  { id: 'needs-reply', label: 'Needs reply', test: (e) => e.category === 'needs-reply' },
+  { id: 'fyi', label: 'FYI', test: (e) => e.category === 'fyi' },
+  { id: 'waiting', label: 'Waiting', test: (e) => e.category === 'waiting' },
+  { id: 'archived', label: 'Archived', test: (e) => e.category === 'archived' },
+];
+function MailRow(e) {
+  const lvl = e.priority;
+  const dueLvl = e.deadline && (e.deadline - now()) < 6 * HOUR ? 'critical' : 'normal';
+  return `<li class="mail-row ${e.read ? '' : 'is-unread'}">
+    ${e.read ? '' : '<span class="unread-dot" aria-hidden="true"></span>'}
+    <button class="mail-main" data-action="open" data-type="email" data-id="${e.id}">
+      <span class="avatar" style="--h:${hue(e.from.name)}">${esc(initialsOf(e.from.name))}</span>
+      <span class="mail-content">
+        <span class="mail-top"><span class="mail-from">${esc(e.from.name)}</span><span class="mail-org">${esc(e.from.org)}</span><time datetime="${e.receivedAt.toISOString()}">${relPast(e.receivedAt)}</time></span>
+        <span class="mail-subject">${e.read ? '' : '<span class="sr-only">Unread: </span>'}${esc(e.subject)}</span>
+        <span class="mail-preview">${esc(e.preview)}</span>
+        <span class="mail-meta">
+          ${lvl !== 'normal' ? pill(lvl) : `<span class="pill quiet">${MAIL_CAT_LABEL[e.category]}</span>`}
+          ${e.deadline && !e.done ? `<span class="due lvl-${dueLvl}">${icon('clock', 'xs')}Due ${esc(dueText(e.deadline, true))}</span>` : ''}
+          ${e.attachments.length ? `<span class="tag">${icon('clip', 'xs')}${e.attachments.length}</span>` : ''}
+        </span>
+      </span>
+    </button>
+    ${e.done ? '' : `<button class="icon-btn mail-done" data-action="mail-done" data-id="${e.id}" aria-label="Mark “${esc(e.subject)}” as done" data-tip="Mark as done">${icon('check')}</button>`}
+  </li>`;
+}
+function MailTriage(s) {
+  const active = MAIL_FILTERS.find((f) => f.id === s.ui.mailFilter);
+  const list = s.emails.filter(active.test).sort((a, b) =>
+    active.id === 'action' || active.id === 'urgent' || active.id === 'needs-reply'
+      ? byLevel(a.priority, b.priority) || b.receivedAt - a.receivedAt
+      : b.receivedAt - a.receivedAt);
+  const shown = take(list, 'mail', s);
+  const actionCount = s.emails.filter(needsAction).length;
+  const body = `
+    <div class="chips" role="group" aria-label="Filter mail">${MAIL_FILTERS.map((f) => chip('mail-filter', f.id, f.label, s.emails.filter(f.test).length, f.id === s.ui.mailFilter)).join('')}</div>
+    <ul class="mail-list">${shown.map(MailRow).join('') || `<li class="empty">No mail in ${esc(active.label)}. Try another filter.</li>`}</ul>
+    ${moreBtn('mail', list.length, shown.length, s)}`;
+  return Card(s, { id: 'mail', title: 'Mail triage', iconName: 'mail', sub: actionCount ? `<b>${actionCount}</b> need your attention` : 'Nothing needs a reply', body });
+}
+
+/* Calendar ----------------------------------------------------------------- */
+const CAT_LABEL = { meeting: 'Meeting', focus: 'Focus', personal: 'Personal', study: 'Study', deadline: 'Deadline' };
+function EventItem(e, state) {
+  const n = now();
+  const pct = state === 'now' ? Math.round(((n - e.start) / (e.end - e.start)) * 100) : 0;
+  const where = e.videoLink ? `<span class="tag">${icon('video', 'xs')}${esc(e.videoLink)}</span>` : e.location ? `<span class="tag">${icon('pin', 'xs')}${esc(e.location)}</span>` : '';
+  const note = state === 'now' ? `Ends ${fmtTime(e.end)}, ${fmtDuration(e.end - n)} left`
+    : state === 'next' ? `Starts in ${fmtDuration(e.start - n)}` : '';
+  return `<li class="tl-item is-${state}">
+    <div class="tl-time">${fmtTime(e.start)}<small>${fmtDuration(e.end - e.start)}</small></div>
+    <div class="tl-rail"><span class="tl-dot cat-${e.category}"></span></div>
+    <button class="tl-body" data-action="open" data-type="event" data-id="${e.id}">
+      <span class="tl-title">${esc(e.title)}${e.important ? `<span data-tip="Important">${icon('flag', 'xs')}</span><span class="sr-only">Important</span>` : ''}</span>
+      <span class="tl-meta"><span class="tag cat-${e.category}"><span class="sw"></span>${CAT_LABEL[e.category]}</span>${where}</span>
+      ${state === 'now' ? `<div class="bar tl-progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Meeting progress"><span style="width:${pct}%"></span></div>` : ''}
+      ${note ? `<span class="tl-note">${note}</span>` : ''}
+    </button>
+  </li>`;
+}
+function CalendarWidget(s) {
+  const n = now();
+  const sorted = [...s.events].sort((a, b) => a.start - b.start);
+  const today = sorted.filter((e) => isToday(e.start));
+  const later = sorted.filter((e) => dayDiff(e.start) > 0 && dayDiff(e.start) <= 7);
+  const nextAny = sorted.find((e) => e.start > n);
+  let body;
+  if (s.ui.calTab === 'today') {
+    const nextToday = today.find((e) => e.start > n);
+    body = today.length ? `<ol class="timeline">${today.map((e) => EventItem(e, e.end <= n ? 'past' : e.start <= n ? 'now' : e === nextToday ? 'next' : 'later')).join('')}</ol>` : '';
+    if (!today.some((e) => e.end > n)) body += `<div class="cal-foot">Nothing left today.${nextAny ? ` Next: <b>${esc(nextAny.title)}</b>, ${esc(dueText(nextAny.start, true))}.` : ''}</div>`;
+  } else {
+    const groups = {};
+    for (const e of later) (groups[startOfDay(e.start).toISOString()] ||= []).push(e);
+    body = Object.values(groups).map((list) => `<h3 class="cal-day">${dayDiff(list[0].start) === 1 ? 'Tomorrow' : fmtLong(list[0].start)}</h3>
+      <ol class="timeline">${list.map((e) => EventItem(e, 'later')).join('')}</ol>`).join('') || `<p class="empty">No events in the next 7 days.</p>`;
+  }
+  const left = today.filter((e) => e.end > n).length;
+  const tools = seg('cal-tab', [{ id: 'today', label: 'Today' }, { id: 'upcoming', label: 'Next 7 days' }], s.ui.calTab, 'Calendar range');
+  return Card(s, { id: 'calendar', title: 'Calendar', iconName: 'calendar', sub: left ? `<b>${left}</b> left today` : 'Day is done', tools, body });
+}
+
+/* GitHub ------------------------------------------------------------------- */
+const PR_FILTERS = [
+  { id: 'all', label: 'All', test: () => true },
+  { id: 'review', label: 'To review', test: (p) => p.reviewRequested },
+  { id: 'mine', label: 'Involved', test: (p) => p.involved && !p.reviewRequested },
+  { id: 'blocked', label: 'Blocked', test: (p) => p.status === 'blocked' },
+  { id: 'failing', label: 'Failing checks', test: (p) => p.checks.failed > 0 },
+];
+const PR_SORTS = {
+  priority: (a, b) => byLevel(prLevel(a), prLevel(b)) || a.createdAt - b.createdAt,
+  oldest: (a, b) => a.createdAt - b.createdAt,
+  repo: (a, b) => a.repo.localeCompare(b.repo) || a.number - b.number,
+};
+const PR_STATUS_TEXT = { open: 'Open', draft: 'Draft', blocked: 'Blocked', 'changes-requested': 'Changes requested' };
+function PrRow(p) {
+  const st = prState(p);
+  const c = p.checks;
+  const checks = c.failed ? stateBadge('error', `${c.failed} failing`) : c.pending ? stateBadge('pending', `${c.pending} pending`) : stateBadge('success', `${c.passed}/${c.total}`);
+  const extra = p.status === 'blocked' ? stateBadge('blocked', 'Blocked') : p.status === 'draft' ? `<span class="pill quiet">Draft</span>` : p.status === 'changes-requested' ? stateBadge('warning', 'Changes requested') : '';
+  return `<li class="gh-row"><button class="gh-main" data-action="open" data-type="pr" data-id="${p.id}">
+    <span class="gh-state st-${st}" data-tip="${esc(STATE_LABEL[st])}">${icon('pr', 'sm')}</span>
+    <span class="gh-content">
+      <span class="gh-title">${esc(p.title)}</span>
+      <span class="gh-meta"><span class="repo">${esc(p.repo.split('/')[1])}</span> #${p.number} by ${esc(p.author === CONFIG.user.githubLogin ? 'you' : p.author)}, ${ageShort(p.createdAt)}</span>
+    </span>
+    <span class="gh-side">${p.reviewRequested ? `<span class="pill lvl-${prLevel(p)}">${icon('users', 'xs')}Review requested</span>` : ''}${extra}${checks}</span>
+  </button></li>`;
+}
+function IssueRow(i) {
+  return `<li class="gh-row"><button class="gh-main" data-action="open" data-type="issue" data-id="${i.id}">
+    <span class="gh-state st-${i.state}" data-tip="${esc(STATE_LABEL[i.state])}">${icon(ISSUE_ICON[i.kind], 'sm')}</span>
+    <span class="gh-content">
+      <span class="gh-title">${esc(i.title)}</span>
+      <span class="gh-meta"><span class="repo">${esc(i.repo.split('/')[1])}</span>${i.number ? ` #${i.number}` : ''}, ${relPast(i.createdAt)}</span>
+    </span>
+    <span class="gh-side">${i.acknowledged ? `<span class="pill quiet">Acknowledged</span>` : ''}${i.level !== 'low' ? pill(i.level) : ''}${stateBadge(i.state)}</span>
+  </button></li>`;
+}
+function GithubAttention(s) {
+  const prTab = s.ui.ghTab === 'prs';
+  const openIssues = s.issues.filter((i) => !i.acknowledged);
+  const tabs = seg('gh-tab', [{ id: 'prs', label: 'PRs', count: s.pulls.length }, { id: 'issues', label: 'Errors', count: openIssues.length }], s.ui.ghTab, 'GitHub view');
+  let body;
+  if (prTab) {
+    const f = PR_FILTERS.find((x) => x.id === s.ui.ghFilter);
+    const list = s.pulls.filter(f.test).sort(PR_SORTS[s.ui.ghSort]);
+    body = `<div class="gh-toolbar">
+        <div class="chips" role="group" aria-label="Filter pull requests">${PR_FILTERS.map((x) => chip('gh-filter', x.id, x.label, s.pulls.filter(x.test).length, x.id === s.ui.ghFilter)).join('')}</div>
+        <label><span class="sr-only">Sort pull requests</span><select class="select" data-action="gh-sort">
+          <option value="priority"${s.ui.ghSort === 'priority' ? ' selected' : ''}>Sort: priority</option>
+          <option value="oldest"${s.ui.ghSort === 'oldest' ? ' selected' : ''}>Sort: oldest first</option>
+          <option value="repo"${s.ui.ghSort === 'repo' ? ' selected' : ''}>Sort: repository</option>
+        </select></label>
+      </div>
+      <ul class="gh-list">${list.map(PrRow).join('') || `<li class="empty">No pull requests match. Pick another filter.</li>`}</ul>`;
+  } else {
+    const list = [...s.issues].sort((a, b) => Number(a.acknowledged) - Number(b.acknowledged) || byLevel(a.level, b.level) || b.createdAt - a.createdAt);
+    const shown = take(list, 'issues', s);
+    body = `<ul class="gh-list">${shown.map(IssueRow).join('')}</ul>${moreBtn('issues', list.length, shown.length, s)}`;
+  }
+  const failing = s.issues.filter((i) => !i.acknowledged && i.state === 'error').length;
+  const review = s.pulls.filter((p) => p.reviewRequested).length;
+  return Card(s, { id: 'github', title: 'GitHub', iconName: 'git', sub: `<b>${review}</b> to review, <b>${failing}</b> failing`, tools: tabs, body });
+}
+
+/* Reminders ---------------------------------------------------------------- */
+const REM_ORDER = { overdue: 0, today: 1, upcoming: 2, done: 3 };
+function Reminders(s) {
+  const list = s.reminders.filter((r) => s.ui.remShowDone || !r.done)
+    .sort((a, b) => REM_ORDER[reminderState(a)] - REM_ORDER[reminderState(b)] || a.due - b.due);
+  const open = s.reminders.filter((r) => !r.done);
+  const overdue = open.filter((r) => reminderState(r) === 'overdue').length;
+  const body = `
+    <ul class="rem-list">${list.map((r) => {
+      const st = reminderState(r);
+      const due = st === 'overdue' ? `Overdue, ${dueText(r.due, r.hasTime).toLowerCase()}` : dueText(r.due, r.hasTime);
+      return `<li class="rem-row ${r.done ? 'is-done' : ''}">
+        <input type="checkbox" class="check" id="rem-${r.id}" data-action="rem-toggle" data-id="${r.id}" ${r.done ? 'checked' : ''}>
+        <div class="rem-text"><label for="rem-${r.id}">${esc(r.title)}</label>
+          <div class="rem-sub"><span class="rem-due ${st}">${esc(due)}</span><span class="tag">${esc(r.category)}</span></div></div>
+        ${r.priority !== 'normal' && !r.done ? `<span data-tip="${LEVEL_LABEL[r.priority]} priority">${lamp(r.priority)}</span>` : ''}
+      </li>`; }).join('') || `<li class="empty">All done. Add the next thing below.</li>`}</ul>
+    <form class="rem-add" data-form="rem-add">
+      <label class="sr-only" for="rem-new">New reminder</label>
+      <input type="text" id="rem-new" name="title" placeholder="Add a reminder" autocomplete="off" required maxlength="120">
+      <label class="sr-only" for="rem-when">When</label>
+      <select class="select" id="rem-when" name="when"><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="week">Next week</option></select>
+      <button class="btn primary" type="submit">${icon('plus', 'sm')}Add</button>
+    </form>`;
+  const tools = `<label class="toggle"><input type="checkbox" data-action="rem-showdone" ${s.ui.remShowDone ? 'checked' : ''}>Done</label>`;
+  return Card(s, { id: 'reminders', title: 'Reminders', iconName: 'checkSquare', sub: `<b>${open.length}</b> open${overdue ? `, <b style="color:var(--crit)">${overdue} overdue</b>` : ''}`, tools, body });
+}
+
+/* Trello ------------------------------------------------------------------- */
+const COLUMNS = [{ id: 'todo', label: 'To do', short: 'To do' }, { id: 'doing', label: 'In progress', short: 'Doing' }, { id: 'review', label: 'Review', short: 'Review' }, { id: 'done', label: 'Done', short: 'Done' }];
+function TrelloTasks(s) {
+  const card = (t) => `<li><button class="kb-card" data-action="open" data-type="task" data-id="${t.id}">
+      <span class="kb-meta">${t.labels.map((l) => `<span class="kb-label lbl-${l}">${esc(l)}</span>`).join('')}<span class="tag">${esc(t.board)}</span></span>
+      <span class="kb-title">${esc(t.title)}</span>
+      ${t.due || t.checklist ? `<span class="kb-meta">${t.due && t.column !== 'done' ? `<span class="tag" style="${dayDiff(t.due) <= 1 ? 'color:var(--high)' : ''}">${icon('clock', 'xs')}${esc(dueText(t.due, false))}</span>` : ''}${t.checklist ? `<span class="tag">${icon('checkSquare', 'xs')}${t.checklist.done}/${t.checklist.total}</span>` : ''}</span>` : ''}
+    </button></li>`;
+  const cols = COLUMNS.map((c) => {
+    const tasks = s.trello.filter((t) => t.column === c.id);
+    return `<section class="kb-col ${c.id === s.ui.trelloCol ? 'is-active' : ''}" data-col="${c.id}" aria-label="${c.label}">
+      <h3 class="kb-col-head">${c.label} <span class="n">${tasks.length}</span></h3>
+      <ul class="kb-cards">${tasks.map(card).join('') || `<li class="empty">Empty</li>`}</ul></section>`;
+  }).join('');
+  const segCtl = seg('trello-col', COLUMNS.map((c) => ({ id: c.id, label: c.short, count: s.trello.filter((t) => t.column === c.id).length })), s.ui.trelloCol, 'Kanban column');
+  const active = s.trello.filter((t) => t.column !== 'done').length;
+  return Card(s, { id: 'trello', title: 'Trello tasks', iconName: 'kanban', sub: `<b>${active}</b> open cards`, body: `<div class="kb">${segCtl}<div class="kb-cols">${cols}</div></div>` });
+}
+
+/* Personal Gantt ----------------------------------------------------------- */
+function ganttWindow(tasks) {
+  const t0 = startOfDay(now());
+  const min = Math.min(+t0, ...tasks.map((t) => +t.start));
+  const max = Math.max(+t0 + DAY, ...tasks.map((t) => +(t.deadline || t.end)), ...tasks.map((t) => +t.end));
+  const start = new Date(startOfDay(min) - 2 * DAY);
+  const end = new Date(+startOfDay(max) + 3 * DAY);
+  const pos = (d) => ((d - start) / (end - start)) * 100;
+  return { start, end, pos, days: Math.round((end - start) / DAY) };
+}
+const ZOOMS = { week: { label: 'Week', dw: 104 }, month: { label: 'Month', dw: 40 }, quarter: { label: 'Quarter', dw: 18 } };
+const GL = { ROW: 56, BAR: 40, GAP: 24, PAD: 16 };
+function isoWeek(d) {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+  return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / DAY + 1) / 7);
+}
+/** Whole weeks (Mon to Sun) around every task, with some air on both sides. */
+function ganttRange(tasks) {
+  const t0 = startOfDay(now());
+  let start = addDays(startOfDay(Math.min(+t0, ...tasks.map((t) => +t.start))), -3);
+  while (start.getDay() !== 1) start = addDays(start, -1);
+  let end = addDays(startOfDay(Math.max(+t0, ...tasks.map((t) => +t.end), ...tasks.map((t) => +(t.deadline || t.end)))), 4);
+  while (end.getDay() !== 0) end = addDays(end, 1);
+  return { start, days: daysBetween(start, end) + 1 };
+}
+/** Rounded elbow connector from the end of `a` to the start of `b` (px space). */
+function depPath(a, b) {
+  const r = 10, e = 8, x1 = a.x2, y1 = a.y, x2 = b.x1, y2 = b.y;
+  if (y2 <= y1) return `M${x1} ${y1} H${x2}`;
+  if (x2 - x1 >= 2 * (r + e)) {
+    const xm = x1 + e + r;
+    return `M${x1} ${y1} H${xm - r} Q${xm} ${y1} ${xm} ${y1 + r} V${y2 - r} Q${xm} ${y2} ${xm + r} ${y2} H${x2 - 3}`;
+  }
+  const xr = x1 + e + r, xl = x2 - e - r, ym = y2 - GL.ROW / 2;
+  return `M${x1} ${y1} H${xr - r} Q${xr} ${y1} ${xr} ${y1 + r} V${ym - r} Q${xr} ${ym} ${xr - r} ${ym} H${xl + r} Q${xl} ${ym} ${xl} ${ym + r} V${y2 - r} Q${xl} ${y2} ${xl + r} ${y2} H${x2 - 3}`;
+}
+const tagChip = (t) => `<span class="gtag ${t.toLowerCase()}">${esc(t)}</span>`;
+function GanttTimeline(s, groups) {
+  const dw = ZOOMS[s.ui.ganttZoom].dw;
+  const R = ganttRange(s.gantt);
+  const W = R.days * dw;
+  const x0 = (d) => daysBetween(R.start, d) * dw;
+  const x1 = (d) => (daysBetween(R.start, d) + 1) * dw;
+  const n = now();
+  const todayX = x0(n) + ((n - startOfDay(n)) / DAY) * dw;
+  const conflicts = depConflicts(s);
+  const month = (d, style) => d.toLocaleDateString(CONFIG.locale, { month: style });
+
+  let weeks = '', days = '', hatch = '';
+  for (let i = 0; i < R.days; i++) {
+    const d = addDays(R.start, i), wd = d.getDay();
+    if (wd === 1) {
+      const e = addDays(d, 6);
+      const label = dw >= 60
+        ? (d.getMonth() === e.getMonth() ? `${d.getDate()} – ${e.getDate()} ${month(d, 'long')}` : `${d.getDate()} ${month(d, 'short')} – ${e.getDate()} ${month(e, 'short')}`)
+        : fmtShort(d);
+      weeks += `<div class="g-week"><span>${label}</span><small>W${isoWeek(d)}</small></div>`;
+    }
+    const lbl = dw >= 80 ? `${fmtWeekday(d)} ${d.getDate()}` : dw >= 30 ? `${d.getDate()}` : '';
+    days += `<div class="g-day${wd === 0 || wd === 6 ? ' we' : ''}${isToday(d) ? ' today' : ''}"><span>${lbl}</span></div>`;
+    if (wd === 6) hatch += `<span class="g-we" style="left:${i * dw}px;width:${2 * dw}px"></span>`;
+  }
+
+  let y = GL.PAD, bars = '', boxes = '';
+  const pos = {};
+  const off = (GL.ROW - GL.BAR) / 2;
+  for (const g of groups) {
+    const ps = new Date(Math.min(...g.tasks.map((t) => +t.start)));
+    const pe = new Date(Math.max(...g.tasks.map((t) => +t.end)));
+    const collapsed = !!s.ui.ganttCollapsed[g.project.id];
+    const top = y;
+    const health = g.project.health;
+    bars += `<button class="gp st-${health}" style="left:${x0(ps) + 4}px;top:${y + off}px;width:${x1(pe) - x0(ps) - 8}px"
+        data-action="gantt-toggle" data-id="${g.project.id}" aria-expanded="${!collapsed}" data-tip="${collapsed ? 'Show' : 'Hide'} ${g.tasks.length} tasks">
+        <span class="gb-fill" style="width:${g.project.progress}%"></span>
+        <span class="gb-label">${icon('chevronDown', collapsed ? 'xs rot' : 'xs')}<span class="gb-id">${esc(g.project.key)}</span><span class="gb-title">${esc(g.project.name)}</span>
+          ${health !== 'on-track' ? `<span class="gtag health st-${health}">${STATUS_LABEL[health]}</span>` : ''}<span class="gtag">${g.project.progress}%</span></span>
+      </button>`;
+    y += GL.ROW;
+    if (!collapsed) for (const t of g.tasks) {
+      const st = ganttStatus(t);
+      const left = x0(t.start) + 4, width = Math.max(x1(t.end) - x0(t.start) - 8, dw - 8);
+      pos[t.id] = { x1: left, x2: left + width, y: y + GL.ROW / 2 };
+      const tip = `${t.key} ${t.title}: ${t.progress}%, ${fmtShort(t.start)} to ${fmtShort(t.end)}${t.deadline ? `, deadline ${fmtShort(t.deadline)}` : ''}. ${STATUS_LABEL[st]}`;
+      bars += `<button class="gb st-${st}" style="left:${left}px;top:${y + off}px;width:${width}px" data-action="open" data-type="gantt" data-id="${t.id}" data-tip="${esc(tip)}" aria-label="${esc(tip)}">
+          <span class="gb-fill" style="width:${t.progress}%"></span>
+          <span class="gb-label"><span class="gb-id">${esc(t.key)}</span><span class="gb-title">${esc(t.title)}</span>${t.tags.map(tagChip).join('')}</span>
+        </button>`;
+      if (t.deadline && daysBetween(t.end, t.deadline) > 0) bars += `<span class="g-mark st-${st}" style="left:${x0(t.deadline) + dw / 2}px;top:${y + GL.ROW / 2}px"></span>`;
+      y += GL.ROW;
+    }
+    boxes += `<div class="g-group" style="left:${x0(ps) - 6}px;top:${top - 6}px;width:${x1(pe) - x0(ps) + 12}px;height:${y - top + 12}px"></div>`;
+    y += GL.GAP;
+  }
+  y -= GL.GAP - GL.PAD;
+
+  const paths = s.gantt.flatMap((t) => t.dependsOn.filter((d) => pos[d] && pos[t.id]).map((d) => {
+    const bad = conflicts.has(`${t.id}<${d}`);
+    return `<path class="${bad ? 'bad' : ''}" d="${depPath(pos[d], pos[t.id])}" marker-end="url(#${bad ? 'g-arr-bad' : 'g-arr'})"/>`;
+  })).join('');
+  const marker = (id, color) => `<marker id="${id}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:${color};stroke:none"/></marker>`;
+
+  return `<div class="g-scroll" tabindex="0" role="region" aria-label="Gantt timeline, scrolls horizontally">
+    <div class="g-canvas" style="width:${W}px;--dw:${dw}px" data-today-x="${todayX}" data-dw="${dw}">
+      <div class="g-weeks">${weeks}</div>
+      <div class="g-days">${days}</div>
+      <div class="g-plot" style="height:${y}px">
+        ${hatch}<span class="g-now" style="left:${todayX}px"></span>${boxes}
+        <svg class="g-deps" width="${W}" height="${y}" aria-hidden="true"><defs>${marker('g-arr', 'var(--dep)')}${marker('g-arr-bad', 'var(--crit)')}</defs>${paths}</svg>
+        ${bars}
+      </div>
+    </div></div>`;
+}
+function GanttList(s, groups, win) {
+  const all = groups.flatMap((g) => g.tasks.map((t) => ({ t, p: g.project })));
+  return `<ul class="g-list">${all.map(({ t, p }) => {
+    const st = ganttStatus(t);
+    const dep = t.dependsOn.map((id) => find(s.gantt, id)).filter(Boolean);
+    return `<li><button class="gm-item st-${st}" data-action="open" data-type="gantt" data-id="${t.id}">
+      <span class="gm-head"><span><span class="gm-project">${esc(t.key)}, ${esc(p.name)}</span><span class="gm-title" style="display:block">${esc(t.title)}</span></span><span class="pill st-${st}">${STATUS_LABEL[st]}</span></span>
+      <span class="gm-range"><span>${fmtShort(t.start)}</span>
+        <span class="gm-track" aria-hidden="true"><span class="gm-span" style="left:${win.pos(t.start)}%;width:${win.pos(t.end) - win.pos(t.start)}%"></span><span class="gm-today" style="left:${win.pos(now())}%"></span></span>
+        <span>${fmtShort(t.end)}</span></span>
+      <span class="gm-progress"><span class="bar" role="progressbar" aria-valuenow="${t.progress}" aria-valuemin="0" aria-valuemax="100" aria-label="Progress"><span style="width:${t.progress}%"></span></span><b>${t.progress}%</b></span>
+      ${dep.length ? `<span class="gm-dep">${icon('link', 'xs')}After ${dep.map((d) => esc(d.title)).join(', ')}</span>` : ''}
+    </button></li>`; }).join('')}</ul>`;
+}
+function PersonalGantt(s) {
+  const filter = s.ui.ganttProject, view = s.ui.ganttView;
+  const groups = projectSummaries(s)
+    .filter((p) => filter === 'all' || p.id === filter)
+    .map((p) => ({ project: p, tasks: [...p.tasks].sort((a, b) => a.start - b.start) }));
+  const conflicts = depConflicts(s).size;
+  const projectOptions = s.projects.filter((p) => s.gantt.some((t) => t.projectId === p.id))
+    .map((p) => `<option value="${p.id}"${filter === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  const toolbar = `<div class="g-toolbar">
+      ${seg('gantt-view', [{ id: 'timeline', label: 'Timeline' }, { id: 'list', label: 'List' }], view, 'Gantt view')}
+      <div class="g-actions">
+        <label><span class="sr-only">Filter by project</span><select class="select" data-action="gantt-project"><option value="all">All projects</option>${projectOptions}</select></label>
+        ${view === 'timeline' ? `<label><span class="sr-only">Zoom</span><select class="select" data-action="gantt-zoom">${Object.entries(ZOOMS).map(([k, z]) => `<option value="${k}"${k === s.ui.ganttZoom ? ' selected' : ''}>${z.label}</option>`).join('')}</select></label>
+        <button class="btn small" data-action="gantt-today">Today</button>` : ''}
+        <button class="btn small${conflicts ? ' warn' : ''}" data-action="gantt-recalc" data-tip="${conflicts ? `${conflicts} ${conflicts === 1 ? 'task starts' : 'tasks start'} before the task it depends on ends` : 'Schedule respects all dependencies'}">${icon('refresh', 'sm')}Recalculate${conflicts ? `<span class="badge">${conflicts}</span>` : ''}</button>
+      </div>
+    </div>`;
+  const legend = ['on-track', 'at-risk', 'delayed', 'done', 'not-started'].map((st) => `<span class="tag st-${st}"><span class="sw"></span>${STATUS_LABEL[st]}</span>`).join('')
+    + (view === 'timeline' ? `<span class="tag"><span class="dep-sw"></span>Depends on</span>${conflicts ? `<span class="tag"><span class="dep-sw bad"></span>Starts too early</span>` : ''}` : '');
+  const content = !groups.length ? '<p class="empty">No tasks assigned to you in this project.</p>'
+    : view === 'timeline' ? GanttTimeline(s, groups) : GanttList(s, groups, ganttWindow(groups.flatMap((g) => g.tasks)));
+  const open = s.gantt.filter((t) => t.progress < 100).length;
+  return Card(s, { id: 'gantt', title: 'Personal Gantt', iconName: 'gantt', sub: `<b>${open}</b> open tasks assigned to you, from the company plan`,
+    body: `<div class="gantt">${toolbar}${content}<div class="g-legend">${legend}</div></div>` });
+}
+
+/* Projects ----------------------------------------------------------------- */
+function ProjectOverview(s) {
+  const list = projectSummaries(s).sort((a, b) => STATUS_RANK[a.health] - STATUS_RANK[b.health]);
+  const body = `<ul class="proj-list">${list.map((p) => `<li><button class="proj" data-action="gantt-focus" data-id="${p.id}" data-tip="Show in Gantt">
+      <span class="proj-top">${lamp(p.health === 'delayed' ? 'critical' : p.health === 'at-risk' ? 'high' : 'upcoming')}<b>${esc(p.name)}</b><span class="pill st-${p.health}">${STATUS_LABEL[p.health]}</span><span class="pct">${p.progress}%</span></span>
+      <span class="bar st-${p.health}"><span style="width:${p.progress}%"></span></span>
+      <span class="proj-next">${p.next ? `Next: <b>${esc(p.next.title)}</b>, ends ${esc(dueText(p.next.end, false))}` : 'All tasks done'}</span>
+    </button></li>`).join('')}</ul>`;
+  return Card(s, { id: 'projects', title: 'Projects', iconName: 'folder', sub: `<b>${list.length}</b> active`, body });
+}
+
+/* Drawer ------------------------------------------------------------------- */
+function kv(rows) { return `<dl class="kv">${rows.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>`; }
+const DRAWERS = {
+  email(s, id) {
+    const e = find(s.emails, id); if (!e) return null;
+    return {
+      kicker: `${icon('mail', 'xs')}Mail, ${MAIL_CAT_LABEL[e.category]}`, title: esc(e.subject),
+      body: `<div style="display:flex;gap:12px;align-items:center"><span class="avatar" style="--h:${hue(e.from.name)}">${esc(initialsOf(e.from.name))}</span>
+          <div><b>${esc(e.from.name)}</b><div class="muted" style="font-size:12.5px">${esc(e.from.address)}</div></div></div>
+        ${kv([['Received', `${fmtLong(e.receivedAt)}, ${fmtTime(e.receivedAt)}`], ['Priority', e.priority === 'normal' ? 'Normal' : pill(e.priority)], e.deadline && ['Deadline', `${fmtLong(e.deadline)}, ${fmtTime(e.deadline)}`]])}
+        <div class="prose">${esc(e.body)}</div>
+        ${e.attachments.length ? `<div class="d-section"><h3>Attachments</h3>${e.attachments.map((a) => `<div class="file">${icon('clip', 'sm')}${esc(a)}</div>`).join('')}</div>` : ''}`,
+      foot: e.done
+        ? `<button class="btn" data-action="mail-move" data-id="${e.id}" data-value="needs-reply">${icon('mail', 'sm')}Move back to inbox</button>`
+        : `<button class="btn primary" data-action="mail-done" data-id="${e.id}" data-close="1">${icon('check', 'sm')}Mark as done</button>
+           ${e.category !== 'waiting' ? `<button class="btn" data-action="mail-move" data-id="${e.id}" data-value="waiting">${icon('hourglass', 'sm')}Move to Waiting</button>` : ''}`,
+    };
+  },
+  event(s, id) {
+    const e = find(s.events, id); if (!e) return null;
+    return {
+      kicker: `${icon('calendar', 'xs')}${CAT_LABEL[e.category]}${e.important ? ', important' : ''}`, title: esc(e.title),
+      body: kv([['When', `${fmtLong(e.start)}<br>${fmtTime(e.start)} to ${fmtTime(e.end)} (${fmtDuration(e.end - e.start)})`],
+        (e.location || e.videoLink) && ['Where', esc(e.videoLink ? `${e.videoLink} video call` : e.location)],
+        e.attendees.length && ['With', esc(e.attendees.join(', '))]]) + (e.notes ? `<div class="prose">${esc(e.notes)}</div>` : ''),
+      foot: e.videoLink && e.end > now() ? `<button class="btn primary" data-action="mock" data-msg="Joining ${esc(e.videoLink)} is simulated in this demo">${icon('video', 'sm')}Join call</button>` : '',
+    };
+  },
+  pr(s, id) {
+    const p = find(s.pulls, id); if (!p) return null;
+    const c = p.checks;
+    const checkRows = [
+      ...c.failedNames.map((n) => `<div class="check-row st-error">${icon('xCircle', 'sm')}${esc(n)}<span class="muted" style="margin-left:auto">failed</span></div>`),
+      c.pending ? `<div class="check-row st-pending">${icon('pending', 'sm')}${c.pending} checks running</div>` : '',
+      c.passed ? `<div class="check-row st-success">${icon('checkCircle', 'sm')}${c.passed} checks passed</div>` : '',
+    ].join('');
+    return {
+      kicker: `${icon('pr', 'xs')}${esc(p.repo)} #${p.number}`, title: esc(p.title),
+      body: kv([['Author', esc(p.author === CONFIG.user.githubLogin ? 'You' : p.author)], ['Status', PR_STATUS_TEXT[p.status] + (p.blockedBy ? `, waiting on ${esc(p.blockedBy)}` : '')],
+        ['Opened', `${relPast(p.createdAt)}`], ['Your review', p.reviewRequested ? pill(prLevel(p), 'Requested') : 'Not requested']]) +
+        `<div class="d-section"><h3>Checks</h3>${checkRows}</div>`,
+      foot: `${p.reviewRequested ? `<button class="btn primary" data-action="pr-reviewed" data-id="${p.id}" data-close="1">${icon('check', 'sm')}Mark review done</button>` : ''}
+             <button class="btn" data-action="mock" data-msg="Opening GitHub is simulated in this demo">${icon('external', 'sm')}Open on GitHub</button>`,
+    };
+  },
+  issue(s, id) {
+    const i = find(s.issues, id); if (!i) return null;
+    return {
+      kicker: `${icon(ISSUE_ICON[i.kind], 'xs')}${esc(i.repo)}${i.number ? ` #${i.number}` : ''}`, title: esc(i.title),
+      body: kv([['State', stateBadge(i.state)], ['Priority', pill(i.level)], ['Since', relPast(i.createdAt)]]) + `<div class="prose">${esc(i.detail)}</div>`,
+      foot: `${i.acknowledged ? '' : `<button class="btn primary" data-action="issue-ack" data-id="${i.id}" data-close="1">${icon('check', 'sm')}Acknowledge</button>`}
+             <button class="btn" data-action="mock" data-msg="Opening GitHub is simulated in this demo">${icon('external', 'sm')}Open on GitHub</button>`,
+    };
+  },
+  task(s, id) {
+    const t = find(s.trello, id); if (!t) return null;
+    return {
+      kicker: `${icon('kanban', 'xs')}Trello, ${esc(t.board)}`, title: esc(t.title),
+      body: kv([t.due && ['Due', esc(dueText(t.due, false))], t.checklist && ['Checklist', `${t.checklist.done} of ${t.checklist.total}`], ['Labels', t.labels.map((l) => `<span class="kb-label lbl-${l}">${esc(l)}</span>`).join(' ')]]) +
+        `<div class="d-section"><h3>Move to</h3><div class="move-grid">${COLUMNS.map((c) => `<button class="btn" data-action="task-move" data-id="${t.id}" data-value="${c.id}" aria-pressed="${t.column === c.id}">${c.label}</button>`).join('')}</div></div>`,
+      foot: '',
+    };
+  },
+  gantt(s, id) {
+    const t = find(s.gantt, id); if (!t) return null;
+    const p = find(s.projects, t.projectId);
+    const st = ganttStatus(t);
+    const expected = Math.round(clamp((now() - t.start) / (t.end - t.start), 0, 1) * 100);
+    const deps = t.dependsOn.map((d) => find(s.gantt, d)).filter(Boolean);
+    const blocks = s.gantt.filter((x) => x.dependsOn.includes(t.id));
+    return {
+      kicker: `${icon('gantt', 'xs')}${esc(t.key)}, ${esc(p.name)}${t.tags.length ? `, ${esc(t.tags.join(', '))}` : ''}`, title: esc(t.title),
+      body: kv([['Status', `<span class="pill st-${st}">${STATUS_LABEL[st]}</span>`], ['Progress', `${t.progress}% <span class="muted">(${expected}% expected by today)</span>`],
+        ['Start', fmtLong(t.start)], ['End', fmtLong(t.end)], t.deadline && ['Deadline', fmtLong(t.deadline)],
+        deps.length && ['Depends on', deps.map((d) => `${esc(d.title)} (${d.progress}%)`).join('<br>')],
+        blocks.length && ['Blocks', blocks.map((d) => esc(d.title)).join('<br>')], ['Project owner', esc(p.owner)]]) +
+        `<div class="bar st-${st}" role="progressbar" aria-valuenow="${t.progress}" aria-valuemin="0" aria-valuemax="100" aria-label="Progress" style="height:8px"><span style="width:${t.progress}%"></span></div>`,
+      foot: '',
+    };
+  },
+  profile(s) {
+    return {
+      kicker: `${icon('users', 'xs')}Profile`, title: esc(CONFIG.user.name),
+      body: `${kv([['Role', esc(CONFIG.user.role)], ['GitHub', esc(CONFIG.user.githubLogin)], ['Theme', currentTheme() === 'dark' ? 'Dark' : 'Light']])}
+        <div class="d-section"><h3>Data sources</h3>${Object.entries(dataSource.sources).map(([k, v]) => `<div class="check-row st-pending">${icon('link', 'sm')}<b>${esc(k)}</b><span class="muted" style="margin-left:auto">${esc(v)}</span></div>`).join('')}</div>
+        <p class="prose">All data is mocked. Each source is read through one DataSource object, so connecting a real service means replacing one implementation, not the widgets.</p>`,
+      foot: `<button class="btn" data-action="theme-toggle">${icon(currentTheme() === 'dark' ? 'sun' : 'moon', 'sm')}Switch to ${currentTheme() === 'dark' ? 'light' : 'dark'} mode</button>`,
+    };
+  },
+};
+
+/* Notifications + search ---------------------------------------------------- */
+function NotifPanel(s) {
+  const items = attentionItems(s).filter((i) => i.level === 'critical' || i.level === 'high');
+  return `<div class="pop-head">Needs you now <button data-action="notif-seen">Mark all as seen</button></div>
+    ${items.map((i) => `<button class="pop-item lvl-${i.level}" data-action="open" data-type="${i.open.type}" data-id="${i.open.id}">
+      ${lamp(i.level)}<div><b>${esc(i.title)}</b><span>${esc(i.source)}, ${esc(i.when)}</span></div></button>`).join('') || '<p class="pop-empty">No critical or high items.</p>'}`;
+}
+function searchIndex(s) {
+  return [
+    ...s.emails.map((e) => ({ group: 'Mail', icon: 'mail', type: 'email', id: e.id, title: e.subject, sub: `${e.from.name}, ${relPast(e.receivedAt)}`, text: `${e.subject} ${e.from.name} ${e.from.org} ${e.preview}` })),
+    ...s.events.map((e) => ({ group: 'Calendar', icon: 'calendar', type: 'event', id: e.id, title: e.title, sub: dueText(e.start, true), text: `${e.title} ${e.location || ''} ${e.attendees.join(' ')}` })),
+    ...s.pulls.map((p) => ({ group: 'Pull requests', icon: 'pr', type: 'pr', id: p.id, title: p.title, sub: `${p.repo} #${p.number}`, text: `${p.title} ${p.repo} ${p.number} ${p.author}` })),
+    ...s.issues.map((i) => ({ group: 'Errors & issues', icon: ISSUE_ICON[i.kind], type: 'issue', id: i.id, title: i.title, sub: i.repo, text: `${i.title} ${i.repo} ${i.detail}` })),
+    ...s.reminders.map((r) => ({ group: 'Reminders', icon: 'checkSquare', type: 'reminder', id: r.id, title: r.title, sub: dueText(r.due, r.hasTime), text: `${r.title} ${r.category}` })),
+    ...s.trello.map((t) => ({ group: 'Trello', icon: 'kanban', type: 'task', id: t.id, title: t.title, sub: `${t.board}, ${COLUMNS.find((c) => c.id === t.column).label}`, text: `${t.title} ${t.board} ${t.labels.join(' ')}` })),
+    ...s.gantt.map((t) => ({ group: 'Plan', icon: 'gantt', type: 'gantt', id: t.id, title: `${t.key} ${t.title}`, sub: find(s.projects, t.projectId).name, text: `${t.key} ${t.title} ${t.tags.join(' ')} ${find(s.projects, t.projectId).name}` })),
+  ];
+}
+function runSearch(q) {
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!terms.length) return [];
+  return searchIndex(store.state).filter((x) => terms.every((t) => x.text.toLowerCase().includes(t))).slice(0, 10);
+}
+
+/* ------------------------------------------------------------- 9. APP SHELL */
+const NAV = [
+  { id: 'overview', label: 'Overview', short: 'Home', icon: 'home', mobile: true },
+  { id: 'mail', label: 'Mail', short: 'Mail', icon: 'mail', mobile: true, count: (s) => s.emails.filter(needsAction).length, hot: (s) => s.emails.some((e) => needsAction(e) && e.priority === 'critical') },
+  { id: 'calendar', label: 'Calendar', short: 'Agenda', icon: 'calendar', mobile: true },
+  { id: 'github', label: 'GitHub', short: 'Code', icon: 'git', mobile: true, count: (s) => s.pulls.filter((p) => p.reviewRequested).length + s.issues.filter((i) => !i.acknowledged && i.state === 'error').length, hot: (s) => s.issues.some((i) => !i.acknowledged && i.level === 'critical') },
+  { id: 'reminders', label: 'Reminders', short: 'Tasks', icon: 'checkSquare', mobile: true, count: (s) => s.reminders.filter((r) => ['overdue', 'today'].includes(reminderState(r))).length },
+  { id: 'gantt', label: 'Personal Gantt', short: 'Plan', icon: 'gantt', mobile: true },
+  { id: 'trello', label: 'Trello', icon: 'kanban' },
+  { id: 'projects', label: 'Projects', icon: 'folder' },
+];
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+function currentTheme() {
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t) return t;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function toggleTheme() {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('cc-theme', next); } catch (e) {}
+  render(store.state);
+}
+
+function renderShell(s) {
+  const n = now(), h = n.getHours();
+  const hello = h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const items = attentionItems(s);
+  const pressing = items.filter((i) => i.level === 'critical' || i.level === 'high').length;
+  const nextEv = [...s.events].sort((a, b) => a.start - b.start).find((e) => e.start > n);
+  const nowEv = s.events.find((e) => e.start <= n && e.end > n);
+  $('[data-bind="greeting"]').textContent = `${hello}, ${CONFIG.user.name}`;
+  $('[data-bind="day-status"]').innerHTML = `${esc(fmtLong(n))}. ` +
+    (pressing ? `You have <strong>${pressing} ${pressing === 1 ? 'thing' : 'things'}</strong> that need your attention today` : 'Nothing urgent right now') +
+    (nowEv ? `, and you're in <strong>${esc(nowEv.title)}</strong> until ${fmtTime(nowEv.end)}.` : nextEv ? `. Next up: <strong>${esc(nextEv.title)}</strong>, ${esc(dueText(nextEv.start, true).replace(/^In /, 'in '))}.` : '.');
+  $('[data-bind="date-short"]').textContent = fmtLong(n);
+  $$('[data-bind="initials"]').forEach((el) => { el.textContent = CONFIG.user.initials; });
+  $('[data-bind="username"]').textContent = CONFIG.user.name;
+  $('[data-bind="role"]').textContent = CONFIG.user.role;
+  const theme = currentTheme();
+  const tb = $('[data-bind="theme-btn"]');
+  tb.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+  tb.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
+  tb.dataset.tip = `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`;
+  const unseen = items.filter((i) => (i.level === 'critical' || i.level === 'high') && !s.ui.notifSeen.has(i.key)).length;
+  const dot = $('[data-bind="notif-count"]');
+  dot.hidden = !unseen; dot.textContent = unseen;
+  $('#notif-btn').setAttribute('aria-label', `Notifications, ${unseen} new`);
+  const navHtml = (cls, withShort) => NAV.filter((x) => !withShort || x.mobile).map((x) => {
+    const c = x.count ? x.count(s) : 0;
+    return `<a class="${cls}" href="#${x.id}" data-nav="${x.id}" data-action="goto" data-target="${x.id}" ${withShort ? '' : `data-tip-rail="${esc(x.label)}"`}>${icon(x.icon)}<span class="nav-label">${esc(withShort ? x.short : x.label)}</span><span class="nav-count ${x.hot && x.hot(s) ? 'hot' : ''}">${c || ''}</span></a>`;
+  }).join('');
+  $('[data-slot="sidenav"]').innerHTML = navHtml('nav-link', false);
+  $('[data-slot="bottomnav"]').innerHTML = navHtml('bn-link', true);
+  markActiveNav(activeSection);
+  const np = $('#notif-panel'); if (!np.hidden) np.innerHTML = NotifPanel(s);
+}
+
+const SECTIONS = {
+  overview: AttentionPanel, kpis: KpiGrid, mail: MailTriage, calendar: CalendarWidget, github: GithubAttention,
+  reminders: Reminders, gantt: PersonalGantt, trello: TrelloTasks, projects: ProjectOverview,
+};
+function renderDrawer(s) {
+  const root = $('#drawer');
+  const d = s.ui.drawer;
+  const view = d && DRAWERS[d.type] ? DRAWERS[d.type](s, d.id) : null;
+  if (!view) { if (!root.hidden) { root.hidden = true; document.body.style.overflow = ''; lastFocus && lastFocus.focus && lastFocus.focus(); } return; }
+  const wasHidden = root.hidden;
+  $('.drawer', root).innerHTML = `
+    <header class="drawer-head"><div><p class="drawer-kicker">${view.kicker}</p><h2 id="drawer-title">${view.title}</h2></div>
+      <button class="icon-btn" data-action="drawer-close" aria-label="Close details">${icon('x')}</button></header>
+    <div class="drawer-body">${view.body}</div>
+    <footer class="drawer-foot">${view.foot || ''}</footer>`;
+  if (wasHidden) { root.hidden = false; document.body.style.overflow = 'hidden'; $('[data-action="drawer-close"].icon-btn', root).focus(); }
+}
+function render(s) {
+  const scrollY = window.scrollY;
+  const ae = document.activeElement;
+  const focusId = ae && ae.id;
+  const focusSel = ae && ae.dataset && ae.dataset.action
+    ? ['action', 'value', 'id', 'type'].filter((k) => ae.dataset[k]).map((k) => `[data-${k}="${CSS.escape(ae.dataset[k])}"]`).join('') : null;
+  const gOld = $('#gantt .g-scroll');
+  const gLeft = gOld ? gOld.scrollLeft : null;
+  renderShell(s);
+  for (const [id, fn] of Object.entries(SECTIONS)) {
+    const el = document.getElementById(id);
+    el.classList.toggle('is-collapsed', !!s.ui.collapsed[id]);
+    el.innerHTML = fn(s);
+  }
+  const gNew = $('#gantt .g-scroll');
+  if (gNew) { if (ganttScrollToday || gLeft === null) { scrollGanttToToday(gNew, false); ganttScrollToday = false; } else gNew.scrollLeft = gLeft; }
+  renderDrawer(s);
+  if (focusId && focusId !== 'search') { const el = document.getElementById(focusId); if (el) el.focus({ preventScroll: true }); }
+  else if (focusSel && !s.ui.drawer) { const el = document.querySelector(focusSel); if (el) el.focus({ preventScroll: true }); }
+  if (Math.abs(window.scrollY - scrollY) > 1) window.scrollTo(0, scrollY);
+}
+
+/* gantt horizontal scroll */
+let ganttScrollToday = true;
+function scrollGanttToToday(el, smooth) {
+  const c = el.firstElementChild;
+  const x = Number(c.dataset.todayX), dw = Number(c.dataset.dw);
+  const left = Math.max(0, x - Math.min(el.clientWidth * 0.3, 2.5 * dw));
+  el.scrollTo({ left, behavior: smooth && !matchMediaSafe('(prefers-reduced-motion: reduce)') ? 'smooth' : 'auto' });
+}
+
+/* navigation + scroll spy */
+let activeSection = 'overview';
+function markActiveNav(id) {
+  const map = { kpis: 'overview' };
+  const target = map[id] || id;
+  $$('[data-nav]').forEach((a) => a.setAttribute('aria-current', String(a.dataset.nav === target)));
+}
+function goTo(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (store.state.ui.collapsed[id]) actions.toggleCollapse(id);
+  el.scrollIntoView({ behavior: matchMediaSafe('(prefers-reduced-motion: reduce)') ? 'auto' : 'smooth', block: 'start' });
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 1400);
+  activeSection = id; markActiveNav(id);
+}
+const matchMediaSafe = (q) => !!(window.matchMedia && window.matchMedia(q).matches);
+function initScrollSpy() {
+  if (!('IntersectionObserver' in window)) return;
+  const visible = new Map();
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) visible.set(e.target.id, e.isIntersecting ? e.boundingClientRect.top : null);
+    const best = [...visible.entries()].filter(([, v]) => v !== null).sort((a, b) => Math.abs(a[1]) - Math.abs(b[1]))[0];
+    if (best && best[0] !== activeSection) { activeSection = best[0]; markActiveNav(activeSection); }
+  }, { rootMargin: '-20% 0px -55% 0px' });
+  Object.keys(SECTIONS).forEach((id) => io.observe(document.getElementById(id)));
+}
+
+/* toast */
+let toastTimer;
+function toast(msg, undo) {
+  const root = $('#toast-root');
+  clearTimeout(toastTimer);
+  root.innerHTML = `<div class="toast" role="status"><span>${esc(msg)}</span>${undo ? '<button type="button" data-toast-undo>Undo</button>' : ''}</div>`;
+  if (undo) $('[data-toast-undo]', root).addEventListener('click', () => { undo(); root.innerHTML = ''; });
+  toastTimer = setTimeout(() => { root.innerHTML = ''; }, 4500);
+}
+
+/* tooltip: one floating element, works for keyboard focus too */
+const tip = () => $('#tooltip');
+function showTip(el) {
+  const railOnly = el.hasAttribute('data-tip-rail');
+  const text = el.getAttribute('data-tip') || el.getAttribute('data-tip-rail');
+  if (!text || matchMediaSafe('(hover: none)')) return;
+  if (railOnly && !(window.innerWidth >= 768 && window.innerWidth < 1200)) return;
+  const t = tip(); t.textContent = text; t.classList.add('show');
+  const r = el.getBoundingClientRect(), tr = t.getBoundingClientRect();
+  let x = railOnly ? r.right + 10 : r.left + r.width / 2 - tr.width / 2;
+  let y = railOnly ? r.top + r.height / 2 - tr.height / 2 : r.top - tr.height - 8;
+  if (y < 8) y = r.bottom + 8;
+  x = clamp(x, 8, window.innerWidth - tr.width - 8);
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+}
+function hideTip() { tip().classList.remove('show'); }
+
+/* popovers */
+function closePopovers(except) {
+  if (except !== 'notif') { $('#notif-panel').hidden = true; $('#notif-btn').setAttribute('aria-expanded', 'false'); }
+  if (except !== 'search') { $('#search-results').hidden = true; $('#search').setAttribute('aria-expanded', 'false'); }
+}
+function renderSearchResults(q) {
+  const box = $('#search-results');
+  const results = runSearch(q);
+  if (!q.trim()) { box.hidden = true; $('#search').setAttribute('aria-expanded', 'false'); return; }
+  let html = '', group = '';
+  results.forEach((r, idx) => {
+    if (r.group !== group) { group = r.group; html += `<div class="pop-group">${esc(group)}</div>`; }
+    html += `<button class="pop-item${idx === 0 ? ' is-active' : ''}" role="option" data-action="open" data-type="${r.type}" data-id="${r.id}">${icon(r.icon, 'sm')}<div><b>${esc(r.title)}</b><span>${esc(r.sub)}</span></div></button>`;
+  });
+  box.innerHTML = html || `<p class="pop-empty">No matches for “${esc(q)}”. Try a sender, repo or project name.</p>`;
+  box.hidden = false; $('#search').setAttribute('aria-expanded', 'true');
+}
+
+/* event wiring (delegated) */
+let lastFocus = null;
+const HANDLERS = {
+  'theme-toggle': () => toggleTheme(),
+  'goto': (el, ev) => { ev.preventDefault(); goTo(el.dataset.target); },
+  'open': (el) => { lastFocus = el; closePopovers(); searchClose(); actions.openDrawer(el.dataset.type, el.dataset.id); },
+  'open-profile': (el) => { lastFocus = el; actions.setUi({ drawer: { type: 'profile', id: 'me' } }); },
+  'drawer-close': () => actions.closeDrawer(),
+  'collapse': (el) => actions.toggleCollapse(el.dataset.id),
+  'expand': (el) => actions.toggleExpand(el.dataset.id),
+  'att-filter': (el) => actions.setUi({ attFilter: store.state.ui.attFilter === el.dataset.value ? 'all' : el.dataset.value }),
+  'mail-filter': (el) => { store.state.ui.expanded.mail = false; actions.setUi({ mailFilter: el.dataset.value }); },
+  'mail-done': (el) => { if (el.dataset.close) actions.closeDrawer(); actions.markEmailDone(el.dataset.id); },
+  'mail-move': (el) => actions.moveEmail(el.dataset.id, el.dataset.value),
+  'cal-tab': (el) => actions.setUi({ calTab: el.dataset.value }),
+  'gh-tab': (el) => actions.setUi({ ghTab: el.dataset.value }),
+  'gh-filter': (el) => actions.setUi({ ghFilter: el.dataset.value }),
+  'pr-reviewed': (el) => { actions.closeDrawer(); actions.markReviewed(el.dataset.id); },
+  'issue-ack': (el) => { actions.closeDrawer(); actions.ackIssue(el.dataset.id); },
+  'trello-col': (el) => actions.setUi({ trelloCol: el.dataset.value }),
+  'task-move': (el) => actions.moveTask(el.dataset.id, el.dataset.value),
+  'gantt-focus': (el) => { ganttScrollToday = true; actions.setUi({ ganttProject: el.dataset.id }); goTo('gantt'); },
+  'gantt-view': (el) => { ganttScrollToday = true; actions.setUi({ ganttView: el.dataset.value }); },
+  'gantt-today': () => { const sc = $('#gantt .g-scroll'); if (sc) scrollGanttToToday(sc, true); },
+  'gantt-recalc': () => actions.recalcGantt(),
+  'gantt-toggle': (el) => store.update((s) => { s.ui.ganttCollapsed[el.dataset.id] = !s.ui.ganttCollapsed[el.dataset.id]; }),
+  'notif-toggle': () => {
+    const p = $('#notif-panel'); const open = p.hidden;
+    closePopovers(open ? 'notif' : undefined);
+    if (open) { p.innerHTML = NotifPanel(store.state); p.hidden = false; $('#notif-btn').setAttribute('aria-expanded', 'true'); }
+  },
+  'notif-seen': () => { store.update((s) => attentionItems(s).forEach((i) => s.ui.notifSeen.add(i.key))); closePopovers(); },
+  'search-open': () => { $('#topbar').classList.add('search-open'); $('#search').focus(); },
+  'search-close': () => searchClose(),
+  'mock': (el) => toast(el.dataset.msg),
+};
+function searchClose() { $('#topbar').classList.remove('search-open'); const i = $('#search'); i.value = ''; renderSearchResults(''); }
+
+function wireEvents() {
+  document.addEventListener('click', (ev) => {
+    const el = ev.target.closest('[data-action]');
+    if (!ev.target.closest('.notif-wrap') && !ev.target.closest('.search')) closePopovers();
+    if (!el) return;
+    const h = HANDLERS[el.dataset.action];
+    if (h && el.tagName !== 'SELECT' && !(el.tagName === 'INPUT')) h(el, ev);
+  });
+  document.addEventListener('change', (ev) => {
+    const el = ev.target;
+    const a = el.dataset.action;
+    if (a === 'rem-toggle') actions.toggleReminder(el.dataset.id);
+    if (a === 'rem-showdone') actions.setUi({ remShowDone: el.checked });
+    if (a === 'gh-sort') actions.setUi({ ghSort: el.value });
+    if (a === 'gantt-project') { ganttScrollToday = true; actions.setUi({ ganttProject: el.value }); }
+    if (a === 'gantt-zoom') { ganttScrollToday = true; actions.setUi({ ganttZoom: el.value }); }
+  });
+  document.addEventListener('submit', (ev) => {
+    const f = ev.target;
+    if (f.dataset.form !== 'rem-add') return;
+    ev.preventDefault();
+    const title = f.title.value.trim();
+    if (!title) return;
+    actions.addReminder(title, f.when.value);
+    const input = $('#rem-new'); if (input) input.focus();
+  });
+  const search = $('#search');
+  search.addEventListener('input', () => renderSearchResults(search.value));
+  search.addEventListener('focus', () => { if (search.value) renderSearchResults(search.value); });
+  search.addEventListener('keydown', (ev) => {
+    const items = $$('#search-results .pop-item');
+    const i = items.findIndex((x) => x.classList.contains('is-active'));
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+      ev.preventDefault(); if (!items.length) return;
+      const next = ev.key === 'ArrowDown' ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+      items.forEach((x) => x.classList.remove('is-active')); items[next].classList.add('is-active'); items[next].scrollIntoView({ block: 'nearest' });
+    }
+    if (ev.key === 'Enter' && items[i]) { ev.preventDefault(); items[i].click(); }
+    if (ev.key === 'Escape') { searchClose(); search.blur(); }
+  });
+  document.addEventListener('keydown', (ev) => {
+    const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    if (ev.key === 'Escape') { if (store.state.ui.drawer) actions.closeDrawer(); closePopovers(); }
+    if (!typing && (ev.key === '/' || ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k'))) {
+      ev.preventDefault(); $('#topbar').classList.add('search-open'); search.focus();
+    }
+    if (ev.key === 'Tab' && store.state.ui.drawer) {
+      const f = $$('#drawer button, #drawer [href], #drawer input, #drawer select').filter((x) => !x.disabled && x.offsetParent !== null);
+      if (!f.length) return;
+      if (ev.shiftKey && document.activeElement === f[0]) { ev.preventDefault(); f[f.length - 1].focus(); }
+      else if (!ev.shiftKey && document.activeElement === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
+    }
+  });
+  document.addEventListener('mouseover', (ev) => { const el = ev.target.closest('[data-tip],[data-tip-rail]'); if (el) showTip(el); else hideTip(); });
+  document.addEventListener('focusin', (ev) => { const el = ev.target.closest && ev.target.closest('[data-tip],[data-tip-rail]'); if (el && ev.target.matches(':focus-visible')) showTip(el); else hideTip(); });
+  window.addEventListener('scroll', hideTip, { passive: true });
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => render(store.state));
+}
+
+/* boot */
+async function boot() {
+  $$('[data-slot="logo"]').forEach((el) => { el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS.logo}</svg>`; });
+  $$('[data-slot="icon-search"]').forEach((el) => { el.innerHTML = icon('search'); });
+  $$('[data-slot="icon-bell"]').forEach((el) => { el.innerHTML = icon('bell'); });
+  $$('[data-slot="icon-x"]').forEach((el) => { el.innerHTML = icon('x', 'sm'); });
+  const [emails, events, pulls, issues, reminders, trello, projects, gantt] = await Promise.all([
+    dataSource.getEmails(), dataSource.getEvents(), dataSource.getPullRequests(), dataSource.getIssues(),
+    dataSource.getReminders(), dataSource.getTasks(), dataSource.getProjects(), dataSource.getGanttFor(CONFIG.user.name),
+  ]);
+  store.subscribe(render);
+  wireEvents();
+  store.set({ emails, events, pulls, issues, reminders, trello, projects, gantt, ui: initialUi() });
+  initScrollSpy();
+  setInterval(() => { if (!document.hidden && !store.state.ui.drawer) render(store.state); }, CONFIG.refreshMs);
+}
+boot();
+</script>
+</body>
+</html>
