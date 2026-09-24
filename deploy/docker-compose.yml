@@ -5,7 +5,7 @@
 # ARGUS_VERSION=<version> (or `edge`, built from main) selects another image version.
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: command
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-command}
