@@ -1,0 +1,93 @@
+# Typecheck, tests, build and a Docker smoke test on every push and pull request.
+# Also called by release.yml before a release is published.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # "today"/"overdue" depend on the time zone: run the tests in the owner's.
+  TZ: Europe/Rome
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 is the minimum in `engines`, 24 is what the Docker images run.
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Migrations match the Drizzle schema
+        if: matrix.node == 24
+        working-directory: apps/server
+        run: |
+          npx drizzle-kit generate
+          if [ -n "$(git status --porcelain src/db/migrations)" ]; then
+            echo "::error::src/db/schema changed without a migration: run 'npm run db:generate' and commit it."
+            git status --porcelain src/db/migrations
+            exit 1
+          fi
+
+  docker:
+    name: Docker smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Create .env
+        run: |
+          cp .env.example .env
+          sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" .env
+      - name: Build and start the stack
+        run: docker compose up -d --build --wait --wait-timeout 180
+      - name: Check the API and the web proxy
+        run: |
+          curl -fsS http://localhost:3000/health
+          curl -fsS http://localhost:8080/ -o /dev/null
+          # /api goes through nginx to the server: unauthenticated is 401, not 502.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/auth/me)" = 401
+      - name: Seed, sign in and load the dashboard
+        run: |
+          docker compose exec -T server node dist/scripts/seed.js
+          docker compose exec -T -e USER_PASSWORD=ci-password-123 server \
+            node dist/scripts/user.js ci@example.com --name "CI"
+          token=$(curl -fsS http://localhost:8080/api/auth/login \
+            -H 'content-type: application/json' \
+            -d '{"email":"ci@example.com","password":"ci-password-123"}' | jq -er .accessToken)
+          curl -fsS http://localhost:8080/api/dashboard -H "authorization: Bearer $token" | jq -e '.attention' > /dev/null
+          docker compose exec -T server node dist/scripts/agent-token.js ci-agent
+      - name: Logs
+        if: failure()
+        run: docker compose logs
+      - name: Stop
+        if: always()
+        run: docker compose down -v
+
+  images:
+    name: Publish edge images
+    needs: [test, docker]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/images.yml
+    permissions:
+      contents: read
+      packages: write

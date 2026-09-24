@@ -1,5 +1,7 @@
 # Argus
 
+[![CI](https://github.com/marcomanfrin/my-personal-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/marcomanfrin/my-personal-dashboard/actions/workflows/ci.yml)
+
 A personal dashboard fed by **AI agents**. The agents read your sources (mail, calendar, GitHub,
 Trello, company planning…) and write the data to the server through a REST API; the browser shows
 it all on a single board and sends your actions back to the sources (mark as done, move a card,
@@ -67,6 +69,13 @@ Open <http://localhost:8080> and sign in. Migrations are applied when the server
 | `db` | 5432 | PostgreSQL 16, `pgdata` volume |
 
 In production, behind HTTPS, set `COOKIE_SECURE=true`.
+
+### Prebuilt images
+
+Every release publishes `ghcr.io/marcomanfrin/argus-server` and `ghcr.io/marcomanfrin/argus-web`
+(amd64 and arm64). The release assets include a `docker-compose.yml` pinned to that version, which
+pulls the images instead of building them: put it next to a `.env` and run `docker compose up -d`.
+The `edge` tag follows `main`.
 
 ## Connecting an agent
 
@@ -155,6 +164,25 @@ demo.html                          reference prototype, do not edit
 ```
 
 Architecture, conventions and the checklist for adding a resource are in [CLAUDE.md](CLAUDE.md).
+
+### CI and releases
+
+GitHub Actions (`.github/workflows/`):
+
+| Workflow | When | What |
+|---|---|---|
+| `ci.yml` | push to `main`, pull requests | typecheck, tests and build on Node 22 and 24; checks that the migrations match the Drizzle schema; builds the stack with compose, signs in and loads the dashboard through nginx; on `main` also publishes the `edge` images |
+| `release.yml` | push of a `v*` tag | CI, then images tagged `1.2.3`, `1.2` and `latest` (a pre-release such as `v1.3.0-rc.1` only gets its own tag), then a GitHub release with generated notes, the pinned compose file and `.env.example` |
+| `images.yml` | called by the two above, or by hand | multi-arch build and push to ghcr.io, with provenance and SBOM |
+| `codeql.yml` | push, pull requests, weekly | security analysis of the TypeScript code and of the workflows |
+| `dependency-review.yml` | pull requests | fails on new dependencies with high-severity vulnerabilities |
+
+Dependabot opens weekly grouped updates for npm, actions and Docker base images.
+To cut a release:
+
+```bash
+git tag v0.2.0 && git push origin v0.2.0
+```
 
 ## Configuration
 

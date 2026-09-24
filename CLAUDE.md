@@ -89,6 +89,9 @@ apps/web/             @argus/web — React 19 + Vite + Tailwind v4 + TanStack Qu
   src/features/<w>/   one widget per folder: attention, kpis, mail, calendar, github,
                       reminders, trello, gantt, projects, profile (card, rows, drawer)
   test/               vitest + jsdom + Testing Library, fake fetch/EventSource
+.github/workflows/    ci (test + compose smoke test, edge images on main) · release (v* tag → images
+                      on ghcr.io + GitHub release) · images (reusable) · codeql · dependency-review
+deploy/               docker-compose.yml on the ghcr.io images, attached to every release
 demo.html             UX reference, do not touch
 ```
 
@@ -162,3 +165,6 @@ npm run db:generate                  # after changing src/db/schema/*
 npm test                             # unit (shared) + integration (server, PGlite)
 npm run typecheck
 ```
+
+Releases: `git tag vX.Y.Z && git push origin vX.Y.Z`. CI runs with `TZ=Europe/Rome` and fails if
+`src/db/schema` changed without a generated migration.

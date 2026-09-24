@@ -1,0 +1,47 @@
+# Runs a released version from the images on ghcr.io, without building anything.
+# Attached to every GitHub release with ARGUS_VERSION pinned. Put it in a folder next to a .env
+# (from .env.example; JWT_SECRET is required, POSTGRES_PASSWORD optional) and run:
+#   docker compose up -d
+# ARGUS_VERSION=<version> (or `edge`, built from main) selects another image version.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: command
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-command}
+      POSTGRES_DB: command
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U command"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+  server:
+    image: ghcr.io/marcomanfrin/argus-server:${ARGUS_VERSION:-latest}
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://command:${POSTGRES_PASSWORD:-command}@db:5432/command
+      HOST: 0.0.0.0
+      PORT: "3000"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    ports:
+      # Agents call the API directly on :3000.
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/marcomanfrin/argus-web:${ARGUS_VERSION:-latest}
+    ports:
+      - "8080:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,58 @@
+# Pushing a `v*` tag (e.g. `git tag v0.2.0 && git push origin v0.2.0`) runs CI, publishes the
+# images to ghcr.io and creates a GitHub release with generated notes and the files to deploy it.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  images:
+    needs: ci
+    uses: ./.github/workflows/images.yml
+    permissions:
+      contents: read
+      packages: write
+
+  release:
+    needs: images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin the release version in the deploy compose file
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          sed "s|\${ARGUS_VERSION:-latest}|\${ARGUS_VERSION:-$version}|g" deploy/docker-compose.yml > docker-compose.yml
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            docker-compose.yml
+            .env.example
+          body: |
+            ## Images
+
+            ```
+            ghcr.io/${{ github.repository_owner }}/argus-server:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/argus-web:${{ env.VERSION }}
+            ```
+
+            ## Deploy
+
+            Download `docker-compose.yml` and `.env.example` from the assets below, then:
+
+            ```bash
+            cp .env.example .env        # set JWT_SECRET, TZ, USER_NAME…
+            docker compose up -d
+            docker compose exec server node dist/scripts/user.js you@example.com --name "Full Name"
+            ```
