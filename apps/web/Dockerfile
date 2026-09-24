@@ -1,6 +1,6 @@
 # Build context: the repository root (npm workspaces).
 # ---- build ------------------------------------------------------------------
-FROM node:24-slim AS build
+FROM node:25-slim AS build
 WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
