@@ -20,7 +20,7 @@
     "@argus/shared": "*",
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.0.0",
-    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/rate-limit": "^11.2.0",
     "drizzle-orm": "^0.44.0",
     "fast-jwt": "^6.3.3",
     "fastify": "^5.4.0",
