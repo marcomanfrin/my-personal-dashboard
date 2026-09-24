@@ -95,7 +95,8 @@ export function Button({ variant = 'default', size = 'md', icon, tip, className,
         variant === 'primary' && 'border-accent bg-accent text-on-accent hover:brightness-110',
         variant === 'default' && 'border-line-strong bg-surface text-fg hover:bg-surface-2',
         variant === 'warn' && 'border-high/55 bg-surface text-high hover:bg-surface-2',
-        'aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-text',
+        // Selected = solid accent, not a tint: the state must read at a glance (WCAG 1.4.11).
+        'aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent aria-pressed:hover:bg-accent',
         'disabled:cursor-not-allowed disabled:opacity-60',
         className,
       )}
@@ -208,8 +209,9 @@ export function Segmented<T extends string>({
           aria-label={o.hint}
           onClick={() => onChange(o.id)}
           className={cn(
-            'h-[26px] whitespace-nowrap rounded-[7px] px-2.5 text-[12.5px] font-bold text-fg-2',
-            'aria-pressed:bg-surface aria-pressed:text-fg aria-pressed:shadow-[0_1px_3px_rgba(0,0,0,.12)]',
+            'h-[26px] whitespace-nowrap rounded-[7px] px-2.5 text-[12.5px] font-bold text-fg-2 hover:bg-surface hover:text-fg',
+            // Selected = inverted, like a pressed Chip: unmistakable in both themes.
+            'aria-pressed:bg-fg aria-pressed:text-canvas aria-pressed:shadow-[0_1px_3px_rgba(0,0,0,.18)] aria-pressed:hover:bg-fg aria-pressed:hover:text-canvas',
             buttonClassName,
           )}
         >

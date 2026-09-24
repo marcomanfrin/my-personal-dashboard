@@ -29,7 +29,7 @@ function Counter({
       onClick={onClick}
       className={cn(
         'flex flex-col gap-0.5 rounded-md border border-line bg-surface-2 px-3 py-2.5 text-left hover:border-line-strong',
-        'aria-pressed:border-c/55 aria-pressed:bg-[color-mix(in_srgb,var(--c)_8%,var(--surface-2))]',
+        'aria-pressed:border-c aria-pressed:bg-[color-mix(in_srgb,var(--c)_12%,var(--surface))] aria-pressed:shadow-[inset_0_0_0_1px_var(--c)]',
         lvl(level),
       )}
     >
