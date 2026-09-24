@@ -167,6 +167,7 @@
   --animate-sheet: sheet 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-slide: slide 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-pulse-lamp: pulse-lamp 2.4s ease-in-out infinite;
+  --animate-lift: lift 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes fade {
     from {
@@ -183,6 +184,17 @@
     from {
       transform: translateX(40px);
       opacity: 0;
+    }
+  }
+  /* A Kanban card picked up for dragging: tilts and rises. */
+  @keyframes lift {
+    from {
+      transform: none;
+      box-shadow: var(--shadow);
+    }
+    to {
+      transform: rotate(1.5deg) scale(1.03);
+      box-shadow: var(--shadow-pop);
     }
   }
   @keyframes pulse-lamp {

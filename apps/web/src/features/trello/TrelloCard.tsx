@@ -9,6 +9,7 @@ import {
   useSensors,
   type Announcements,
   type DragEndEvent,
+  type DropAnimation,
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { TaskColumn, type Task } from '@command/shared';
@@ -20,6 +21,7 @@ import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
 import { COLUMNS } from '../../lib/labels';
 import { cardFace, DRAG_HINT_ID, KanbanCard, KanbanCardBody } from './KanbanCard';
+import { RETURN_EASE, RETURN_MS, untiltOnReturn, useCardFlip } from './useCardFlip';
 
 /** A click this soon after a drop belongs to the drag, not to the card. */
 const CLICK_AFTER_DROP_MS = 150;
@@ -29,6 +31,19 @@ const columnLabel = (id: unknown) => COLUMNS.find((c) => c.id === id)?.label ?? 
 
 /** Drop target ids: the column itself, or its tab in the narrow one-column layout. */
 const tabDropId = (c: TaskColumn) => `tab:${c}`;
+
+/** A drag that did not move the card: the preview glides back and untilts, the card stays hidden until it lands. */
+const returnAnimation: DropAnimation = {
+  duration: RETURN_MS,
+  easing: RETURN_EASE,
+  sideEffects: ({ active, dragOverlay }) => {
+    active.node.style.opacity = '0';
+    untiltOnReturn(dragOverlay.node);
+    return () => {
+      active.node.style.opacity = '';
+    };
+  },
+};
 const columnOf = (overId: string | number): TaskColumn | null => {
   const parsed = TaskColumn.safeParse(String(overId).replace(/^tab:/, ''));
   return parsed.success ? parsed.data : null;
@@ -45,7 +60,11 @@ export function TrelloCard({ className }: { className?: string }) {
   const { moveTask } = useActions();
   const [col, setCol] = useState<TaskColumn>('doing');
   const [dragging, setDragging] = useState<Task | null>(null);
+  /** The last drop moved the card: it lands in its new column (FLIP), so the preview must not fly back. */
+  const [landed, setLanded] = useState(false);
   const droppedAt = useRef(0);
+  const board = useRef<HTMLDivElement>(null);
+  const flip = useCardFlip(board, data.tasks.map((t) => `${t.id}:${t.column}`).join(','));
   const open = data.tasks.filter((t) => t.column !== 'done').length;
 
   const sensors = useSensors(
@@ -65,12 +84,19 @@ export function TrelloCard({ className }: { className?: string }) {
     onDragCancel: ({ active }) => `Moving ${titleOf(active.id)} was cancelled.`,
   };
 
-  const onDragStart = ({ active }: DragStartEvent) => setDragging(data.tasks.find((t) => t.id === active.id) ?? null);
+  const onDragStart = ({ active }: DragStartEvent) => {
+    flip.refresh();
+    setLanded(false);
+    setDragging(data.tasks.find((t) => t.id === active.id) ?? null);
+  };
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setDragging(null);
     droppedAt.current = Date.now();
     const to = over ? columnOf(over.id) : null;
     if (!to || to === active.data.current?.column) return;
+    const at = active.rect.current.translated;
+    if (at) flip.landFrom(String(active.id), at);
+    setLanded(true);
     moveTask(String(active.id), to);
     // Narrow layout: follow the card to the tab it was dropped on.
     setCol(to);
@@ -89,7 +115,7 @@ export function TrelloCard({ className }: { className?: string }) {
         onDragEnd={onDragEnd}
         onDragCancel={() => setDragging(null)}
       >
-        <div className="@container/kb">
+        <div ref={board} className="@container/kb">
           {/* Narrow layout: tabs to browse; while dragging, the same row becomes the drop targets. */}
           {dragging ? (
             <div className="mb-3 grid grid-cols-4 gap-1.5 @min-[620px]/kb:hidden" aria-hidden="true">
@@ -127,9 +153,9 @@ export function TrelloCard({ className }: { className?: string }) {
             ))}
           </div>
         </div>
-        <DragOverlay dropAnimation={prefersReducedMotion() ? null : undefined}>
+        <DragOverlay dropAnimation={landed || prefersReducedMotion() ? null : returnAnimation}>
           {dragging && (
-            <div className={cn(cardFace, 'rotate-[1.5deg] cursor-grabbing border-line-strong bg-surface shadow-pop')}>
+            <div className={cn(cardFace, 'animate-lift cursor-grabbing border-line-strong bg-surface')}>
               <KanbanCardBody task={dragging} />
             </div>
           )}

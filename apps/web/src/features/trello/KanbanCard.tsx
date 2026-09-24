@@ -66,6 +66,7 @@ export function KanbanCard({ task: t, wasDragged }: { task: Task; wasDragged: ()
           if (!wasDragged()) open('task', t.id);
         }}
         aria-describedby={DRAG_HINT_ID}
+        data-card={t.id}
         className={cn(
           cardFace,
           'cursor-grab hover:border-line-strong active:cursor-grabbing @min-[620px]/kb:bg-surface',
