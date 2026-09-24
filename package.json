@@ -22,9 +22,9 @@
     "dev:web": "npm run dev -w @argus/web"
   },
   "devDependencies": {
-    "concurrently": "^9.2.4",
+    "concurrently": "^10.0.5",
     "prettier": "^3.3.0",
-    "typescript": "^5.6.0",
+    "typescript": "^7.0.2",
     "vite": "^8.3.0"
   },
   "engines": {
