@@ -37,7 +37,7 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           sed "s|\${ARGUS_VERSION:-latest}|\${ARGUS_VERSION:-$version}|g" deploy/docker-compose.yml > docker-compose.yml
           echo "VERSION=$version" >> "$GITHUB_ENV"
-      - uses: softprops/action-gh-release@v3
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
