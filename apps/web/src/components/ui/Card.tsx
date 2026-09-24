@@ -33,7 +33,7 @@ export function Card({ id, title, icon, sub, tools, className, children }: CardP
       <header
         className={cn(
           'flex flex-wrap items-center gap-2.5 px-4 pt-3.5 pr-3.5 pb-2.5 md:px-[18px] md:pt-4 md:pr-4 md:pb-3',
-          collapsed && 'pb-3.5 md:pb-3.5',
+          collapsed ? 'pb-3.5 md:pb-3.5' : 'border-b border-line',
         )}
       >
         <div className="flex min-w-0 flex-[1_1_200px] items-center gap-2.5">
@@ -63,7 +63,7 @@ export function Card({ id, title, icon, sub, tools, className, children }: CardP
         </div>
       </header>
       {!collapsed && (
-        <div id={`${id}-body`} className="min-w-0 px-4 pb-4 md:px-[18px] md:pb-[18px]">
+        <div id={`${id}-body`} className="min-w-0 px-4 pt-3 pb-4 md:px-[18px] md:pt-3.5 md:pb-[18px]">
           {children}
         </div>
       )}

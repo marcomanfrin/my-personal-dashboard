@@ -5,30 +5,31 @@
    the Tailwind theme below (bg-surface, text-fg-2, border-line, ...).
    ========================================================================= */
 :root {
-  --bg: #f2f3f8;
-  --bg-glow-1: rgba(106, 88, 240, 0.07);
-  --bg-glow-2: rgba(15, 168, 148, 0.05);
+  /* Light theme: a tinted canvas, white cards and tinted cells so every layer reads apart. */
+  --bg: #dfe3ed;
+  --bg-glow-1: rgba(106, 88, 240, 0.06);
+  --bg-glow-2: rgba(15, 168, 148, 0.04);
   --surface: #ffffff;
-  --surface-2: #f6f7fb;
-  --surface-3: #eceef6;
-  --line: rgba(20, 26, 60, 0.08);
-  --line-strong: rgba(20, 26, 60, 0.15);
-  --text: #151933;
-  --text-2: #555b7b;
-  --text-3: #8a8fab;
+  --surface-2: #eef0f6;
+  --surface-3: #e1e4ee;
+  --line: rgba(20, 26, 60, 0.13);
+  --line-strong: rgba(20, 26, 60, 0.22);
+  --text: #121630;
+  --text-2: #464c6c;
+  --text-3: #6c7291;
   --accent: #6552ec;
-  --accent-soft: rgba(101, 82, 236, 0.1);
-  --accent-text: #5341dd;
+  --accent-soft: rgba(101, 82, 236, 0.12);
+  --accent-text: #4b39d6;
   --on-accent: #ffffff;
-  --crit: #e0334a;
-  --high: #d9701a;
-  --med: #b48a0c;
-  --low: #2f74db;
+  --crit: #d42a41;
+  --high: #c96314;
+  --med: #9c7708;
+  --low: #2a69cc;
   --g-blue: #4a67e8;
   --dep: #d9687c;
-  --ok: #17966a;
-  --blocked: #7a6ea6;
-  --shadow: 0 1px 2px rgba(20, 26, 60, 0.04), 0 6px 20px rgba(20, 26, 60, 0.04);
+  --ok: #128a60;
+  --blocked: #6f6399;
+  --shadow: 0 1px 2px rgba(20, 26, 60, 0.07), 0 6px 18px rgba(20, 26, 60, 0.07);
   --shadow-pop: 0 10px 40px rgba(20, 26, 60, 0.16);
   --av-fg-l: 38%;
   --scrim: rgba(12, 15, 30, 0.35);
