@@ -11,6 +11,10 @@ updates:
       # Patch and minor updates in one PR; majors each get their own.
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Types must match the oldest supported Node (`engines`), not the newest release.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
@@ -26,9 +30,17 @@ updates:
     schedule:
       interval: weekly
     labels: [dependencies, docker]
+    ignore:
+      # Node majors are picked by hand, LTS lines only.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: docker-compose
     directories: [/, /deploy]
     schedule:
       interval: weekly
     labels: [dependencies, docker]
+    ignore:
+      # A PostgreSQL major needs a data migration (dump/restore or pg_upgrade): done by hand.
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]
