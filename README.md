@@ -1,31 +1,31 @@
 # Command
 
-Dashboard personale popolata da **agenti AI**. Gli agenti leggono le sorgenti (posta, calendario,
-GitHub, Trello, planning aziendale…) e scrivono i dati sul server via API REST; il browser li
-mostra in un'unica board e rimanda alle sorgenti le azioni dell'utente (segna come fatto, sposta
-una card, ack di una PR…).
+A personal dashboard fed by **AI agents**. The agents read your sources (mail, calendar, GitHub,
+Trello, company planning…) and write the data to the server through a REST API; the browser shows
+it all on a single board and sends your actions back to the sources (mark as done, move a card,
+ack a PR…).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/dashboard-dark.png">
-  <img alt="La board di Command con i dati demo: attenzione, KPI, posta e calendario" src="docs/dashboard-light.png">
+  <img alt="The Command board with demo data: attention, KPIs, mail and calendar" src="docs/dashboard-light.png">
 </picture>
 
-- **Widget**: attenzione (cosa richiede un intervento adesso), KPI, posta, calendario, GitHub (PR e
-  issue), promemoria, Kanban Trello, Gantt aziendale, progetti.
-- **Live**: ogni scrittura arriva al browser via SSE, senza ricaricare.
-- **Azioni reversibili**: aggiornamento ottimistico con Undo; le modifiche finiscono in una coda
-  (`actions`) che l'agente della sorgente applica al sistema reale.
-- **Preferenze per utente**: layout della board, widget nascosti o compressi e sidebar sono salvati
-  sul server e seguono l'utente fra dispositivi.
-- Tema chiaro/scuro, layout desktop e mobile.
+- **Widgets**: attention (what needs you right now), KPIs, mail, calendar, GitHub (PRs and
+  issues), reminders, Trello Kanban, company Gantt, projects.
+- **Live**: every write reaches the browser over SSE, no reload needed.
+- **Reversible actions**: optimistic updates with Undo; changes go into a queue (`actions`) that
+  the source's agent applies to the real system.
+- **Per-user preferences**: board layout, hidden or collapsed widgets and the sidebar are saved on
+  the server and follow the user across devices.
+- Light/dark theme, desktop and mobile layouts.
 
-`demo.html` è il prototipo di riferimento per UX e regole di dominio.
+`demo.html` is the reference prototype for UX and domain rules.
 
-## Come funziona
+## How it works
 
 ```mermaid
 flowchart LR
-  agents["Agenti AI<br>(connettori)"]
+  agents["AI agents<br>(connectors)"]
   api["Fastify API"]
   db[("PostgreSQL")]
   browser["Browser<br>(React)"]
@@ -35,145 +35,148 @@ flowchart LR
   api <-- "GET /api/dashboard<br>PATCH /api/&lt;resource&gt;/:id<br>SSE /api/stream" --> browser
 ```
 
-1. L'agente invia i record con `PUT /api/ingest/:resource` (upsert per `externalId`).
-2. Il browser legge lo snapshot da `GET /api/dashboard` e ricalcola in locale priorità, KPI e stato
-   dei progetti.
-3. Un'azione dell'utente (`PATCH /api/<resource>/:id`) aggiorna subito il record e accoda una riga
-   in `actions`.
-4. L'agente prende le azioni in carico (`POST /api/actions/claim`), le esegue sulla sorgente e ne
-   riporta l'esito (`PATCH /api/actions/:id`).
+1. The agent sends records with `PUT /api/ingest/:resource` (upsert by `externalId`).
+2. The browser reads the snapshot from `GET /api/dashboard` and computes priorities, KPIs and
+   project status locally.
+3. A user action (`PATCH /api/<resource>/:id`) updates the record immediately and queues a row in
+   `actions`.
+4. The agent claims the actions (`POST /api/actions/claim`), applies them to the source and reports
+   the outcome (`PATCH /api/actions/:id`).
 
-## Avvio rapido (Docker)
+## Quick start (Docker)
 
-Serve Docker. Tutto lo stack (PostgreSQL, API, web) parte con compose:
+Requires Docker. The whole stack (PostgreSQL, API, web) starts with compose:
 
 ```bash
 cp .env.example .env
-# imposta JWT_SECRET (almeno 32 caratteri):
+# set JWT_SECRET (at least 32 characters):
 #   node -e "console.log(crypto.randomBytes(48).toString('base64url'))"
-# e controlla TZ, USER_NAME, USER_GITHUB
+# and check TZ, USER_NAME, USER_GITHUB
 
 docker compose up -d --build
-docker compose exec server node dist/scripts/seed.js                       # dati demo (facoltativo)
-docker compose exec server node dist/scripts/user.js tu@esempio.it --name "Nome Cognome"
+docker compose exec server node dist/scripts/seed.js                       # demo data (optional)
+docker compose exec server node dist/scripts/user.js you@example.com --name "Full Name"
 ```
 
-Apri <http://localhost:8080> e accedi. Le migrazioni vengono applicate all'avvio del server.
+Open <http://localhost:8080> and sign in. Migrations are applied when the server starts.
 
-| Servizio | Porta | Note |
+| Service | Port | Notes |
 |---|---|---|
-| `web` | 8080 | nginx: serve il frontend e fa da proxy a `/api` (stessa origine, necessaria per il cookie di refresh) |
-| `server` | 3000 | API Fastify, a cui si collegano gli agenti |
-| `db` | 5432 | PostgreSQL 16, volume `pgdata` |
+| `web` | 8080 | nginx: serves the frontend and proxies `/api` (same origin, required for the refresh cookie) |
+| `server` | 3000 | Fastify API, where agents connect |
+| `db` | 5432 | PostgreSQL 16, `pgdata` volume |
 
-In produzione, dietro HTTPS, imposta `COOKIE_SECURE=true`.
+In production, behind HTTPS, set `COOKIE_SECURE=true`.
 
-## Collegare un agente
+## Connecting an agent
 
-Crea un agente e il suo token (mostrato una sola volta, in DB ne resta solo l'hash):
+Create an agent and its token (shown once; only its hash is stored in the DB):
 
 ```bash
 docker compose exec server node dist/scripts/agent-token.js github pulls,issues
-# senza risorse = tutte; --rotate emette un nuovo token per un agente esistente
+# no resources = all of them; --rotate issues a new token for an existing agent
 ```
 
-Risorse: `emails`, `events`, `pulls`, `issues`, `reminders`, `tasks`, `projects`, `gantt`.
-Un agente può scrivere solo sulle risorse del suo scope.
+Resources: `emails`, `events`, `pulls`, `issues`, `reminders`, `tasks`, `projects`, `gantt`.
+An agent can only write to the resources in its scope.
 
-Un ciclo tipico:
+A typical cycle:
 
 ```bash
 API=http://localhost:3000/api
 AUTH="Authorization: Bearer cmd_agent_..."
 
-# 1. apri una run (facoltativo, serve a tracciare esito e statistiche)
+# 1. open a run (optional, tracks outcome and stats)
 curl -X POST $API/agents/runs -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "resource": "reminders" }'
 
-# 2. invia i dati; "replace" cancella i record di questo agente non più presenti
+# 2. send the data; "replace" deletes this agent's records that are no longer present
 curl -X PUT $API/ingest/reminders -H "$AUTH" -H 'content-type: application/json' -d '{
-  "runId": "<id della run>",
+  "runId": "<run id>",
   "mode": "replace",
   "items": [
-    { "externalId": "todo:42", "title": "Rinnovare certificato", "due": "2026-09-30T09:00:00+02:00", "priority": "high" }
+    { "externalId": "todo:42", "title": "Renew certificate", "due": "2026-09-30T09:00:00+02:00", "priority": "high" }
   ]
 }'
 
-# 3. applica alla sorgente le azioni fatte dall'utente
+# 3. apply the user's actions to the source
 curl -X POST $API/actions/claim -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "resource": "reminders", "limit": 10 }'
 curl -X PATCH $API/actions/<id> -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "status": "done" }'
 
-# 4. chiudi la run
+# 4. close the run
 curl -X PATCH $API/agents/runs/<id> -H "$AUTH" -H 'content-type: application/json' \
-  -d '{ "status": "success", "summary": "1 promemoria sincronizzato" }'
+  -d '{ "status": "success", "summary": "1 reminder synced" }'
 ```
 
-Regole utili:
+Good to know:
 
-- Le date sono sempre ISO 8601 con offset.
-- Il formato dei record è definito dagli schemi zod in `packages/shared/src/schemas`
-  (`*Input` per l'ingest, `*Patch` per i campi modificabili dall'utente).
-- I campi con un'azione utente ancora in coda non vengono sovrascritti dall'ingest: la risposta li
-  elenca in `protectedFields`.
-- Un'azione presa in carico e non chiusa entro 10 minuti torna disponibile.
+- Dates are always ISO 8601 with an offset.
+- Record shapes are defined by the zod schemas in `packages/shared/src/schemas`
+  (`*Input` for ingest, `*Patch` for the fields the user can edit).
+- Fields with a user action still in the queue are not overwritten by ingest: the response lists
+  them in `protectedFields`.
+- A claimed action that is not completed within 10 minutes becomes available again.
 
-L'elenco completo degli endpoint è in [CLAUDE.md](CLAUDE.md#api-prefisso-api).
+The full endpoint list is in [CLAUDE.md](CLAUDE.md#api-prefisso-api) (in Italian).
 
-## Sviluppo
+## Development
 
-Requisiti: Node.js 22+, Docker per PostgreSQL.
+Requirements: Node.js 22+, Docker for PostgreSQL.
 
 ```bash
 npm install
 cp .env.example .env
-docker compose up -d db              # solo il database
+docker compose up -d db              # database only
 npm run db:migrate
-npm run db:seed                      # dati demo
-npm run user:create -- tu@esempio.it --name "Nome Cognome"
-npm run dev                          # API su :3000 (watch) + web su :5173 (proxy /api)
+npm run db:seed                      # demo data
+npm run user:create -- you@example.com --name "Full Name"
+npm run dev                          # API on :3000 (watch) + web on :5173 (proxies /api)
 ```
 
-| Comando | |
+| Command | |
 |---|---|
-| `npm run dev:api` · `npm run dev:web` | avvia solo una delle due app |
-| `npm test` | test unitari (shared), integrazione API su PGlite (senza Docker), frontend su jsdom |
-| `npm run typecheck` | controllo dei tipi su tutti i workspace |
-| `npm run build` | build di server e web |
-| `npm run db:generate` | genera una migrazione dopo aver modificato `apps/server/src/db/schema` |
-| `npm run user:reset -- <email>` | nuova password, chiude tutte le sessioni |
-| `npm run agent:token -- <nome> [risorse]` | crea un agente e stampa il token |
+| `npm run dev:api` · `npm run dev:web` | start only one of the two apps |
+| `npm test` | unit tests (shared), API integration on PGlite (no Docker), frontend on jsdom |
+| `npm run typecheck` | type check across all workspaces |
+| `npm run build` | build server and web |
+| `npm run db:generate` | generate a migration after changing `apps/server/src/db/schema` |
+| `npm run user:reset -- <email>` | set a new password, sign out all sessions |
+| `npm run agent:token -- <name> [resources]` | create an agent and print its token |
 
-### Struttura
+### Layout
 
 ```
-packages/shared   @command/shared  schemi zod (contratto unico) e logica di dominio pura
-apps/server       @command/server  Fastify 5, Drizzle, PostgreSQL, auth JWT, SSE
+packages/shared   @command/shared  zod schemas (the single contract) and pure domain logic
+apps/server       @command/server  Fastify 5, Drizzle, PostgreSQL, JWT auth, SSE
 apps/web          @command/web     React 19, Vite, Tailwind v4, TanStack Query
-demo.html                          prototipo di riferimento, non modificare
+demo.html                          reference prototype, do not edit
 ```
 
-Architettura, convenzioni e checklist per aggiungere una risorsa sono in [CLAUDE.md](CLAUDE.md).
+Architecture, conventions and the checklist for adding a resource are in [CLAUDE.md](CLAUDE.md)
+(in Italian).
 
-## Configurazione
+## Configuration
 
-Variabili principali di `.env` (vedi `.env.example`):
+Main `.env` variables (see `.env.example`):
 
-| Variabile | Descrizione |
+| Variable | Description |
 |---|---|
-| `JWT_SECRET` | segreto per firmare i token utente, obbligatorio |
-| `DATABASE_URL` | connessione PostgreSQL |
-| `TZ` | fuso orario dell'owner: definisce "oggi" e "scaduto" |
-| `USER_NAME`, `USER_ROLE`, `USER_GITHUB` | owner della dashboard, usato anche per filtrare il Gantt aziendale |
-| `CORS_ORIGIN` | origine del frontend in sviluppo |
-| `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_DAYS` | durata di access token (15 min) e refresh token (7 gg) |
-| `LOGIN_RATE_LIMIT` | tentativi di login consentiti per finestra |
-| `COOKIE_SECURE` | `true` dietro HTTPS |
+| `JWT_SECRET` | secret used to sign user tokens, required |
+| `DATABASE_URL` | PostgreSQL connection |
+| `TZ` | the owner's time zone: defines "today" and "overdue" |
+| `USER_NAME`, `USER_ROLE`, `USER_GITHUB` | dashboard owner, also used to filter the company Gantt |
+| `CORS_ORIGIN` | frontend origin in development |
+| `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_DAYS` | lifetime of the access token (15 min) and refresh token (7 days) |
+| `LOGIN_RATE_LIMIT` | login attempts allowed per window |
+| `COOKIE_SECURE` | `true` behind HTTPS |
 
-## Sicurezza
+## Security
 
-- Utente: password con scrypt, access token JWT a vita breve tenuto in memoria, refresh token in
-  cookie httpOnly ruotato a ogni uso. Il riuso di un refresh già ruotato revoca tutte le sessioni.
-- Agenti: token separati con scope per risorsa; un token agente non vale come utente e viceversa.
-- Login con rate limit e risposta identica per email inesistente o password errata.
+- Users: scrypt-hashed passwords, a short-lived JWT access token kept in memory, a refresh token
+  in an httpOnly cookie rotated on every use. Reusing an already rotated refresh token revokes all
+  sessions.
+- Agents: separate tokens scoped per resource; an agent token does not work as a user token and
+  vice versa.
+- Rate-limited login, with the same response for an unknown email and a wrong password.
