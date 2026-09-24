@@ -158,13 +158,16 @@ export function Avatar({ initials, className }: { initials: string; className?: 
   );
 }
 
-/** Fixed bottom bar on phones: the six main sections. */
+/**
+ * Fixed bottom bar on phones: the main sections still shown. Hidden widgets drop
+ * out, so the items share the width up to a cap and stay centered.
+ */
 export function BottomNav() {
   const { current, countOf, onClick, items } = useNavState();
   return (
     <nav
       aria-label="Sections"
-      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-line bg-surface/88 px-1 pt-1.5 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-lg md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex justify-center border-t border-line bg-surface/88 px-1 pt-1.5 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-lg md:hidden"
     >
       {items.filter((x) => x.short).map((x) => {
         const { n, hot } = countOf(x);
@@ -177,7 +180,7 @@ export function BottomNav() {
             aria-current={isCurrent}
             aria-label={navLabel(x.label, n, hot)}
             className={cn(
-              'relative flex min-h-[50px] flex-col items-center justify-center gap-[3px] rounded-[10px] py-1.5 text-[10.5px] font-bold',
+              'relative flex min-h-[50px] max-w-24 min-w-0 flex-1 flex-col items-center justify-center gap-[3px] rounded-[10px] py-1.5 text-[10.5px] font-bold',
               isCurrent ? 'text-accent-text' : 'text-fg-3',
             )}
           >

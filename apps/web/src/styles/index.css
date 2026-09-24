@@ -369,6 +369,15 @@
     cursor: pointer;
     text-align: inherit;
   }
+  /* iOS zooms into any focused field under 16px and stays zoomed (the autofocused
+     login email did it on first open). Important so widget sizes can't undercut it. */
+  @media (pointer: coarse) {
+    input:not([type='checkbox'], [type='radio']),
+    select,
+    textarea {
+      font-size: max(16px, 1em) !important;
+    }
+  }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
