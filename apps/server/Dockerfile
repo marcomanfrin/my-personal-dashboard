@@ -1,6 +1,6 @@
 # Build context: the repository root (npm workspaces).
 # ---- build ------------------------------------------------------------------
-FROM node:24-slim AS build
+FROM node:25-slim AS build
 WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
@@ -13,7 +13,7 @@ COPY apps/server apps/server
 RUN npm run build -w @argus/server
 
 # ---- runtime ----------------------------------------------------------------
-FROM node:24-slim
+FROM node:25-slim
 WORKDIR /repo
 ENV NODE_ENV=production
 COPY package.json package-lock.json ./
