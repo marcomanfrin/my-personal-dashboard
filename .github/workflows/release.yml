@@ -12,6 +12,11 @@ permissions:
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
+    # ci.yml contains the edge `images` job: a caller must grant every permission a called
+    # workflow's jobs ask for, even skipped ones, or the run fails at startup.
+    permissions:
+      contents: read
+      packages: write
 
   images:
     needs: ci
