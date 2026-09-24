@@ -1,6 +1,7 @@
 import { STATUS_RANK } from '@command/shared';
+import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
-import { Lamp, Pill, ProgressBar, SrOnly } from '../../components/ui/primitives';
+import { Empty, Lamp, Pill, ProgressBar, SrOnly, Toggle } from '../../components/ui/primitives';
 import { useDashboard } from '../../hooks/useDashboard';
 import { useSections } from '../../layout/sections';
 import { cn } from '../../lib/cn';
@@ -12,11 +13,30 @@ import { setGanttProject } from '../gantt/focus';
 export function ProjectsCard({ className }: { className?: string }) {
   const { data, insights, now } = useDashboard();
   const { goTo } = useSections();
-  const list = [...insights.projects].sort((a, b) => STATUS_RANK[a.health] - STATUS_RANK[b.health]);
+  const [showDone, setShowDone] = useState(false);
+  const active = insights.projects.filter((p) => p.openTasks > 0).length;
+  const list = insights.projects
+    .filter((p) => showDone || p.openTasks > 0)
+    .sort((a, b) => STATUS_RANK[a.health] - STATUS_RANK[b.health]);
   const taskById = new Map(data.gantt.map((t) => [t.id, t]));
 
   return (
-    <Card id="projects" title="Projects" icon="folder" className={className} sub={<><b>{list.length}</b> active</>}>
+    <Card
+      id="projects"
+      title="Projects"
+      icon="folder"
+      className={className}
+      sub={
+        <>
+          <b>{active}</b> active
+        </>
+      }
+      tools={
+        <Toggle checked={showDone} onChange={setShowDone}>
+          Completed
+        </Toggle>
+      }
+    >
       <ul className="flex flex-col gap-1">
         {list.map((p) => {
           const next = p.nextTaskId ? taskById.get(p.nextTaskId) : undefined;
@@ -57,6 +77,7 @@ export function ProjectsCard({ className }: { className?: string }) {
             </li>
           );
         })}
+        {!list.length && <Empty>All projects are completed.</Empty>}
       </ul>
     </Card>
   );

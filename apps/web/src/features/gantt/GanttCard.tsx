@@ -1,7 +1,7 @@
 import { ms, type GanttStatus } from '@command/shared';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Card } from '../../components/ui/Card';
-import { Button, Empty, Segmented, Tag } from '../../components/ui/primitives';
+import { Button, Empty, Segmented, Tag, Toggle } from '../../components/ui/primitives';
 import { useActions } from '../../hooks/useActions';
 import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
@@ -26,10 +26,13 @@ export function GanttCard({ className }: { className?: string }) {
   const [zoom, setZoom] = useState<Zoom>('week');
   const [project, setProject] = useGanttFocus();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [showDone, setShowDone] = useState(false);
   const scroller = useRef<HTMLDivElement | null>(null);
   const dw = ZOOMS[zoom].dw;
 
-  const groups: GanttGroup[] = insights.projects
+  // Completed projects are hidden unless asked for; a focused one stays visible.
+  const visible = insights.projects.filter((p) => showDone || p.openTasks > 0 || p.key === project);
+  const groups: GanttGroup[] = visible
     .filter((p) => project === 'all' || p.key === project)
     .map((p) => ({
       project: p,
@@ -78,7 +81,7 @@ export function GanttCard({ className }: { className?: string }) {
           <span className="sr-only">Filter by project</span>
           <select className="select" value={project} onChange={(e) => setProject(e.target.value)}>
             <option value="all">All projects</option>
-            {insights.projects.map((p) => (
+            {visible.map((p) => (
               <option key={p.key} value={p.key}>
                 {p.name}
               </option>
@@ -137,6 +140,11 @@ export function GanttCard({ className }: { className?: string }) {
       title="Personal Gantt"
       icon="gantt"
       className={className}
+      tools={
+        <Toggle checked={showDone} onChange={setShowDone}>
+          Completed
+        </Toggle>
+      }
       sub={
         <>
           <b>{openTasks}</b> open tasks assigned to you, from the company plan
@@ -146,7 +154,9 @@ export function GanttCard({ className }: { className?: string }) {
       <div className="flex flex-col gap-3">
         {toolbar}
         {!groups.length ? (
-          <Empty as="p">No tasks assigned to you in this project.</Empty>
+          <Empty as="p">
+            {project === 'all' && insights.projects.length ? 'All your projects are completed.' : 'No tasks assigned to you in this project.'}
+          </Empty>
         ) : view === 'timeline' ? (
           <GanttTimeline
             groups={groups}
