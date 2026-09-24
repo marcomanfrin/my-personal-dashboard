@@ -3,43 +3,13 @@ import { BrandMark } from '../components/ui/Brand';
 import { Button } from '../components/ui/primitives';
 import { DrawerProvider } from '../drawer/DrawerContext';
 import { DrawerHost } from '../drawer/DrawerHost';
-import { AttentionPanel } from '../features/attention/AttentionPanel';
-import { CalendarCard } from '../features/calendar/CalendarCard';
-import { GanttCard } from '../features/gantt/GanttCard';
-import { GithubCard } from '../features/github/GithubCard';
-import { KpiGrid } from '../features/kpis/KpiGrid';
-import { MailCard } from '../features/mail/MailCard';
-import { ProjectsCard } from '../features/projects/ProjectsCard';
-import { RemindersCard } from '../features/reminders/RemindersCard';
-import { TrelloCard } from '../features/trello/TrelloCard';
 import { DashboardProvider } from '../hooks/useDashboard';
+import { Board } from '../layout/Board';
 import { Greeting } from '../layout/Greeting';
 import { LiveAnnouncer } from '../layout/LiveAnnouncer';
 import { BottomNav, Sidebar } from '../layout/Navigation';
 import { SectionsProvider } from '../layout/sections';
 import { Topbar } from '../layout/Topbar';
-
-/**
- * The board: one column on phones, two from 768px, a 12-column grid from 1200px
- * with the same spans and order as the demo. `dense` fills the gaps.
- */
-function Board() {
-  return (
-    <main id="main" tabIndex={-1} className="mx-auto outline-none max-w-[1680px] px-3 pt-3.5 pb-[calc(var(--bottomnav-h)+28px)] xs:px-4 md:px-7 md:pt-[18px] md:pb-12">
-      <div className="grid grid-flow-row-dense grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-[18px] xl:grid-cols-12 [&>*]:min-w-0">
-        <AttentionPanel className="md:col-span-2 xl:order-1 xl:col-span-7" />
-        <KpiGrid className="md:col-span-2 xl:order-2 xl:col-span-5" />
-        <MailCard className="md:col-span-2 xl:order-3 xl:col-span-7" />
-        <CalendarCard className="xl:order-4 xl:col-span-5" />
-        <RemindersCard className="xl:order-6 xl:col-span-5" />
-        <GithubCard className="md:col-span-2 xl:order-5 xl:col-span-7" />
-        <GanttCard className="md:col-span-2 xl:order-7 xl:col-span-12" />
-        <TrelloCard className="md:col-span-2 xl:order-8 xl:col-span-8" />
-        <ProjectsCard className="md:col-span-2 xl:order-9 xl:col-span-4" />
-      </div>
-    </main>
-  );
-}
 
 function Loading() {
   return (

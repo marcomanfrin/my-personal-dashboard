@@ -173,6 +173,8 @@ export interface SegOption<T extends string> {
   id: T;
   label: string;
   count?: number;
+  /** Full name when `label` is an abbreviation: tooltip and accessible name. */
+  hint?: string;
 }
 
 /** iOS-style segmented control. */
@@ -202,7 +204,8 @@ export function Segmented<T extends string>({
           key={o.id}
           type="button"
           aria-pressed={o.id === value}
-          title={o.label}
+          title={o.hint ?? o.label}
+          aria-label={o.hint}
           onClick={() => onChange(o.id)}
           className={cn(
             'h-[26px] whitespace-nowrap rounded-[7px] px-2.5 text-[12.5px] font-bold text-fg-2',

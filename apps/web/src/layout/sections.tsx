@@ -7,6 +7,8 @@ const FLASH_MS = 1400;
 interface SectionsState {
   collapsed: Record<string, boolean>;
   toggle(id: string): void;
+  /** Collapses (or expands) all the given sections at once. */
+  setAll(ids: readonly string[], collapsed: boolean): void;
   /** Scrolls to a section, expanding and briefly highlighting it. */
   goTo(id: string): void;
   active: string;
@@ -56,6 +58,11 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggle = useCallback((id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] })), []);
+  const setAll = useCallback(
+    (ids: readonly string[], value: boolean) =>
+      setCollapsed((c) => ({ ...c, ...Object.fromEntries(ids.map((id) => [id, value])) })),
+    [],
+  );
 
   const goTo = useCallback((id: string) => {
     setCollapsed((c) => (c[id] ? { ...c, [id]: false } : c));
@@ -73,8 +80,8 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ collapsed, toggle, goTo, active, flashing, register }),
-    [collapsed, toggle, goTo, active, flashing, register],
+    () => ({ collapsed, toggle, setAll, goTo, active, flashing, register }),
+    [collapsed, toggle, setAll, goTo, active, flashing, register],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

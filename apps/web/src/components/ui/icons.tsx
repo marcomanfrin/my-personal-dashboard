@@ -150,6 +150,27 @@ export const ICONS = {
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronRight: <path d="m9 6 6 6-6 6" />,
+  chevronLeft: <path d="m15 6-6 6 6 6" />,
+  grip: (
+    <>
+      <circle cx="9" cy="6" r="1.2" />
+      <circle cx="15" cy="6" r="1.2" />
+      <circle cx="9" cy="12" r="1.2" />
+      <circle cx="15" cy="12" r="1.2" />
+      <circle cx="9" cy="18" r="1.2" />
+      <circle cx="15" cy="18" r="1.2" />
+    </>
+  ),
+  layout: (
+    <>
+      <rect x="3" y="3" width="8" height="10" rx="2" />
+      <rect x="13" y="3" width="8" height="6" rx="2" />
+      <rect x="13" y="11" width="8" height="10" rx="2" />
+      <rect x="3" y="15" width="8" height="6" rx="2" />
+    </>
+  ),
+  collapseAll: <path d="m7 20 5-5 5 5M7 4l5 5 5-5" />,
+  expandAll: <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />,
   sidebar: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="2.5" />
