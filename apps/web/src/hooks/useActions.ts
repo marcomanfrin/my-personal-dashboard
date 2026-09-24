@@ -115,8 +115,11 @@ export function useActions() {
         toast.show('Acknowledged', () => patch('issues', id, { acknowledged: false }));
       },
       moveTask(id: string, column: TaskColumn) {
+        const t = find('tasks', id);
+        if (!t || t.column === column) return;
+        const from = t.column;
         patch('tasks', id, { column });
-        toast.show(`Moved to ${COLUMNS.find((c) => c.id === column)!.label}`);
+        toast.show(`Moved to ${COLUMNS.find((c) => c.id === column)!.label}`, () => patch('tasks', id, { column: from }));
       },
       recalcGantt() {
         mutateRecalc(undefined, {

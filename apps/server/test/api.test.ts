@@ -1,4 +1,4 @@
-import type { Action, DashboardResponse, Email, IngestResult, Reminder, StreamEvent } from '@command/shared';
+import type { Action, DashboardResponse, Email, IngestResult, Reminder, StreamEvent, Task } from '@command/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createTestApp, type TestContext } from './helpers';
 
@@ -193,6 +193,23 @@ describe('user actions and the outbox', () => {
     // 4. Once applied, the source is the truth again.
     await t.inject({ method: 'PUT', url: '/api/ingest/emails', headers: t.agentAuth, payload: { items: [stripMeta(stale)] } });
     expect(await emailByExternal('m4')).toMatchObject({ done: false, category: 'needs-reply' });
+  });
+
+  it('queues Trello card moves, undo included, in the order the agent must apply them', async () => {
+    const card = (await t.inject({ method: 'GET', url: '/api/tasks' })).json<Task[]>().find((x) => x.column !== 'done')!;
+    const from = card.column;
+
+    // Drag to Done, then Undo from the toast.
+    await t.inject({ method: 'PATCH', url: `/api/tasks/${card.id}`, payload: { column: 'done' } });
+    await t.inject({ method: 'PATCH', url: `/api/tasks/${card.id}`, payload: { column: from } });
+
+    const claimed = (
+      await t.inject({ method: 'POST', url: '/api/actions/claim', headers: t.agentAuth, payload: { resource: 'tasks' } })
+    ).json<Action[]>();
+    expect(claimed.filter((a) => a.recordId === card.id)).toMatchObject([
+      { externalId: card.externalId, changes: { column: 'done' }, previous: { column: from } },
+      { externalId: card.externalId, changes: { column: from }, previous: { column: 'done' } },
+    ]);
   });
 
   it('ignores no-op patches and rejects empty ones', async () => {
