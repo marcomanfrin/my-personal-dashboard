@@ -119,7 +119,7 @@ Good to know:
   them in `protectedFields`.
 - A claimed action that is not completed within 10 minutes becomes available again.
 
-The full endpoint list is in [CLAUDE.md](CLAUDE.md#api-prefisso-api) (in Italian).
+The full endpoint list is in [CLAUDE.md](CLAUDE.md#api-prefix-api).
 
 ## Development
 
@@ -154,8 +154,7 @@ apps/web          @command/web     React 19, Vite, Tailwind v4, TanStack Query
 demo.html                          reference prototype, do not edit
 ```
 
-Architecture, conventions and the checklist for adding a resource are in [CLAUDE.md](CLAUDE.md)
-(in Italian).
+Architecture, conventions and the checklist for adding a resource are in [CLAUDE.md](CLAUDE.md).
 
 ## Configuration
 
