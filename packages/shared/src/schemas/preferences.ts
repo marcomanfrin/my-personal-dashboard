@@ -5,10 +5,12 @@ import { IsoDate } from './common';
 export const BoardSpan = z.literal([4, 5, 7, 8, 12]);
 export type BoardSpan = z.infer<typeof BoardSpan>;
 
-/** Widget order and the widths the user changed. Unknown widget ids are ignored by the web app. */
+/** Widget order, the widths the user changed and the hidden widgets. Unknown widget ids are ignored by the web app. */
 export const BoardLayout = z.object({
   order: z.array(z.string().max(64)).max(50),
   spans: z.record(z.string().max(64), BoardSpan),
+  /** Widgets taken off the board (and out of the navigation); optional for layouts saved before it existed. */
+  hidden: z.array(z.string().max(64)).max(50).optional(),
 });
 export type BoardLayout = z.infer<typeof BoardLayout>;
 

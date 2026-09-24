@@ -25,10 +25,12 @@ export function BoardEditor({
   widgets,
   move,
   resize,
+  toggleHidden,
 }: {
   widgets: PlacedWidget[];
   move: (id: string, to: number) => void;
   resize: (id: string, span: Span) => void;
+  toggleHidden: (id: string) => void;
 }) {
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -75,6 +77,7 @@ export function BoardEditor({
               count={widgets.length}
               onMove={(to) => move(w.id, to)}
               onResize={(span) => resize(w.id, span)}
+              onToggleHidden={() => toggleHidden(w.id)}
             />
           ))}
         </ol>
@@ -89,12 +92,14 @@ function Tile({
   count,
   onMove,
   onResize,
+  onToggleHidden,
 }: {
   widget: PlacedWidget;
   index: number;
   count: number;
   onMove: (to: number) => void;
   onResize: (span: Span) => void;
+  onToggleHidden: () => void;
 }) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: w.id,
@@ -112,7 +117,9 @@ function Tile({
     >
       <div
         className={cn(
-          'flex min-h-[84px] flex-wrap items-center gap-2.5 rounded-lg border border-dashed border-line-strong bg-surface p-3 shadow-card transition-shadow',
+          'flex min-h-[84px] flex-wrap items-center gap-2.5 rounded-lg border border-dashed border-line-strong bg-surface p-3 shadow-card transition-[box-shadow,background-color]',
+          // Hidden: stays in place (order and width are kept) but reads as off.
+          w.hidden && 'bg-surface-2 shadow-none [&_.tile-body]:opacity-55',
           isDragging && 'border-solid border-accent shadow-pop',
         )}
       >
@@ -128,11 +135,25 @@ function Tile({
         >
           <Icon name="grip" />
         </button>
-        <span className="grid size-8 flex-none place-items-center rounded-[10px] border border-line bg-surface-2 text-fg-2">
-          <Icon name={w.icon} />
+        <span className="tile-body flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="grid size-8 flex-none place-items-center rounded-[10px] border border-line bg-surface-2 text-fg-2">
+            <Icon name={w.icon} />
+          </span>
+          <b className="min-w-0 truncate text-[14.5px] font-[750]">{w.title}</b>
+          {w.hidden && (
+            <span className="flex-none rounded-full border border-line-strong px-2 py-0.5 text-[11.5px] font-bold text-fg-2">
+              Hidden
+            </span>
+          )}
         </span>
-        <b className="min-w-0 flex-1 truncate text-[14.5px] font-[750]">{w.title}</b>
         <div className="ml-auto flex items-center gap-1.5">
+          <IconButton
+            icon={w.hidden ? 'eye' : 'eyeOff'}
+            label={w.hidden ? `Show ${w.title}` : `Hide ${w.title}`}
+            tip={w.hidden ? 'Show' : 'Hide'}
+            aria-pressed={w.hidden}
+            onClick={onToggleHidden}
+          />
           {/* Widths only apply from 1200px: hidden below, where the board is one or two columns. */}
           <Segmented
             label={`Width of ${w.title}`}

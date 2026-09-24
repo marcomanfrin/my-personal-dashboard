@@ -37,6 +37,12 @@ describe('user preferences', () => {
     expect(now.updatedAt).toEqual(expect.any(String));
   });
 
+  it('stores hidden widgets with the layout, and accepts layouts saved before they existed', async () => {
+    const board = { order: ['mail', 'gantt'], spans: {}, hidden: ['gantt'] };
+    expect((await patch({ board })).json<PreferencesResponse>().preferences.board).toEqual(board);
+    expect((await patch({ board: { order: ['mail'], spans: {} } })).statusCode).toBe(200);
+  });
+
   it('rejects unknown keys, bad values and empty bodies', async () => {
     expect((await patch({ theme: 'dark' })).statusCode).toBe(400);
     expect((await patch({ board: { order: [], spans: { gantt: 6 } } })).statusCode).toBe(400);

@@ -5,6 +5,7 @@ import { useDashboard } from '../hooks/useDashboard';
 import { cn } from '../lib/cn';
 import { usePreference } from '../hooks/usePreference';
 import { storage } from '../lib/storage';
+import { useHiddenWidgets } from './boardLayout';
 import { NAV, navTarget, type NavItem } from './nav';
 import { useSections } from './sections';
 
@@ -67,7 +68,10 @@ function useNavState() {
     e.preventDefault();
     goTo(id);
   };
-  return { current, countOf, onClick };
+  // A hidden widget has nothing to scroll to: leave it out of the navigation.
+  const hidden = useHiddenWidgets();
+  const items = NAV.filter((x) => !hidden.has(x.id));
+  return { current, countOf, onClick, items };
 }
 
 /**
@@ -75,7 +79,7 @@ function useNavState() {
  * 1200px the user can collapse it to the rail; the choice is remembered.
  */
 export function Sidebar() {
-  const { current, countOf, onClick } = useNavState();
+  const { current, countOf, onClick, items } = useNavState();
   const [collapsed, toggleCollapsed] = useSidebarCollapsed();
 
   return (
@@ -88,7 +92,7 @@ export function Sidebar() {
     >
       <Brand className="px-[7px] pt-1 pb-[18px]" nameClassName={railLabel} />
       <nav className="flex flex-col gap-0.5">
-        {NAV.map((x) => {
+        {items.map((x) => {
           const { n, hot } = countOf(x);
           const isCurrent = current === x.id;
           return (
@@ -154,13 +158,13 @@ export function Avatar({ initials, className }: { initials: string; className?: 
 
 /** Fixed bottom bar on phones: the six main sections. */
 export function BottomNav() {
-  const { current, countOf, onClick } = useNavState();
+  const { current, countOf, onClick, items } = useNavState();
   return (
     <nav
       aria-label="Sections"
       className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-line bg-surface/88 px-1 pt-1.5 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-lg md:hidden"
     >
-      {NAV.filter((x) => x.short).map((x) => {
+      {items.filter((x) => x.short).map((x) => {
         const { n, hot } = countOf(x);
         const isCurrent = current === x.id;
         return (

@@ -64,13 +64,14 @@ export const spanClass = (span: Span, wide: boolean) => `${wide ? 'md:col-span-2
 
 export interface PlacedWidget extends Widget {
   wide: boolean;
+  hidden: boolean;
 }
 
 const LAYOUT_KEY = 'cc-board-layout';
-const DEFAULT_LAYOUT: BoardLayout = { order: WIDGETS.map((w) => w.id), spans: {} };
+const DEFAULT_LAYOUT: BoardLayout = { order: WIDGETS.map((w) => w.id), spans: {}, hidden: [] };
 const SPANS = new Set<number>(Object.keys(XL_SPAN).map(Number));
 
-/** A stored layout made valid again: unknown ids dropped, new widgets appended, bad widths ignored. */
+/** A stored layout made valid again: unknown ids dropped, new widgets appended (visible), bad widths ignored. */
 function sanitize(raw: Partial<BoardLayout> | null | undefined): BoardLayout {
   const known = new Set(WIDGETS.map((w) => w.id));
   const order = (Array.isArray(raw?.order) ? raw.order : []).filter((id, i, a) => known.has(id) && a.indexOf(id) === i);
@@ -78,7 +79,8 @@ function sanitize(raw: Partial<BoardLayout> | null | undefined): BoardLayout {
   const spans = Object.fromEntries(
     Object.entries(raw?.spans ?? {}).filter(([id, s]) => known.has(id) && SPANS.has(s as number)),
   ) as Record<string, Span>;
-  return { order, spans };
+  const hidden = (Array.isArray(raw?.hidden) ? raw.hidden : []).filter((id, i, a) => known.has(id) && a.indexOf(id) === i);
+  return { order, spans, hidden };
 }
 
 /** The widgets in the user's order with their widths. */
@@ -88,7 +90,12 @@ export function placeWidgets(layout: BoardLayout): PlacedWidget[] {
     const custom = layout.spans[id];
     const span = custom ?? w.span;
     // A custom width decides the 768px layout too: wider than half spans both columns.
-    return { ...w, span, wide: custom ? span > 6 : (w.wide ?? w.span > 6) };
+    return {
+      ...w,
+      span,
+      wide: custom ? span > 6 : (w.wide ?? w.span > 6),
+      hidden: !!layout.hidden?.includes(id),
+    };
   });
 }
 
@@ -114,10 +121,26 @@ export function useBoardLayout() {
     (id: string, span: Span) => setLayout((l) => ({ ...l, spans: { ...l.spans, [id]: span } })),
     [setLayout],
   );
+  const toggleHidden = useCallback(
+    (id: string) =>
+      setLayout((l) => {
+        const hidden = l.hidden ?? [];
+        return { ...l, hidden: hidden.includes(id) ? hidden.filter((x) => x !== id) : [...hidden, id] };
+      }),
+    [setLayout],
+  );
   const reset = useCallback(() => setStored(DEFAULT_LAYOUT), [setStored]);
   const isDefault =
-    layout.order.every((id, i) => id === DEFAULT_LAYOUT.order[i]) && Object.keys(layout.spans).length === 0;
+    layout.order.every((id, i) => id === DEFAULT_LAYOUT.order[i]) &&
+    Object.keys(layout.spans).length === 0 &&
+    !layout.hidden?.length;
   const widgets = useMemo(() => placeWidgets(layout), [layout]);
 
-  return { layout, widgets, move, resize, reset, isDefault };
+  return { layout, widgets, visible: widgets.filter((w) => !w.hidden), move, resize, toggleHidden, reset, isDefault };
+}
+
+/** Ids of the widgets the user hid: for the navigation, which leaves them out too. */
+export function useHiddenWidgets(): ReadonlySet<string> {
+  const [stored] = usePreference('board', LAYOUT_KEY, DEFAULT_LAYOUT);
+  return useMemo(() => new Set(sanitize(stored).hidden), [stored]);
 }
