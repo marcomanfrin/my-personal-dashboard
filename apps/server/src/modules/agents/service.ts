@@ -6,13 +6,18 @@ import {
   type AgentRunFinish,
   type AgentRunStart,
   type Resource,
-} from '@command/shared';
+} from '@argus/shared';
 import type { Db } from '../../db/client';
 import { conflict, forbidden, notFound } from '../../lib/errors';
 import type { EventBus } from '../../plugins/events-bus';
 import { createAgentsRepository } from './repository';
 
-export const AGENT_TOKEN_PREFIX = 'cmd_agent_';
+export const AGENT_TOKEN_PREFIX = 'argus_agent_';
+/** Prefix of tokens issued before the rename to Argus; still accepted. */
+const LEGACY_AGENT_TOKEN_PREFIX = 'cmd_agent_';
+
+export const isAgentToken = (token: string | null | undefined): token is string =>
+  !!token && (token.startsWith(AGENT_TOKEN_PREFIX) || token.startsWith(LEGACY_AGENT_TOKEN_PREFIX));
 
 const hashToken = (token: string) => createHash('sha256').update(token).digest('hex');
 const newToken = () => AGENT_TOKEN_PREFIX + randomBytes(24).toString('base64url');

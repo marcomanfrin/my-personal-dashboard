@@ -1,4 +1,4 @@
-import { EmailPatch, MailCategory } from '@command/shared';
+import { EmailPatch, MailCategory } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { idOf, patchOf, queryOf } from '../../lib/routes';

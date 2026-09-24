@@ -1,4 +1,4 @@
-import { addDays, daysBetween, DAY, ms, startOfDay, type GanttTask } from '@command/shared';
+import { addDays, daysBetween, DAY, ms, startOfDay, type GanttTask } from '@argus/shared';
 
 export type Zoom = 'week' | 'month' | 'quarter';
 /** Pixels per day at each zoom. */

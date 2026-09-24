@@ -1,7 +1,7 @@
 import { text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { agents } from './agents';
 
-/** Columns shared by every resource table (see RecordMeta + SourceFields in @command/shared). */
+/** Columns shared by every resource table (see RecordMeta + SourceFields in @argus/shared). */
 export const recordColumns = () => ({
   id: uuid('id').primaryKey().defaultRandom(),
   externalId: text('external_id').notNull().unique(),

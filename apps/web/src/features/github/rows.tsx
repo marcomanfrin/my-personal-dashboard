@@ -1,4 +1,4 @@
-import { prLevel, prState, type Issue, type PrState, type PullRequest } from '@command/shared';
+import { prLevel, prState, type Issue, type PrState, type PullRequest } from '@argus/shared';
 import type { ReactNode } from 'react';
 import { Icon } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/icons';

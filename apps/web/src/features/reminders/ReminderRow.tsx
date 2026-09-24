@@ -1,4 +1,4 @@
-import { reminderState, type Reminder } from '@command/shared';
+import { reminderState, type Reminder } from '@argus/shared';
 import { Lamp, lvl } from '../../components/ui/primitives';
 import { Tag } from '../../components/ui/primitives';
 import { useActions } from '../../hooks/useActions';

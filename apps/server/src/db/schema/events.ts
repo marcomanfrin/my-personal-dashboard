@@ -1,4 +1,4 @@
-import type { EventCategory } from '@command/shared';
+import type { EventCategory } from '@argus/shared';
 import { boolean, index, pgTable, text } from 'drizzle-orm/pg-core';
 import { recordColumns, ts } from './columns';
 

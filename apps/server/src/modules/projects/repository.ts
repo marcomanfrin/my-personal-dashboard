@@ -1,4 +1,4 @@
-import type { Project } from '@command/shared';
+import type { Project } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { projects } from '../../db/schema';
 import { createResourceRepository } from '../../lib/resource-repository';

@@ -1,4 +1,4 @@
-import { RESOURCE_SCHEMAS, RESOURCES } from '@command/shared';
+import { RESOURCE_SCHEMAS, RESOURCES } from '@argus/shared';
 import { RESOURCE_REPOSITORIES } from '../modules/registry';
 import type { Db } from './client';
 import { demoData } from './seed-data';

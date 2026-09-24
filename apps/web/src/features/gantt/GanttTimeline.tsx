@@ -1,4 +1,4 @@
-import { addDays, daysBetween, DAY, dayDiff, ganttStatus, ms, startOfDay } from '@command/shared';
+import { addDays, daysBetween, DAY, dayDiff, ganttStatus, ms, startOfDay } from '@argus/shared';
 import type { ReactNode, Ref } from 'react';
 import { Icon } from '../../components/ui/Icon';
 import { useDrawer } from '../../drawer/DrawerContext';

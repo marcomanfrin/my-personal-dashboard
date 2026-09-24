@@ -1,4 +1,4 @@
-import { Preferences, type PreferencesPatch, type PreferencesResponse } from '@command/shared';
+import { Preferences, type PreferencesPatch, type PreferencesResponse } from '@argus/shared';
 import type { Db } from '../../db/client';
 import type { EventBus } from '../../plugins/events-bus';
 import { createPreferencesRepository, type StoredPreferences } from './repository';

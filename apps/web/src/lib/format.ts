@@ -1,4 +1,4 @@
-import { dayDiff, MIN, ms, toDate, type DateLike } from '@command/shared';
+import { dayDiff, MIN, ms, toDate, type DateLike } from '@argus/shared';
 
 /** UI text is English, as in the demo; times use 24h. */
 export const LOCALE = 'en-US';

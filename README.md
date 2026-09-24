@@ -1,4 +1,4 @@
-# Command
+# Argus
 
 A personal dashboard fed by **AI agents**. The agents read your sources (mail, calendar, GitHub,
 Trello, company planning…) and write the data to the server through a REST API; the browser shows
@@ -7,7 +7,7 @@ ack a PR…).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/dashboard-dark.png">
-  <img alt="The Command board with demo data: attention, KPIs, mail and calendar" src="docs/dashboard-light.png">
+  <img alt="The Argus board with demo data: attention, KPIs, mail and calendar" src="docs/dashboard-light.png">
 </picture>
 
 - **Widgets**: attention (what needs you right now), KPIs, mail, calendar, GitHub (PRs and
@@ -84,7 +84,7 @@ A typical cycle:
 
 ```bash
 API=http://localhost:3000/api
-AUTH="Authorization: Bearer cmd_agent_..."
+AUTH="Authorization: Bearer argus_agent_..."
 
 # 1. open a run (optional, tracks outcome and stats)
 curl -X POST $API/agents/runs -H "$AUTH" -H 'content-type: application/json' \
@@ -148,9 +148,9 @@ npm run dev                          # API on :3000 (watch) + web on :5173 (prox
 ### Layout
 
 ```
-packages/shared   @command/shared  zod schemas (the single contract) and pure domain logic
-apps/server       @command/server  Fastify 5, Drizzle, PostgreSQL, JWT auth, SSE
-apps/web          @command/web     React 19, Vite, Tailwind v4, TanStack Query
+packages/shared   @argus/shared  zod schemas (the single contract) and pure domain logic
+apps/server       @argus/server  Fastify 5, Drizzle, PostgreSQL, JWT auth, SSE
+apps/web          @argus/web     React 19, Vite, Tailwind v4, TanStack Query
 demo.html                          reference prototype, do not edit
 ```
 

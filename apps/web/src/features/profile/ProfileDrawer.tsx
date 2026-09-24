@@ -1,4 +1,4 @@
-import type { Resource, SourceStatus } from '@command/shared';
+import type { Resource, SourceStatus } from '@argus/shared';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '../../api/endpoints';
 import { queryKeys } from '../../api/queryClient';

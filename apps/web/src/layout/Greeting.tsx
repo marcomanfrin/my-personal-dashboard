@@ -1,4 +1,4 @@
-import { ms } from '@command/shared';
+import { ms } from '@argus/shared';
 import { useDashboard } from '../hooks/useDashboard';
 import { dueText, fmtLong, fmtTime, plural } from '../lib/format';
 

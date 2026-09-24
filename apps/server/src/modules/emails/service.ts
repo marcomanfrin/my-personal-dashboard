@@ -1,4 +1,4 @@
-import { normalizeEmailPatch, type Email, type EmailPatch, type MailCategory } from '@command/shared';
+import { normalizeEmailPatch, type Email, type EmailPatch, type MailCategory } from '@argus/shared';
 import { eq } from 'drizzle-orm';
 import { emails } from '../../db/schema';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';

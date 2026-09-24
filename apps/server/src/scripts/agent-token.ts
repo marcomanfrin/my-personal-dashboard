@@ -1,5 +1,5 @@
 import { parseArgs } from 'node:util';
-import { RESOURCES, Resource } from '@command/shared';
+import { RESOURCES, Resource } from '@argus/shared';
 import { databaseUrl, loadEnvFile } from '../config/env';
 import { createPgDb } from '../db/client';
 import { createAgentsService } from '../modules/agents/service';

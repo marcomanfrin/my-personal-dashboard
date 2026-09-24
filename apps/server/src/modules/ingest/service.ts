@@ -4,7 +4,7 @@ import {
   type Agent,
   type IngestResult,
   type Resource,
-} from '@command/shared';
+} from '@argus/shared';
 import type { Db } from '../../db/client';
 import { badRequest } from '../../lib/errors';
 import { formatIssues, parse } from '../../lib/validate';

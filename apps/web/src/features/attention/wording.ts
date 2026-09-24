@@ -1,4 +1,4 @@
-import type { AttentionItem, DashboardData } from '@command/shared';
+import type { AttentionItem, DashboardData } from '@argus/shared';
 import type { IconName } from '../../components/ui/icons';
 import { dueText, relPast } from '../../lib/format';
 import { attentionIcon } from '../../lib/labels';

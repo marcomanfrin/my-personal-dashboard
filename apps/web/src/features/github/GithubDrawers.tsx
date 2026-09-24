@@ -1,4 +1,4 @@
-import { prLevel, type Issue, type PullRequest } from '@command/shared';
+import { prLevel, type Issue, type PullRequest } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { Button, Kv, LevelPill, StateBadge } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

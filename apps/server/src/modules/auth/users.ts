@@ -1,4 +1,4 @@
-import type { AuthUser } from '@command/shared';
+import type { AuthUser } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { badRequest, conflict, notFound } from '../../lib/errors';
 import { hashPassword, MIN_PASSWORD_LENGTH } from './password';

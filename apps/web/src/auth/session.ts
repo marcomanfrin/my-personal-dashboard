@@ -1,4 +1,4 @@
-import type { ApiError, AuthUser, LoginBody, TokenResponse } from '@command/shared';
+import type { ApiError, AuthUser, LoginBody, TokenResponse } from '@argus/shared';
 
 /**
  * The browser session. The access token lives only in memory (never in storage);

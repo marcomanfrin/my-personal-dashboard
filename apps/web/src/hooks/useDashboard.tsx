@@ -4,7 +4,7 @@ import {
   type DashboardInsights,
   type SourceStatus,
   type UserProfile,
-} from '@command/shared';
+} from '@argus/shared';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { endpoints } from '../api/endpoints';

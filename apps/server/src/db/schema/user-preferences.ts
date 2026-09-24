@@ -1,4 +1,4 @@
-import type { Preferences } from '@command/shared';
+import type { Preferences } from '@argus/shared';
 import { jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { users } from './users';
 

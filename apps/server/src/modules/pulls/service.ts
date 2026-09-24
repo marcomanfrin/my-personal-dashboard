@@ -1,4 +1,4 @@
-import type { PullRequest, PullRequestPatch } from '@command/shared';
+import type { PullRequest, PullRequestPatch } from '@argus/shared';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';
 import { createPullsRepository } from './repository';
 

@@ -1,4 +1,4 @@
-import type { DashboardData, Resource } from '@command/shared';
+import type { DashboardData, Resource } from '@argus/shared';
 import type { IconName } from '../components/ui/icons';
 import { dueText, relPast } from './format';
 import { COLUMNS, ISSUE_ICON } from './labels';

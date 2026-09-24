@@ -1,8 +1,8 @@
-import type { Agent } from '@command/shared';
+import type { Agent } from '@argus/shared';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 import { unauthorized } from '../lib/errors';
-import { AGENT_TOKEN_PREFIX, type AgentsService } from '../modules/agents/service';
+import { isAgentToken, type AgentsService } from '../modules/agents/service';
 import type { AccessClaims } from '../modules/auth/access-tokens';
 import type { AuthService } from '../modules/auth/service';
 
@@ -42,7 +42,7 @@ export const authPlugin = fp(async (app: FastifyInstance, { agents, auth }: Auth
   app.decorateRequest('user', null);
 
   const asAgent = async (request: FastifyRequest, token: string | null) => {
-    if (!token?.startsWith(AGENT_TOKEN_PREFIX)) throw unauthorized('Agent token required');
+    if (!isAgentToken(token)) throw unauthorized('Agent token required');
     const found = await agents.authenticate(token);
     if (!found) throw unauthorized();
     request.agent = found;
@@ -60,7 +60,7 @@ export const authPlugin = fp(async (app: FastifyInstance, { agents, auth }: Auth
     user: async (request) => asUser(request, bearerOf(request)),
     any: async (request) => {
       const token = bearerOf(request);
-      return token?.startsWith(AGENT_TOKEN_PREFIX) ? asAgent(request, token) : asUser(request, token);
+      return isAgentToken(token) ? asAgent(request, token) : asUser(request, token);
     },
     stream: async (request) => {
       const q = request.query as { access_token?: unknown } | undefined;

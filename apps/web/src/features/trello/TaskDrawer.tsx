@@ -1,4 +1,4 @@
-import { sortByPosition, type Task } from '@command/shared';
+import { sortByPosition, type Task } from '@argus/shared';
 import { Button, Kv } from '../../components/ui/primitives';
 import { DrawerSection, DrawerView } from '../../drawer/DrawerShell';
 import { useActions } from '../../hooks/useActions';

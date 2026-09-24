@@ -1,4 +1,4 @@
-import type { AttentionLevel } from '@command/shared';
+import type { AttentionLevel } from '@argus/shared';
 import { useState } from 'react';
 import { Empty, Lamp, LinkButton, lvl, ShowMore } from '../../components/ui/primitives';
 import { useSection } from '../../layout/sections';

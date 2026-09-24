@@ -1,4 +1,4 @@
-import type { ActionStatus, ActionType, Resource } from '@command/shared';
+import type { ActionStatus, ActionType, Resource } from '@argus/shared';
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { agents } from './agents';
 

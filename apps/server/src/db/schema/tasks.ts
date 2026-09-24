@@ -1,4 +1,4 @@
-import type { TaskColumn } from '@command/shared';
+import type { TaskColumn } from '@argus/shared';
 import { doublePrecision, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
 import { recordColumns, ts } from './columns';
 

@@ -1,4 +1,4 @@
-import { STATUS_RANK } from '@command/shared';
+import { STATUS_RANK } from '@argus/shared';
 import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Empty, Lamp, Pill, ProgressBar, SrOnly, Toggle } from '../../components/ui/primitives';

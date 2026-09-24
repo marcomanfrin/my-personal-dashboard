@@ -1,4 +1,4 @@
-import { PullRequestPatch } from '@command/shared';
+import { PullRequestPatch } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { idOf, patchOf } from '../../lib/routes';
 

@@ -1,4 +1,4 @@
-import type { Action, ActionClaim, ActionComplete, ActionQuery, Agent } from '@command/shared';
+import type { Action, ActionClaim, ActionComplete, ActionQuery, Agent } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { conflict, forbidden, notFound } from '../../lib/errors';
 import type { EventBus } from '../../plugins/events-bus';

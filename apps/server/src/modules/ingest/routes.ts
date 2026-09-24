@@ -1,4 +1,4 @@
-import { Resource } from '@command/shared';
+import { Resource } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { parse } from '../../lib/validate';

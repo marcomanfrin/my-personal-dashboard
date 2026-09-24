@@ -1,4 +1,4 @@
-import type { Resource } from '@command/shared';
+import type { Resource } from '@argus/shared';
 import type { Db } from '../db/client';
 import type { RecordBase } from '../lib/resource-service';
 import type { ResourceRepository } from '../lib/resource-repository';

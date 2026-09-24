@@ -1,4 +1,4 @@
-import type { Reminder } from '@command/shared';
+import type { Reminder } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { reminders } from '../../db/schema';
 import { createResourceRepository } from '../../lib/resource-repository';

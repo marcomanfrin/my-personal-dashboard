@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
-RUN npm ci --workspace @command/web --workspace @command/shared --include-workspace-root
+RUN npm ci --workspace @argus/web --workspace @argus/shared --include-workspace-root
 COPY tsconfig.base.json ./
 COPY packages/shared packages/shared
 COPY apps/web apps/web

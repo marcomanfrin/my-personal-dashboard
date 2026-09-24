@@ -1,4 +1,4 @@
-import { TaskColumn, TaskPatch } from '@command/shared';
+import { TaskColumn, TaskPatch } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { idOf, patchOf, queryOf } from '../../lib/routes';

@@ -1,4 +1,4 @@
-import type { StreamEventType } from '@command/shared';
+import type { StreamEventType } from '@argus/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { queryKeys } from '../api/queryClient';

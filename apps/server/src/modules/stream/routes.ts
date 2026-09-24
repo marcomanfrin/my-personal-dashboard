@@ -1,5 +1,5 @@
 import type { ServerResponse } from 'node:http';
-import type { StreamEvent } from '@command/shared';
+import type { StreamEvent } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 
 /** Keeps proxies and browsers from closing an idle stream. */

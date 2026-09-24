@@ -1,4 +1,4 @@
-import { ms, type CalendarEvent } from '@command/shared';
+import { ms, type CalendarEvent } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { Kv } from '../../components/ui/primitives';
 import { DrawerView, Prose } from '../../drawer/DrawerShell';

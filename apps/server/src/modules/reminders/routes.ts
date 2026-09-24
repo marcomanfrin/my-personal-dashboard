@@ -1,4 +1,4 @@
-import { ReminderCreate, ReminderPatch } from '@command/shared';
+import { ReminderCreate, ReminderPatch } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { idOf, patchOf, queryOf } from '../../lib/routes';

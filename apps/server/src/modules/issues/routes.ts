@@ -1,4 +1,4 @@
-import { IssuePatch } from '@command/shared';
+import { IssuePatch } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { idOf, patchOf } from '../../lib/routes';
 

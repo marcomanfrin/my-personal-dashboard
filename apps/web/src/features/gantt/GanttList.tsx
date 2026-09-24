@@ -1,4 +1,4 @@
-import { ganttStatus } from '@command/shared';
+import { ganttStatus } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { Pill, ProgressBar } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

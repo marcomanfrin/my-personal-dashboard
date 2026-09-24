@@ -1,4 +1,4 @@
-import { HOUR, ms, type Email } from '@command/shared';
+import { HOUR, ms, type Email } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { Avatar, IconButton, LevelPill, Pill, SrOnly, Tag } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

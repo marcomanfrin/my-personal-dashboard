@@ -1,4 +1,4 @@
-import { needsAction } from '@command/shared';
+import { needsAction } from '@argus/shared';
 import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Chip, ChipRail, Empty, ShowMore } from '../../components/ui/primitives';

@@ -1,4 +1,4 @@
-import type { Preferences, PreferencesResponse } from '@command/shared';
+import type { Preferences, PreferencesResponse } from '@argus/shared';
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { endpoints } from '../api/endpoints';

@@ -36,7 +36,7 @@ export function LoginPage() {
         <Brand className="mb-6 justify-center text-lg" />
         <form onSubmit={submit} className="rounded-lg border border-line bg-surface p-6 shadow-card" noValidate>
           <h1 className="text-[22px] leading-tight font-extrabold tracking-[-.02em]">Sign in</h1>
-          <p className="mt-1 text-sm text-fg-2">Your command center, kept up to date by your agents.</p>
+          <p className="mt-1 text-sm text-fg-2">A hundred eyes on your day, kept open by your agents.</p>
 
           <label className="mt-5 block text-[12.5px] font-bold text-fg-2" htmlFor="email">
             Email

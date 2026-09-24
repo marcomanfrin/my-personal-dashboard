@@ -1,7 +1,7 @@
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator';
-import { RESOURCES, type Resource, type TokenResponse } from '@command/shared';
+import { RESOURCES, type Resource, type TokenResponse } from '@argus/shared';
 import type { InjectOptions } from 'fastify';
 import { buildApp } from '../src/app';
 import { loadConfig } from '../src/config/env';
@@ -73,7 +73,7 @@ export async function createTestApp(env: Record<string, string> = {}): Promise<T
 
 /** The refresh cookie set by a login/refresh response, as a `cookie` header value. */
 export function refreshCookieOf(res: Response): string {
-  const c = res.cookies.find((x) => x.name === 'cmd_refresh');
+  const c = res.cookies.find((x) => x.name === 'argus_refresh');
   if (!c) throw new Error('no refresh cookie');
-  return `cmd_refresh=${c.value}`;
+  return `argus_refresh=${c.value}`;
 }

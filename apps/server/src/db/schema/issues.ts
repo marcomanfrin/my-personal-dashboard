@@ -1,4 +1,4 @@
-import type { IssueKind, IssueState, Priority } from '@command/shared';
+import type { IssueKind, IssueState, Priority } from '@argus/shared';
 import { boolean, integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { recordColumns, ts } from './columns';
 

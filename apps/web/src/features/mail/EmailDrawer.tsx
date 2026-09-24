@@ -1,4 +1,4 @@
-import type { Email } from '@command/shared';
+import type { Email } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { Avatar, Button, Kv, LevelPill } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

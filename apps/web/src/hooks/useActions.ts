@@ -7,7 +7,7 @@ import {
   type ReminderCreate,
   type TaskColumn,
   type TaskPatch,
-} from '@command/shared';
+} from '@argus/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { endpoints, type PatchableResource, type PatchMap, type RecordOf } from '../api/endpoints';

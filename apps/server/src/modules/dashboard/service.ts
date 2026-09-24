@@ -5,7 +5,7 @@ import {
   type DashboardResponse,
   type SourceStatus,
   type UserProfile,
-} from '@command/shared';
+} from '@argus/shared';
 import type { Config } from '../../config/env';
 import type { Db } from '../../db/client';
 import type { AgentsService } from '../agents/service';

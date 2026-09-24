@@ -1,9 +1,9 @@
-import { LoginBody, type TokenResponse } from '@command/shared';
+import { LoginBody, type TokenResponse } from '@argus/shared';
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify';
 import { parse } from '../../lib/validate';
 import type { Session } from './service';
 
-export const REFRESH_COOKIE = 'cmd_refresh';
+export const REFRESH_COOKIE = 'argus_refresh';
 /** The refresh cookie is sent only to the auth routes, never to the rest of the API. */
 const COOKIE_PATH = '/api/auth';
 

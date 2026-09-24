@@ -1,4 +1,4 @@
-import type { PrState, Priority } from '@command/shared';
+import type { PrState, Priority } from '@argus/shared';
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 import { hue, initialsOf } from '../../lib/format';

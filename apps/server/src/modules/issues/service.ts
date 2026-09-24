@@ -1,4 +1,4 @@
-import type { Issue, IssuePatch } from '@command/shared';
+import type { Issue, IssuePatch } from '@argus/shared';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';
 import { createIssuesRepository } from './repository';
 

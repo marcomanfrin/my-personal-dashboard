@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import type { AuthUser, LoginBody, TokenResponse } from '@command/shared';
+import type { AuthUser, LoginBody, TokenResponse } from '@argus/shared';
 import type { Config } from '../../config/env';
 import type { Db } from '../../db/client';
 import { unauthorized } from '../../lib/errors';

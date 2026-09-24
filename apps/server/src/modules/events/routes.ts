@@ -1,4 +1,4 @@
-import { IsoDate } from '@command/shared';
+import { IsoDate } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { idOf, queryOf } from '../../lib/routes';

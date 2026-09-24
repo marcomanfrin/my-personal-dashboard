@@ -1,4 +1,4 @@
-import type { Agent, AgentRun, AgentRunStatus, Resource } from '@command/shared';
+import type { Agent, AgentRun, AgentRunStatus, Resource } from '@argus/shared';
 import { desc, eq, sql } from 'drizzle-orm';
 import type { Db } from '../../db/client';
 import { agentRuns, agents } from '../../db/schema';

@@ -1,4 +1,4 @@
-import { rescheduleByDependencies, type GanttTask, type GanttTaskPatch } from '@command/shared';
+import { rescheduleByDependencies, type GanttTask, type GanttTaskPatch } from '@argus/shared';
 import { eq } from 'drizzle-orm';
 import { ganttTasks } from '../../db/schema';
 import { badRequest } from '../../lib/errors';

@@ -1,4 +1,4 @@
-import type { BoardLayout, BoardSpan } from '@command/shared';
+import type { BoardLayout, BoardSpan } from '@argus/shared';
 import { useCallback, useMemo, type ComponentType } from 'react';
 import type { IconName } from '../components/ui/icons';
 import { AttentionPanel } from '../features/attention/AttentionPanel';

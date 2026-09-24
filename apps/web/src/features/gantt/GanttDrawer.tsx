@@ -1,4 +1,4 @@
-import { clamp, ganttStatus, ms, type GanttTask } from '@command/shared';
+import { clamp, ganttStatus, ms, type GanttTask } from '@argus/shared';
 import { Kv, Pill, ProgressBar } from '../../components/ui/primitives';
 import { DrawerView } from '../../drawer/DrawerShell';
 import { useDashboard } from '../../hooks/useDashboard';

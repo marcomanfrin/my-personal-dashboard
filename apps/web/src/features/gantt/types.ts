@@ -1,4 +1,4 @@
-import type { GanttStatus, GanttTask, ProjectSummary } from '@command/shared';
+import type { GanttStatus, GanttTask, ProjectSummary } from '@argus/shared';
 
 export interface GanttGroup {
   project: ProjectSummary;

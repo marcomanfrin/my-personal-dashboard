@@ -13,7 +13,7 @@ import type {
   ReminderCreate,
   ReminderPatch,
   TaskPatch,
-} from '@command/shared';
+} from '@argus/shared';
 import { api } from './client';
 
 /** Resources the user can change, with their PATCH body. */

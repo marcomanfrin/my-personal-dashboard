@@ -32,7 +32,7 @@ export function migrationsFolder(override?: string): string {
   for (let i = 0; i < 6; i++) {
     if (existsSync(join(dir, 'migrations', 'meta'))) return join(dir, 'migrations');
     const pkg = join(dir, 'package.json');
-    if (existsSync(pkg) && JSON.parse(readFileSync(pkg, 'utf8')).name === '@command/server')
+    if (existsSync(pkg) && JSON.parse(readFileSync(pkg, 'utf8')).name === '@argus/server')
       return join(dir, 'src', 'db', 'migrations');
     dir = dirname(dir);
   }

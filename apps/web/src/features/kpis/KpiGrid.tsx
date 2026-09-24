@@ -1,4 +1,4 @@
-import type { KpiId } from '@command/shared';
+import type { KpiId } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/icons';
 import { Lamp, lvl } from '../../components/ui/primitives';

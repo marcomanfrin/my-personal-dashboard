@@ -1,4 +1,4 @@
-import type { Email } from '@command/shared';
+import type { Email } from '@argus/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createTestApp, type TestContext } from './helpers';
 

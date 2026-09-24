@@ -1,4 +1,4 @@
-import type { Action, ActionStatus, ActionType, Resource } from '@command/shared';
+import type { Action, ActionStatus, ActionType, Resource } from '@argus/shared';
 import { and, asc, desc, eq, inArray, lt, or, sql } from 'drizzle-orm';
 import type { Db } from '../../db/client';
 import { actions } from '../../db/schema';

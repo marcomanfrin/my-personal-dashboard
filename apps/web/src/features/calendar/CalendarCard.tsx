@@ -1,4 +1,4 @@
-import { dayDiff, ms, startOfDay, type CalendarEvent } from '@command/shared';
+import { dayDiff, ms, startOfDay, type CalendarEvent } from '@argus/shared';
 import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Empty, Segmented } from '../../components/ui/primitives';

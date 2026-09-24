@@ -1,4 +1,4 @@
-import type { AuthUser, TokenResponse } from '@command/shared';
+import type { AuthUser, TokenResponse } from '@argus/shared';
 import { createSigner } from 'fast-jwt';
 import { sql } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -34,7 +34,7 @@ describe('login', () => {
     expect(body).not.toHaveProperty('refreshToken');
     expect(res.headers['cache-control']).toBe('no-store');
 
-    const cookie = res.cookies.find((c) => c.name === 'cmd_refresh')!;
+    const cookie = res.cookies.find((c) => c.name === 'argus_refresh')!;
     expect(cookie).toMatchObject({ httpOnly: true, sameSite: 'Strict', path: '/api/auth' });
   });
 
@@ -53,12 +53,12 @@ describe('access tokens', () => {
 
   it('rejects tokens signed with another key or already expired', async () => {
     const claims = { sub: '00000000-0000-4000-8000-000000000000', email: 'x@example.com', name: 'x' };
-    const forged = createSigner({ key: 'another-secret-that-is-long-enough!!', iss: 'command', aud: 'command-dashboard' })(claims);
+    const forged = createSigner({ key: 'another-secret-that-is-long-enough!!', iss: 'argus', aud: 'argus-dashboard' })(claims);
     expect((await dashboard(`Bearer ${forged}`)).statusCode).toBe(401);
     const expired = createSigner({
       key: 'test-secret-that-is-long-enough-for-hs256',
-      iss: 'command',
-      aud: 'command-dashboard',
+      iss: 'argus',
+      aud: 'argus-dashboard',
       clockTimestamp: Date.now() - 3_600_000,
       expiresIn: 60_000,
     })(claims);
@@ -113,9 +113,9 @@ describe('refresh and logout', () => {
 
   it('requires a cookie and clears it on failure', async () => {
     expect((await refresh()).statusCode).toBe(401);
-    const bad = await refresh('cmd_refresh=not-a-real-token');
+    const bad = await refresh('argus_refresh=not-a-real-token');
     expect(bad.statusCode).toBe(401);
-    expect(bad.cookies.find((c) => c.name === 'cmd_refresh')?.value).toBe('');
+    expect(bad.cookies.find((c) => c.name === 'argus_refresh')?.value).toBe('');
   });
 
   it('logout revokes the refresh token', async () => {

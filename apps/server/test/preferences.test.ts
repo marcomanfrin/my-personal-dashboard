@@ -1,4 +1,4 @@
-import type { PreferencesResponse, StreamEvent } from '@command/shared';
+import type { PreferencesResponse, StreamEvent } from '@argus/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createTestApp, type TestContext } from './helpers';
 

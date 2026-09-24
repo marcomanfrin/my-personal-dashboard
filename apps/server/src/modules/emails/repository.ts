@@ -1,4 +1,4 @@
-import type { Email } from '@command/shared';
+import type { Email } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { emails } from '../../db/schema';
 import { createResourceRepository } from '../../lib/resource-repository';

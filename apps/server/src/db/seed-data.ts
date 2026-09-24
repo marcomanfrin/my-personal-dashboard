@@ -8,7 +8,7 @@ import type {
   ReminderInput,
   Resource,
   TaskInput,
-} from '@command/shared';
+} from '@argus/shared';
 
 /**
  * The mock data of demo.html (section 3. MOCK) as agent input, with dates

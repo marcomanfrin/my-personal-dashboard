@@ -1,4 +1,4 @@
-import { byLevel, ms, prLevel, type Issue, type PullRequest } from '@command/shared';
+import { byLevel, ms, prLevel, type Issue, type PullRequest } from '@argus/shared';
 
 export type PrFilterId = 'all' | 'review' | 'mine' | 'blocked' | 'failing';
 export type PrSortId = 'priority' | 'oldest' | 'repo';

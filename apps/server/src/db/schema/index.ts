@@ -1,4 +1,4 @@
-import type { Resource } from '@command/shared';
+import type { Resource } from '@argus/shared';
 import { emails } from './emails';
 import { events } from './events';
 import { ganttTasks } from './gantt-tasks';

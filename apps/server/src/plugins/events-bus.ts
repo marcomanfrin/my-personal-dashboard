@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import type { StreamEvent } from '@command/shared';
+import type { StreamEvent } from '@argus/shared';
 
 /** In-process pub/sub between services (publishers) and SSE connections (subscribers). */
 export class EventBus {

@@ -1,4 +1,4 @@
-import type { ApiError } from '@command/shared';
+import type { ApiError } from '@argus/shared';
 import { expire, refresh, session } from '../auth/session';
 
 export class HttpError extends Error {

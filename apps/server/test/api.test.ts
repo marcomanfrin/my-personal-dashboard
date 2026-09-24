@@ -1,5 +1,7 @@
-import type { Action, DashboardResponse, Email, IngestResult, Reminder, StreamEvent, Task } from '@command/shared';
+import { createHash } from 'node:crypto';
+import type { Action, DashboardResponse, Email, IngestResult, Reminder, StreamEvent, Task } from '@argus/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { agents } from '../src/db/schema';
 import { createTestApp, type TestContext } from './helpers';
 
 let t: TestContext;
@@ -76,10 +78,23 @@ describe('agent ingest', () => {
     const wrong = await t.app.inject({
       method: 'PUT',
       url: '/api/ingest/emails',
-      headers: { authorization: 'Bearer cmd_agent_nope' },
+      headers: { authorization: 'Bearer argus_agent_nope' },
       payload: { items: [] },
     });
     expect(wrong.statusCode).toBe(401);
+  });
+
+  it('still accepts tokens issued with the pre-rename cmd_agent_ prefix', async () => {
+    const legacy = 'cmd_agent_issued-before-the-rename';
+    const tokenHash = createHash('sha256').update(legacy).digest('hex');
+    await t.db.insert(agents).values({ name: 'legacy', scopes: ['emails'], tokenHash });
+    const res = await t.app.inject({
+      method: 'PUT',
+      url: '/api/ingest/emails',
+      headers: { authorization: `Bearer ${legacy}` },
+      payload: { items: [] },
+    });
+    expect(res.statusCode).toBe(200);
   });
 
   it('enforces scopes', async () => {

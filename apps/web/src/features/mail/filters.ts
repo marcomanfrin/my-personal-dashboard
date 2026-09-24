@@ -1,4 +1,4 @@
-import { byLevel, ms, needsAction, type Email } from '@command/shared';
+import { byLevel, ms, needsAction, type Email } from '@argus/shared';
 
 export type MailFilterId = 'action' | 'urgent' | 'needs-reply' | 'fyi' | 'waiting' | 'archived';
 

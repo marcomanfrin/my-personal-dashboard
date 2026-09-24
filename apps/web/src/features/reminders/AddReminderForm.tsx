@@ -1,4 +1,4 @@
-import { addDays, startOfDay } from '@command/shared';
+import { addDays, startOfDay } from '@argus/shared';
 import { useRef, useState, type FormEvent } from 'react';
 import { Button } from '../../components/ui/primitives';
 import { useActions } from '../../hooks/useActions';

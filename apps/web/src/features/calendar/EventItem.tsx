@@ -1,4 +1,4 @@
-import { ms, type CalendarEvent } from '@command/shared';
+import { ms, type CalendarEvent } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { ProgressBar, SrOnly, Tag } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

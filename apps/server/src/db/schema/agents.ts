@@ -1,4 +1,4 @@
-import type { AgentRunStatus, Resource } from '@command/shared';
+import type { AgentRunStatus, Resource } from '@argus/shared';
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const agents = pgTable('agents', {

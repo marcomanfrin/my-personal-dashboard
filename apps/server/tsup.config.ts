@@ -14,7 +14,7 @@ export default defineConfig({
   target: 'node22',
   clean: true,
   // The shared package ships TypeScript sources: bundle it instead of importing at runtime.
-  noExternal: ['@command/shared'],
+  noExternal: ['@argus/shared'],
   onSuccess: async () => {
     cpSync('src/db/migrations', 'dist/migrations', { recursive: true });
   },

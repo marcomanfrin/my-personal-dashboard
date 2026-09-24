@@ -1,4 +1,4 @@
-import type { Project } from '@command/shared';
+import type { Project } from '@argus/shared';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';
 import { createProjectsRepository } from './repository';
 

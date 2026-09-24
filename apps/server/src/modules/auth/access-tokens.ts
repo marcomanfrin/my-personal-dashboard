@@ -1,7 +1,7 @@
 import { createSigner, createVerifier } from 'fast-jwt';
 
-const ISSUER = 'command';
-const AUDIENCE = 'command-dashboard';
+const ISSUER = 'argus';
+const AUDIENCE = 'argus-dashboard';
 
 /** Claims of a dashboard access token. `sub` is the user id. */
 export interface AccessClaims {

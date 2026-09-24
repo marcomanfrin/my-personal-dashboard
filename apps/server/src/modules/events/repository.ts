@@ -1,4 +1,4 @@
-import type { CalendarEvent } from '@command/shared';
+import type { CalendarEvent } from '@argus/shared';
 import type { Db } from '../../db/client';
 import { events } from '../../db/schema';
 import { createResourceRepository } from '../../lib/resource-repository';

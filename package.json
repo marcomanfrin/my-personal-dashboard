@@ -1,5 +1,5 @@
 {
-  "name": "command",
+  "name": "argus",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -7,19 +7,19 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm run dev -w @command/server\" \"npm run dev -w @command/web\"",
-    "build": "npm run build -w @command/server && npm run build -w @command/web",
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm run dev -w @argus/server\" \"npm run dev -w @argus/web\"",
+    "build": "npm run build -w @argus/server && npm run build -w @argus/web",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
-    "db:generate": "npm run db:generate -w @command/server",
-    "db:migrate": "npm run db:migrate -w @command/server",
-    "db:seed": "npm run db:seed -w @command/server",
-    "agent:token": "npm run agent:token -w @command/server --",
-    "user:create": "npm run user:create -w @command/server --",
-    "user:reset": "npm run user:reset -w @command/server --",
-    "dev:api": "npm run dev -w @command/server",
-    "dev:web": "npm run dev -w @command/web"
+    "db:generate": "npm run db:generate -w @argus/server",
+    "db:migrate": "npm run db:migrate -w @argus/server",
+    "db:seed": "npm run db:seed -w @argus/server",
+    "agent:token": "npm run agent:token -w @argus/server --",
+    "user:create": "npm run user:create -w @argus/server --",
+    "user:reset": "npm run user:reset -w @argus/server --",
+    "dev:api": "npm run dev -w @argus/server",
+    "dev:web": "npm run dev -w @argus/web"
   },
   "devDependencies": {
     "concurrently": "^9.2.4",

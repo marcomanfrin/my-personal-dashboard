@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core';
-import { dayDiff, type Task } from '@command/shared';
+import { dayDiff, type Task } from '@argus/shared';
 import { Tag } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';
 import { useDashboard } from '../../hooks/useDashboard';

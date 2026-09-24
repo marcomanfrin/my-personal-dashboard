@@ -6,11 +6,11 @@ COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
-RUN npm ci --workspace @command/server --workspace @command/shared --include-workspace-root
+RUN npm ci --workspace @argus/server --workspace @argus/shared --include-workspace-root
 COPY tsconfig.base.json ./
 COPY packages/shared packages/shared
 COPY apps/server apps/server
-RUN npm run build -w @command/server
+RUN npm run build -w @argus/server
 
 # ---- runtime ----------------------------------------------------------------
 FROM node:24-slim
@@ -20,7 +20,7 @@ COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
-RUN npm ci --omit=dev --workspace @command/server --ignore-scripts && npm cache clean --force
+RUN npm ci --omit=dev --workspace @argus/server --ignore-scripts && npm cache clean --force
 COPY --from=build /repo/apps/server/dist apps/server/dist
 WORKDIR /repo/apps/server
 USER node

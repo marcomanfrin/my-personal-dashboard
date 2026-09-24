@@ -1,4 +1,4 @@
-import type { Task, TaskColumn, TaskPatch } from '@command/shared';
+import type { Task, TaskColumn, TaskPatch } from '@argus/shared';
 import { and, eq } from 'drizzle-orm';
 import { tasks } from '../../db/schema';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';

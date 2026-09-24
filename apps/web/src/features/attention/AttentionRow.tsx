@@ -1,4 +1,4 @@
-import type { AttentionItem } from '@command/shared';
+import type { AttentionItem } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import { lvl, SrOnly } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';

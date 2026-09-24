@@ -1,4 +1,4 @@
-import type { Priority, PullRequestStatus } from '@command/shared';
+import type { Priority, PullRequestStatus } from '@argus/shared';
 import { boolean, integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
 import { recordColumns, ts } from './columns';
 

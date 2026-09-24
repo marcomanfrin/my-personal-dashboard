@@ -15,7 +15,7 @@ import {
   type DragStartEvent,
   type Over,
 } from '@dnd-kit/core';
-import { sortByPosition, TaskColumn, type Task } from '@command/shared';
+import { sortByPosition, TaskColumn, type Task } from '@argus/shared';
 import { Fragment, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Empty, Segmented } from '../../components/ui/primitives';

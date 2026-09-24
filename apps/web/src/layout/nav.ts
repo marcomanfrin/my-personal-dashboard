@@ -1,4 +1,4 @@
-import { needsAction, reminderState, type DashboardData } from '@command/shared';
+import { needsAction, reminderState, type DashboardData } from '@argus/shared';
 import type { IconName } from '../components/ui/icons';
 
 export interface NavItem {

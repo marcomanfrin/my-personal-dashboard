@@ -1,4 +1,4 @@
-import { ms, reminderState, type ReminderState } from '@command/shared';
+import { ms, reminderState, type ReminderState } from '@argus/shared';
 import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Empty, Toggle } from '../../components/ui/primitives';

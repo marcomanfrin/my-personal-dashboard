@@ -1,4 +1,4 @@
-import { AgentRunFinish, AgentRunStart } from '@command/shared';
+import { AgentRunFinish, AgentRunStart } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { parse } from '../../lib/validate';

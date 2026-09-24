@@ -1,4 +1,4 @@
-import { RESOURCE_SCHEMAS, RESOURCES, type DashboardData, type DashboardResponse, type TokenResponse } from '@command/shared';
+import { RESOURCE_SCHEMAS, RESOURCES, type DashboardData, type DashboardResponse, type TokenResponse } from '@argus/shared';
 // The same demo data the server seeds, so the UI is tested on realistic content.
 import { demoData } from '../../server/src/db/seed-data';
 

@@ -1,4 +1,4 @@
-import type { DashboardData } from '@command/shared';
+import type { DashboardData } from '@argus/shared';
 import { useEffect, type ReactNode } from 'react';
 import { EventDrawer } from '../features/calendar/EventDrawer';
 import { GanttDrawer } from '../features/gantt/GanttDrawer';

@@ -1,4 +1,4 @@
-import { ms, type GanttStatus } from '@command/shared';
+import { ms, type GanttStatus } from '@argus/shared';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Button, Empty, Segmented, Tag, Toggle } from '../../components/ui/primitives';

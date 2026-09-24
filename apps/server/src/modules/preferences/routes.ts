@@ -1,4 +1,4 @@
-import { PreferencesPatch } from '@command/shared';
+import { PreferencesPatch } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { nonEmpty, parse } from '../../lib/validate';
 

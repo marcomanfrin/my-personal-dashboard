@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { ReminderCreate, type Reminder, type ReminderPatch } from '@command/shared';
+import { ReminderCreate, type Reminder, type ReminderPatch } from '@argus/shared';
 import { eq } from 'drizzle-orm';
 import { reminders } from '../../db/schema';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';

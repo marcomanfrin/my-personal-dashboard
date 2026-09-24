@@ -1,4 +1,4 @@
-import { clamp } from '@command/shared';
+import { clamp } from '@argus/shared';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/cn';
 

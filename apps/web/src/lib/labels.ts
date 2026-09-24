@@ -9,7 +9,7 @@ import type {
   Priority,
   PullRequestStatus,
   TaskColumn,
-} from '@command/shared';
+} from '@argus/shared';
 import type { IconName } from '../components/ui/icons';
 
 export const LEVEL_LABEL: Record<Priority, string> = {

@@ -1,4 +1,4 @@
-import type { Preferences } from '@command/shared';
+import type { Preferences } from '@argus/shared';
 import { eq, sql } from 'drizzle-orm';
 import type { Db } from '../../db/client';
 import { userPreferences } from '../../db/schema';

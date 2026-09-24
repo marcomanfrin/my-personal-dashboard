@@ -1,4 +1,4 @@
-import { ActionClaim, ActionComplete, ActionQuery } from '@command/shared';
+import { ActionClaim, ActionComplete, ActionQuery } from '@argus/shared';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { parse } from '../../lib/validate';

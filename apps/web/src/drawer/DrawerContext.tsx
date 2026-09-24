@@ -1,4 +1,4 @@
-import type { Resource } from '@command/shared';
+import type { Resource } from '@argus/shared';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useActions } from '../hooks/useActions';
 import { useSections } from '../layout/sections';

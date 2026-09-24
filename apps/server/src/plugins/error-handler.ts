@@ -1,4 +1,4 @@
-import type { ApiError } from '@command/shared';
+import type { ApiError } from '@argus/shared';
 import type { FastifyError, FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { HttpError } from '../lib/errors';

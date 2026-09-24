@@ -1,4 +1,4 @@
-import type { AuthUser } from '@command/shared';
+import type { AuthUser } from '@argus/shared';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { Db } from '../../db/client';
 import { refreshTokens, users } from '../../db/schema';

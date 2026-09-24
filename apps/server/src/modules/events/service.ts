@@ -1,4 +1,4 @@
-import type { CalendarEvent } from '@command/shared';
+import type { CalendarEvent } from '@argus/shared';
 import { and, gte, lt } from 'drizzle-orm';
 import { events } from '../../db/schema';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';

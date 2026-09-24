@@ -1,4 +1,4 @@
-import type { Resource } from '@command/shared';
+import type { Resource } from '@argus/shared';
 import type { Db } from '../db/client';
 import { createActionsRepository } from '../modules/actions/repository';
 import type { EventBus } from '../plugins/events-bus';
