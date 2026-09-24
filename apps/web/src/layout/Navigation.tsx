@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Brand } from '../components/ui/Brand';
 import { Icon } from '../components/ui/Icon';
 import { useDashboard } from '../hooks/useDashboard';
 import { cn } from '../lib/cn';
 import { usePreference } from '../hooks/usePreference';
 import { storage } from '../lib/storage';
-import { useHiddenWidgets } from './boardLayout';
-import { NAV, navTarget, type NavItem } from './nav';
+import { useVisibleWidgetIds } from './boardLayout';
+import { navItems, navTarget, type NavItem } from './nav';
 import { useSections } from './sections';
 
 /** The link's accessible name: the label stays even where only the icon shows, plus the count. */
@@ -61,16 +61,18 @@ function useSidebarCollapsed(): [boolean, () => void] {
 
 function useNavState() {
   const { data, now } = useDashboard();
-  const { active, goTo } = useSections();
+  const { active, goTo, order } = useSections();
   const current = navTarget(active);
   const countOf = (x: NavItem) => ({ n: x.count?.(data, now) ?? 0, hot: x.hot?.(data) ?? false });
   const onClick = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     goTo(id);
   };
-  // A hidden widget has nothing to scroll to: leave it out of the navigation.
-  const hidden = useHiddenWidgets();
-  const items = NAV.filter((x) => !hidden.has(x.id));
+  // Same order as the board shows (the dense grid can pull a widget up into a gap);
+  // the saved order until the board is measured, or while it is being edited.
+  // A hidden widget has nothing to scroll to, so it stays out.
+  const visibleIds = useVisibleWidgetIds();
+  const items = useMemo(() => navItems(sortByRendered(visibleIds, order)), [visibleIds, order]);
   return { current, countOf, onClick, items };
 }
 
@@ -187,4 +189,16 @@ export function BottomNav() {
       })}
     </nav>
   );
+}
+
+/**
+ * The ids on screen in rendered order, then the ones without a section element
+ * (the KPIs), as saved. Nothing on screen (the editor is open): the saved order.
+ */
+function sortByRendered(ids: readonly string[], rendered: readonly string[]): readonly string[] {
+  const shown = new Set(ids);
+  const onScreen = rendered.filter((id) => shown.has(id));
+  if (!onScreen.length) return ids;
+  const measured = new Set(onScreen);
+  return [...onScreen, ...ids.filter((id) => !measured.has(id))];
 }

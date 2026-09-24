@@ -3,6 +3,13 @@ import { usePreference } from '../hooks/usePreference';
 
 const COLLAPSED_KEY = 'cc-collapsed';
 const FLASH_MS = 1400;
+/** The spy ignores scrolling after a nav click until the page has been still this long. */
+const SCROLL_IDLE_MS = 160;
+/** Fraction of the viewport below the topbar where a section counts as "being read". */
+const READING_LINE = 0.3;
+const BOTTOM_SLACK_PX = 4;
+/** Widgets side by side in the grid share a row even if their tops differ by a pixel or two. */
+const ROW_TOLERANCE_PX = 8;
 const NONE_COLLAPSED: Record<string, boolean> = {};
 
 interface SectionsState {
@@ -13,11 +20,27 @@ interface SectionsState {
   /** Scrolls to a section, expanding and briefly highlighting it. */
   goTo(id: string): void;
   active: string;
+  /** Rendered sections in reading order (rows top to bottom, left to right): the dense grid can differ from the saved order. */
+  order: readonly string[];
   flashing: string | null;
   register(id: string, el: HTMLElement | null): void;
 }
 
 const Ctx = createContext<SectionsState | null>(null);
+
+/** Reading order of boxes laid out in rows: top to bottom, then left to right within a row. */
+export function readingOrder(boxes: { id: string; top: number; left: number }[]): string[] {
+  const byTop = [...boxes].sort((a, b) => a.top - b.top);
+  const rows: (typeof boxes)[] = [];
+  for (const b of byTop) {
+    const row = rows.at(-1);
+    if (row && b.top - row[0]!.top <= ROW_TOLERANCE_PX) row.push(b);
+    else rows.push([b]);
+  }
+  return rows.flatMap((row) => row.sort((a, b) => a.left - b.left).map((b) => b.id));
+}
+
+const sameOrder = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -26,35 +49,91 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = usePreference('collapsed', COLLAPSED_KEY, NONE_COLLAPSED);
   const [active, setActive] = useState('overview');
   const [flashing, setFlashing] = useState<string | null>(null);
+  const [order, setOrder] = useState<readonly string[]>([]);
   const elements = useRef(new Map<string, HTMLElement>());
-  const observer = useRef<IntersectionObserver | null>(null);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  /** While a nav click scrolls, the spy stays quiet so it does not flicker through the sections passed. */
+  const navigating = useRef(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const flashTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const scheduleOrder = useRef<() => void>(() => {});
 
-
-  useEffect(() => {
-    if (!('IntersectionObserver' in window)) return;
-    const visible = new Map<string, number | null>();
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) visible.set(e.target.id, e.isIntersecting ? e.boundingClientRect.top : null);
-        const best = [...visible.entries()]
-          .filter((x): x is [string, number] => x[1] !== null)
-          .sort((a, b) => Math.abs(a[1]) - Math.abs(b[1]))[0];
-        if (best) setActive(best[0]);
-      },
-      { rootMargin: '-20% 0px -55% 0px' },
-    );
-    elements.current.forEach((el) => observer.current!.observe(el));
-    return () => observer.current?.disconnect();
+  const releaseWhenIdle = useCallback(() => {
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => (navigating.current = false), SCROLL_IDLE_MS);
   }, []);
 
+  // Scroll spy on live positions: the active section is the last row whose top has
+  // passed the reading line below the topbar (at the very bottom of the page, the
+  // last row that shows). Side-by-side widgets share a row: the current one wins,
+  // otherwise the leftmost.
+  useEffect(() => {
+    let frame = 0;
+    let orderFrame = 0;
+    const measureOrder = () => {
+      orderFrame = 0;
+      const next = readingOrder(
+        [...elements.current]
+          .map(([id, el]) => ({ id, rect: el.getBoundingClientRect() }))
+          .filter((r) => r.rect.height > 0)
+          .map(({ id, rect }) => ({ id, top: rect.top, left: rect.left })),
+      );
+      setOrder((prev) => (sameOrder(prev, next) ? prev : next));
+    };
+    scheduleOrder.current = () => {
+      if (!orderFrame) orderFrame = requestAnimationFrame(measureOrder);
+    };
+    const measure = () => {
+      frame = 0;
+      if (navigating.current || !elements.current.size) return;
+      const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const line = pad + (window.innerHeight - pad) * READING_LINE;
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - BOTTOM_SLACK_PX;
+      const rects = [...elements.current].map(([id, el]) => ({ id, rect: el.getBoundingClientRect() }));
+      const limit = atBottom ? window.innerHeight : line;
+      const passed = rects.filter((r) => r.rect.top <= limit && r.rect.height > 0);
+      if (!passed.length) {
+        const first = rects.sort((a, b) => a.rect.top - b.rect.top || a.rect.left - b.rect.left)[0];
+        if (first) setActive(first.id);
+        return;
+      }
+      const rowTop = Math.max(...passed.map((r) => r.rect.top));
+      const row = passed.filter((r) => r.rect.top >= rowTop - ROW_TOLERANCE_PX);
+      const next =
+        row.find((r) => r.id === activeRef.current) ?? row.sort((a, b) => a.rect.left - b.rect.left)[0]!;
+      setActive(next.id);
+    };
+    const schedule = () => {
+      if (navigating.current) releaseWhenIdle();
+      else if (!frame) frame = requestAnimationFrame(measure);
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    // Collapsing or expanding a card moves the others without scrolling.
+    const onLayout = () => {
+      schedule();
+      scheduleOrder.current();
+    };
+    window.addEventListener('resize', onLayout);
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onLayout);
+    resize?.observe(document.body);
+    onLayout();
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', onLayout);
+      resize?.disconnect();
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(orderFrame);
+      clearTimeout(idleTimer.current);
+    };
+  }, [releaseWhenIdle]);
+
   const register = useCallback((id: string, el: HTMLElement | null) => {
-    const prev = elements.current.get(id);
-    if (prev && prev !== el) observer.current?.unobserve(prev);
-    if (el) {
-      elements.current.set(id, el);
-      observer.current?.observe(el);
-    } else elements.current.delete(id);
+    if (el) elements.current.set(id, el);
+    else elements.current.delete(id);
+    // Widgets moved or shown again: the navigation follows the new layout.
+    scheduleOrder.current();
   }, []);
 
   const toggle = useCallback((id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] })), []);
@@ -67,6 +146,8 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
   const goTo = useCallback((id: string) => {
     setCollapsed((c) => (c[id] ? { ...c, [id]: false } : c));
     setActive(id);
+    navigating.current = true;
+    releaseWhenIdle();
     // Let an expanded card render before measuring.
     requestAnimationFrame(() => {
       const section = document.getElementById(id);
@@ -77,11 +158,11 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
     clearTimeout(flashTimer.current);
     setFlashing(id);
     flashTimer.current = setTimeout(() => setFlashing(null), FLASH_MS);
-  }, []);
+  }, [releaseWhenIdle]);
 
   const value = useMemo(
-    () => ({ collapsed, toggle, setAll, goTo, active, flashing, register }),
-    [collapsed, toggle, setAll, goTo, active, flashing, register],
+    () => ({ collapsed, toggle, setAll, goTo, active, order, flashing, register }),
+    [collapsed, toggle, setAll, goTo, active, order, flashing, register],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

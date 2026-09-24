@@ -139,8 +139,11 @@ export function useBoardLayout() {
   return { layout, widgets, visible: widgets.filter((w) => !w.hidden), move, resize, toggleHidden, reset, isDefault };
 }
 
-/** Ids of the widgets the user hid: for the navigation, which leaves them out too. */
-export function useHiddenWidgets(): ReadonlySet<string> {
+/** Ids of the visible widgets in the user's order: the navigation follows the board. */
+export function useVisibleWidgetIds(): readonly string[] {
   const [stored] = usePreference('board', LAYOUT_KEY, DEFAULT_LAYOUT);
-  return useMemo(() => new Set(sanitize(stored).hidden), [stored]);
+  return useMemo(() => {
+    const { order, hidden } = sanitize(stored);
+    return order.filter((id) => !hidden?.includes(id));
+  }, [stored]);
 }

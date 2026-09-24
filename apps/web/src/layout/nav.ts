@@ -47,3 +47,14 @@ export const NAV: NavItem[] = [
 
 /** The KPI tiles belong to the overview for navigation purposes. */
 export const navTarget = (sectionId: string) => (sectionId === 'kpis' ? 'overview' : sectionId);
+
+/**
+ * The nav items for the board's visible widgets, in board order. An item sits where
+ * its first section is (Overview goes where the attention panel or the KPIs come
+ * first) and shows only if its own section is visible.
+ */
+export function navItems(visibleIds: readonly string[]): NavItem[] {
+  const visible = new Set(visibleIds);
+  const order = [...new Set(visibleIds.map(navTarget))];
+  return order.flatMap((id) => NAV.filter((x) => x.id === id && visible.has(id)));
+}
