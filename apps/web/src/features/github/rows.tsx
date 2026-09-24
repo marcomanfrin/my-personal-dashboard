@@ -2,7 +2,7 @@ import { prLevel, prState, type Issue, type PrState, type PullRequest } from '@c
 import type { ReactNode } from 'react';
 import { Icon } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/icons';
-import { LevelPill, lvl, Pill, StateBadge } from '../../components/ui/primitives';
+import { LevelPill, lvl, Pill, SrOnly, StateBadge } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';
 import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
@@ -38,6 +38,7 @@ function GhRow({
           className={cn('grid size-[30px] flex-none place-items-center rounded-sm bg-c/12 text-c', `st-${state}`)}
         >
           <Icon name={icon} size="sm" />
+          <SrOnly>{STATE_LABEL[state]}:</SrOnly>
         </span>
         <span className="min-w-0 flex-1 sm:flex sm:flex-col">
           <span className="block text-sm leading-[1.35] font-[650]">{title}</span>

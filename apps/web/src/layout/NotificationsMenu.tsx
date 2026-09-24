@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Lamp, lvl } from '../components/ui/primitives';
 import { IconButton } from '../components/ui/primitives';
 import { useDrawer } from '../drawer/DrawerContext';
 import { attentionTitle, attentionWhen } from '../features/attention/wording';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useDashboard } from '../hooks/useDashboard';
+import { ATTENTION_LEVEL_LABEL } from '../lib/labels';
 import { storage } from '../lib/storage';
 
 const SEEN_KEY = 'cc-notif-seen';
@@ -16,7 +17,19 @@ export function NotificationsMenu() {
   const [open, setOpen] = useState(false);
   const [seen, setSeen] = useState<string[]>(() => storage.get(SEEN_KEY, []));
   const root = useRef<HTMLDivElement>(null);
+  const bell = useRef<HTMLButtonElement>(null);
   useClickOutside(root, () => setOpen(false), open);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      bell.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
 
   const items = insights.attention.filter((i) => i.level === 'critical' || i.level === 'high');
   const unseen = items.filter((i) => !seen.includes(i.key)).length;
@@ -31,6 +44,7 @@ export function NotificationsMenu() {
   return (
     <div ref={root} className="relative">
       <IconButton
+        ref={bell}
         icon="bell"
         label={`Notifications, ${unseen} new`}
         tip="Notifications"
@@ -47,11 +61,13 @@ export function NotificationsMenu() {
       {open && (
         <div
           id="notif-panel"
+          role="region"
+          aria-labelledby="notif-title"
           className="absolute top-[calc(100%+8px)] -right-12 z-40 w-[min(360px,calc(100vw-20px))] overflow-hidden rounded-md border border-line-strong bg-surface shadow-pop md:right-0"
         >
-          <div className="flex items-center justify-between border-b border-line px-3.5 py-3 text-[13.5px] font-bold">
-            Needs you now
-            <button type="button" onClick={markSeen} className="text-[12.5px] font-bold text-accent-text">
+          <div className="flex items-center justify-between border-b border-line px-3.5 py-2 text-[13.5px] font-bold">
+            <h2 id="notif-title">Needs you now</h2>
+            <button type="button" onClick={markSeen} className="-mr-1.5 rounded-sm px-1.5 py-1.5 text-[12.5px] font-bold text-accent-text hover:bg-surface-2">
               Mark all as seen
             </button>
           </div>
@@ -61,11 +77,11 @@ export function NotificationsMenu() {
               type="button"
               onClick={() => {
                 setOpen(false);
-                openRecord(i.ref.resource, i.ref.id);
+                openRecord(i.ref.resource, i.ref.id, bell.current);
               }}
               className={`flex w-full items-start gap-2.5 px-3.5 py-[9px] text-left hover:bg-surface-2 ${lvl(i.level)}`}
             >
-              <Lamp className="mt-1.5" />
+              <Lamp className="mt-1.5" label={ATTENTION_LEVEL_LABEL[i.level]} />
               <div>
                 <b className="block text-[13.5px] leading-[1.35] font-[650]">{attentionTitle(i, data)}</b>
                 <span className="text-[12.5px] text-fg-3">

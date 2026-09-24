@@ -30,7 +30,7 @@ function SourceRow({ s, now }: { s: SourceStatus; now: Date }) {
   return (
     <div className="flex items-start gap-2.5 py-2 text-[13px] [&+&]:border-t [&+&]:border-line">
       <span className={cn('mt-1.5', failed ? 'st-error' : s.lastSyncAt ? 'st-success' : 'st-pending')}>
-        <Lamp />
+        <Lamp label={failed ? 'Last run failed' : s.lastSyncAt ? 'Synced' : 'Never synced'} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">

@@ -2,6 +2,7 @@ import type { KpiId } from '@command/shared';
 import { Icon } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/icons';
 import { Lamp, lvl } from '../../components/ui/primitives';
+import { LEVEL_LABEL } from '../../lib/labels';
 import { useDashboard } from '../../hooks/useDashboard';
 import { useSections } from '../../layout/sections';
 import { cn } from '../../lib/cn';
@@ -31,7 +32,7 @@ export function KpiGrid({ className }: { className?: string }) {
               e.preventDefault();
               goTo(k.target);
             }}
-            aria-label={`${k.value} ${t.label}${t.sub ? `, ${t.sub}` : ''}. Go to section`}
+            aria-label={`${k.value} ${t.label}${t.sub ? `, ${t.sub}` : ''}${k.level ? `, ${LEVEL_LABEL[k.level].toLowerCase()} priority` : ''}. Go to section`}
             className={cn(
               'relative isolate flex min-h-[104px] flex-col justify-between gap-2.5 overflow-hidden rounded-[15px] border border-line bg-surface p-3.5 shadow-card hover:border-line-strong',
               k.level &&

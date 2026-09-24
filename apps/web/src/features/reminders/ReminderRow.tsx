@@ -39,7 +39,7 @@ export function ReminderRow({ reminder: r }: { reminder: Reminder }) {
       </div>
       {r.priority !== 'normal' && !r.done && (
         <span data-tip={`${LEVEL_LABEL[r.priority]} priority`} className={lvl(r.priority)}>
-          <Lamp />
+          <Lamp label={`${LEVEL_LABEL[r.priority]} priority`} />
         </span>
       )}
     </li>

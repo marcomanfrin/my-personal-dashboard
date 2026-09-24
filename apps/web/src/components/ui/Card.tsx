@@ -41,7 +41,7 @@ export function Card({ id, title, icon, sub, tools, className, children }: CardP
             <Icon name={icon} />
           </span>
           <div>
-            <h2 id={`${id}-title`} className="text-[15.5px] leading-tight font-[750] tracking-[-.01em]">
+            <h2 id={`${id}-title`} tabIndex={-1} className="text-[15.5px] leading-tight font-[750] tracking-[-.01em]">
               {title}
             </h2>
             {sub && <p className="text-[12.5px] font-semibold text-fg-3 [&_b]:text-fg-2">{sub}</p>}
@@ -53,7 +53,7 @@ export function Card({ id, title, icon, sub, tools, className, children }: CardP
             type="button"
             onClick={toggle}
             aria-expanded={!collapsed}
-            aria-controls={`${id}-body`}
+            aria-controls={collapsed ? undefined : `${id}-body`}
             aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${title}`}
             data-tip={collapsed ? 'Expand' : 'Collapse'}
             className="relative grid size-[38px] flex-none place-items-center rounded-[10px] text-fg-2 hover:bg-surface-2 hover:text-fg"

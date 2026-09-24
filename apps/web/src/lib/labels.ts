@@ -1,5 +1,6 @@
 import type {
   AttentionItem,
+  AttentionLevel,
   EventCategory,
   GanttStatus,
   IssueKind,
@@ -18,6 +19,8 @@ export const LEVEL_LABEL: Record<Priority, string> = {
   low: 'Low',
   normal: 'Normal',
 };
+
+export const ATTENTION_LEVEL_LABEL: Record<AttentionLevel, string> = { ...LEVEL_LABEL, upcoming: 'Upcoming' };
 
 export const MAIL_CAT_LABEL: Record<MailCategory, string> = {
   urgent: 'Urgent',

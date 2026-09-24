@@ -25,7 +25,7 @@ export function EventItem({ event: e, state }: { event: CalendarEvent; state: Ev
         : '';
 
   return (
-    <li className={cn('group/tl grid grid-cols-[48px_18px_minmax(0,1fr)] gap-x-2', state === 'past' && 'opacity-50')}>
+    <li className={cn('group/tl grid grid-cols-[48px_18px_minmax(0,1fr)] gap-x-2', state === 'past' && 'text-fg-3')}>
       <div className="pt-[11px] text-right text-[13.5px] leading-[1.2] font-bold">
         {fmtTime(e.start)}
         <small className="block text-[11.5px] font-semibold text-fg-3">{fmtDuration(end - start)}</small>
@@ -59,6 +59,7 @@ export function EventItem({ event: e, state }: { event: CalendarEvent; state: Ev
       >
         <span className="flex items-center gap-1.5 text-sm leading-[1.35] font-[650]">
           {e.title}
+          {state === 'past' && <SrOnly>(ended)</SrOnly>}
           {e.important && (
             <>
               <span data-tip="Important" className="text-high">

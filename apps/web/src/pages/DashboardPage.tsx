@@ -14,6 +14,7 @@ import { RemindersCard } from '../features/reminders/RemindersCard';
 import { TrelloCard } from '../features/trello/TrelloCard';
 import { DashboardProvider } from '../hooks/useDashboard';
 import { Greeting } from '../layout/Greeting';
+import { LiveAnnouncer } from '../layout/LiveAnnouncer';
 import { BottomNav, Sidebar } from '../layout/Navigation';
 import { SectionsProvider } from '../layout/sections';
 import { Topbar } from '../layout/Topbar';
@@ -24,7 +25,7 @@ import { Topbar } from '../layout/Topbar';
  */
 function Board() {
   return (
-    <main className="mx-auto max-w-[1680px] px-3 pt-3.5 pb-[calc(var(--bottomnav-h)+28px)] xs:px-4 md:px-7 md:pt-[18px] md:pb-12">
+    <main id="main" tabIndex={-1} className="mx-auto outline-none max-w-[1680px] px-3 pt-3.5 pb-[calc(var(--bottomnav-h)+28px)] xs:px-4 md:px-7 md:pt-[18px] md:pb-12">
       <div className="grid grid-flow-row-dense grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-[18px] xl:grid-cols-12 [&>*]:min-w-0">
         <AttentionPanel className="md:col-span-2 xl:order-1 xl:col-span-7" />
         <KpiGrid className="md:col-span-2 xl:order-2 xl:col-span-5" />
@@ -42,8 +43,9 @@ function Board() {
 
 function Loading() {
   return (
-    <div className="grid min-h-screen place-items-center" aria-busy="true" aria-label="Loading dashboard">
+    <div className="grid min-h-screen place-items-center" role="status" aria-busy="true">
       <BrandMark className="animate-pulse" />
+      <span className="sr-only">Loading dashboard</span>
     </div>
   );
 }
@@ -67,6 +69,12 @@ export function DashboardPage() {
     <DashboardProvider fallback={<Loading />} error={(retry) => <LoadError retry={retry} />}>
       <SectionsProvider>
         <DrawerProvider>
+          <a
+            href="#main"
+            className="sr-only z-90 rounded-md bg-accent px-3.5 py-2 text-sm font-bold text-on-accent focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+          >
+            Skip to content
+          </a>
           <div className="relative z-1 grid min-h-screen grid-cols-[var(--sidebar-w)_minmax(0,1fr)]">
             <Sidebar />
             <div className="col-start-2 min-w-0">
@@ -80,6 +88,7 @@ export function DashboardPage() {
           </div>
           <DrawerHost />
           <TooltipLayer />
+          <LiveAnnouncer />
         </DrawerProvider>
       </SectionsProvider>
     </DashboardProvider>

@@ -6,10 +6,15 @@ import { cn } from '../lib/cn';
 import { NAV, navTarget, type NavItem } from './nav';
 import { useSections } from './sections';
 
+/** The link's accessible name: the label stays even where only the icon shows, plus the count. */
+const navLabel = (label: string, n: number, hot: boolean) => (n ? `${label}, ${n}${hot ? ' urgent' : ''}` : label);
+
+/** Visual badge only; its meaning is in the link's `navLabel`. */
 function Count({ n, hot, className }: { n: number; hot: boolean; className?: string }) {
   if (!n) return null;
   return (
     <span
+      aria-hidden="true"
       className={cn(
         'grid place-items-center rounded-full font-bold',
         hot ? 'bg-crit/16 text-crit' : 'bg-surface-3 text-fg-2',
@@ -58,6 +63,7 @@ export function Sidebar() {
               href={`#${x.id}`}
               onClick={onClick(x.id)}
               aria-current={isCurrent}
+              aria-label={navLabel(x.label, n, hot)}
               data-tip-rail={x.label}
               className={cn(
                 'relative flex items-center gap-3 rounded-sm text-sm font-semibold text-fg-2 hover:bg-surface-2 hover:text-fg',
@@ -81,6 +87,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={() => open('profile', 'me')}
+          aria-label={`${user.name}: profile and data sources`}
           data-tip-rail="Profile and data sources"
           className="flex w-full items-center justify-center gap-2.5 rounded-md border border-line bg-surface-2 p-1.5 xl:justify-start xl:p-2.5"
         >
@@ -126,6 +133,7 @@ export function BottomNav() {
             href={`#${x.id}`}
             onClick={onClick(x.id)}
             aria-current={isCurrent}
+            aria-label={navLabel(x.label, n, hot)}
             className={cn(
               'relative flex min-h-[50px] flex-col items-center justify-center gap-[3px] rounded-[10px] py-1.5 text-[10.5px] font-bold',
               isCurrent ? 'text-accent-text' : 'text-fg-3',

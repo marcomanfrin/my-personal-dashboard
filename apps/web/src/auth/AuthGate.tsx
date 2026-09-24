@@ -26,8 +26,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (booting)
     return (
-      <div className="grid min-h-screen place-items-center" aria-busy="true" aria-label="Loading">
+      <div className="grid min-h-screen place-items-center" role="status" aria-busy="true">
         <BrandMark className="animate-pulse" />
+        <span className="sr-only">Loading</span>
       </div>
     );
   return current ? children : <LoginPage />;

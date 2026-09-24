@@ -1,9 +1,10 @@
 import type { AttentionItem } from '@command/shared';
 import { Icon } from '../../components/ui/Icon';
-import { lvl } from '../../components/ui/primitives';
+import { lvl, SrOnly } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';
 import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
+import { ATTENTION_LEVEL_LABEL } from '../../lib/labels';
 import { attentionContext, attentionIconFor, attentionTitle, attentionWhen } from './wording';
 
 export function AttentionRow({ item }: { item: AttentionItem }) {
@@ -23,6 +24,7 @@ export function AttentionRow({ item }: { item: AttentionItem }) {
           <Icon name={attentionIconFor(item, data)} size="sm" />
         </span>
         <span className="min-w-0 flex-1">
+          <SrOnly>{ATTENTION_LEVEL_LABEL[item.level]}:</SrOnly>
           <b className="block truncate text-sm font-[650]">{attentionTitle(item, data)}</b>
           <span className="block truncate text-[12.5px] text-fg-3">
             {item.source}: {attentionContext(item)}

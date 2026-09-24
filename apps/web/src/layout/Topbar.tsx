@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Brand } from '../components/ui/Brand';
 import { IconButton } from '../components/ui/primitives';
 import { useDrawer } from '../drawer/DrawerContext';
@@ -15,6 +15,7 @@ export function Topbar() {
   const { open } = useDrawer();
   const { theme, toggle } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchButton = useRef<HTMLButtonElement>(null);
   const next = theme === 'dark' ? 'light' : 'dark';
 
   return (
@@ -27,8 +28,15 @@ export function Topbar() {
       <Brand className="text-[15px] md:hidden" nameClassName="max-[359px]:hidden" />
       <span className="hidden text-[13.5px] font-semibold whitespace-nowrap text-fg-2 md:block">{fmtLong(now)}</span>
       <div className="flex-1" />
-      <SearchBox mobileOpen={searchOpen} onMobileClose={() => setSearchOpen(false)} />
-      <IconButton icon="search" label="Search" className="md:hidden" onClick={() => setSearchOpen(true)} />
+      <SearchBox
+        mobileOpen={searchOpen}
+        trigger={searchButton}
+        onMobileClose={(refocus) => {
+          setSearchOpen(false);
+          if (refocus) requestAnimationFrame(() => searchButton.current?.focus());
+        }}
+      />
+      <IconButton ref={searchButton} icon="search" label="Search" className="md:hidden" onClick={() => setSearchOpen(true)} />
       <NotificationsMenu />
       <IconButton icon={theme === 'dark' ? 'sun' : 'moon'} label={`Switch to ${next} mode`} tip={`Switch to ${next} mode`} onClick={toggle} />
       <button type="button" aria-label="Profile and data sources" data-tip="Profile and data sources" onClick={() => open('profile', 'me')}>

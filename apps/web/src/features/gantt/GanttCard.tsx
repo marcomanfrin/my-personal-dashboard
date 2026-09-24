@@ -108,6 +108,7 @@ export function GanttCard({ className }: { className?: string }) {
           variant={conflicts ? 'warn' : 'default'}
           disabled={recalculating}
           onClick={recalcGantt}
+          aria-describedby="gantt-recalc-desc"
           tip={
             conflicts
               ? `${conflicts} ${plural(conflicts, 'task starts', 'tasks start')} before the task it depends on ends`
@@ -115,8 +116,13 @@ export function GanttCard({ className }: { className?: string }) {
           }
         >
           Recalculate
+          <span id="gantt-recalc-desc" className="sr-only">
+            {conflicts
+              ? `${conflicts} ${plural(conflicts, 'task starts', 'tasks start')} before the task it depends on ends`
+              : 'Schedule respects all dependencies'}
+          </span>
           {conflicts > 0 && (
-            <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-high px-[5px] text-[11px] font-extrabold text-white">
+            <span aria-hidden="true" className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-high px-[5px] text-[11px] font-extrabold text-white">
               {conflicts}
             </span>
           )}

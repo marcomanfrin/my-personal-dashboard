@@ -43,7 +43,7 @@ export function AddReminderForm() {
         autoComplete="off"
         required
         maxLength={120}
-        className="h-[38px] min-w-0 flex-1 rounded-[10px] border border-line bg-surface-2 px-3 outline-0 focus:border-accent/60 focus:shadow-[0_0_0_3px_var(--accent-soft)] max-[380px]:basis-full"
+        className="h-[38px] min-w-0 flex-1 rounded-[10px] border border-control bg-surface-2 px-3 placeholder:text-fg-3 focus:border-accent max-[380px]:basis-full"
       />
       <label className="sr-only" htmlFor="rem-when">
         When

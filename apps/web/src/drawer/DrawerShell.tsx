@@ -16,7 +16,7 @@ export interface DrawerViewProps {
 export function DrawerView({ kickerIcon, kicker, title, children, foot }: DrawerViewProps) {
   return (
     <>
-      <header className="flex items-start gap-3 border-b border-line px-[18px] pt-[18px] pb-3">
+      <div className="flex items-start gap-3 border-b border-line px-[18px] pt-[18px] pb-3">
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-fg-3">
             <Icon name={kickerIcon} size="xs" />
@@ -27,7 +27,7 @@ export function DrawerView({ kickerIcon, kicker, title, children, foot }: Drawer
           </h2>
         </div>
         <DrawerCloseButton />
-      </header>
+      </div>
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-[18px] py-4">{children}</div>
       {foot && <footer className="flex flex-wrap gap-2 border-t border-line px-[18px] pt-3 pb-4">{foot}</footer>}
     </>
@@ -41,7 +41,7 @@ function DrawerCloseButton() {
 
 /** Bottom sheet on phones, right-side panel from 768px. Traps focus, closes on Esc or backdrop. */
 export function DrawerShell({ onClose, children }: { onClose: () => void; children: ReactNode }) {
-  const panel = useRef<HTMLElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
@@ -52,7 +52,7 @@ export function DrawerShell({ onClose, children }: { onClose: () => void; childr
       if (e.key === 'Escape') onClose();
       if (e.key !== 'Tab' || !panel.current) return;
       const focusable = [
-        ...panel.current.querySelectorAll<HTMLElement>('button, [href], input, select, textarea'),
+        ...panel.current.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
       ].filter((x) => !x.hasAttribute('disabled') && x.offsetParent !== null);
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -75,7 +75,7 @@ export function DrawerShell({ onClose, children }: { onClose: () => void; childr
   return (
     <div className="fixed inset-0 z-60">
       <div className="absolute inset-0 animate-fade bg-[var(--scrim)]" onClick={onClose} />
-      <aside
+      <div
         ref={panel}
         role="dialog"
         aria-modal="true"
@@ -86,7 +86,7 @@ export function DrawerShell({ onClose, children }: { onClose: () => void; childr
         }
       >
         {children}
-      </aside>
+      </div>
     </div>
   );
 }

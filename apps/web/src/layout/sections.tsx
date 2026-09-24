@@ -62,7 +62,10 @@ export function SectionsProvider({ children }: { children: ReactNode }) {
     setActive(id);
     // Let an expanded card render before measuring.
     requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      const section = document.getElementById(id);
+      section?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      // Move focus too, so the next Tab continues inside the section instead of the nav.
+      section?.querySelector<HTMLElement>('h2[tabindex]')?.focus({ preventScroll: true });
     });
     clearTimeout(flashTimer.current);
     setFlashing(id);

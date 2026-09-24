@@ -5,7 +5,7 @@ import { Icon } from '../components/ui/Icon';
 import { Button } from '../components/ui/primitives';
 
 const field =
-  'h-[42px] w-full rounded-[11px] border border-line bg-surface-2 px-3 font-medium text-fg outline-0 placeholder:text-fg-3 focus:border-accent/60 focus:shadow-[0_0_0_3px_var(--accent-soft)]';
+  'h-[42px] w-full rounded-[11px] border border-control bg-surface-2 px-3 font-medium text-fg placeholder:text-fg-3 focus:border-accent';
 
 /** Email + password; on success the session store switches the app to the dashboard. */
 export function LoginPage() {
@@ -16,6 +16,10 @@ export function LoginPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password) {
+      setError('Enter your email and password.');
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -45,6 +49,8 @@ export function LoginPage() {
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'login-error' : undefined}
             className={`${field} mt-1.5`}
           />
 
@@ -58,17 +64,19 @@ export function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'login-error' : undefined}
             className={`${field} mt-1.5`}
           />
 
           {error && (
-            <p role="alert" className="mt-3.5 flex items-center gap-2 rounded-[10px] bg-crit/10 px-3 py-2 text-[13px] font-semibold text-crit">
+            <p id="login-error" role="alert" className="mt-3.5 flex items-center gap-2 rounded-[10px] bg-crit/10 px-3 py-2 text-[13px] font-semibold text-crit">
               <Icon name="alert" size="sm" />
               {error}
             </p>
           )}
 
-          <Button type="submit" variant="primary" className="mt-5 w-full" disabled={busy || !email || !password}>
+          <Button type="submit" variant="primary" className="mt-5 w-full" disabled={busy}>
             {busy ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>

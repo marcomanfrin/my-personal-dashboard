@@ -16,19 +16,23 @@
   --line-strong: rgba(20, 26, 60, 0.22);
   --text: #121630;
   --text-2: #464c6c;
-  --text-3: #6c7291;
-  --accent: #6552ec;
+  --text-3: #5c6280;
+  --accent: #5641dc;
   --accent-soft: rgba(101, 82, 236, 0.12);
   --accent-text: #4b39d6;
   --on-accent: #ffffff;
-  --crit: #d42a41;
-  --high: #c96314;
-  --med: #9c7708;
-  --low: #2a69cc;
+  --crit: #b01a31;
+  --high: #944a0a;
+  --med: #7a5c00;
+  --low: #2159b8;
   --g-blue: #4a67e8;
   --dep: #d9687c;
-  --ok: #128a60;
-  --blocked: #6f6399;
+  --ok: #096b49;
+  --blocked: #62578c;
+  --teal: #086b5c;
+  --pink: #973090;
+  /* Form control outlines: at least 3:1 against the card (WCAG 1.4.11). */
+  --control-border: rgba(20, 26, 60, 0.55);
   --shadow: 0 1px 2px rgba(20, 26, 60, 0.07), 0 6px 18px rgba(20, 26, 60, 0.07);
   --shadow-pop: 0 10px 40px rgba(20, 26, 60, 0.16);
   --av-fg-l: 38%;
@@ -49,7 +53,7 @@
     --line-strong: rgba(160, 172, 235, 0.19);
     --text: #e8eaf8;
     --text-2: #a3a8c8;
-    --text-3: #6d7398;
+    --text-3: #9095ba;
     --accent: #8e7fff;
     --accent-soft: rgba(142, 127, 255, 0.15);
     --accent-text: #b3a8ff;
@@ -62,6 +66,9 @@
     --dep: #f07d92;
     --ok: #40d396;
     --blocked: #a298d0;
+    --teal: #2fbfa9;
+    --pink: #d465c9;
+    --control-border: rgba(160, 172, 235, 0.6);
     --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.18);
     --shadow-pop: 0 18px 50px rgba(0, 0, 0, 0.5);
     --av-fg-l: 74%;
@@ -79,7 +86,7 @@
   --line-strong: rgba(160, 172, 235, 0.19);
   --text: #e8eaf8;
   --text-2: #a3a8c8;
-  --text-3: #6d7398;
+  --text-3: #9095ba;
   --accent: #8e7fff;
   --accent-soft: rgba(142, 127, 255, 0.15);
   --accent-text: #b3a8ff;
@@ -92,6 +99,9 @@
   --dep: #f07d92;
   --ok: #40d396;
   --blocked: #a298d0;
+  --teal: #2fbfa9;
+  --pink: #d465c9;
+  --control-border: rgba(160, 172, 235, 0.6);
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.18);
   --shadow-pop: 0 18px 50px rgba(0, 0, 0, 0.5);
   --av-fg-l: 74%;
@@ -136,6 +146,7 @@
   --color-ok: var(--ok);
   --color-blocked: var(--blocked);
   --color-dep: var(--dep);
+  --color-control: var(--control-border);
   --color-g-blue: var(--g-blue);
   --color-c: var(--c, var(--text-3));
 
@@ -248,7 +259,7 @@
   --c: var(--accent);
 }
 @utility cat-focus {
-  --c: #2fbfa9;
+  --c: var(--teal);
 }
 @utility cat-personal {
   --c: var(--text-3);
@@ -260,7 +271,7 @@
   --c: var(--high);
 }
 @utility lbl-hmi {
-  --c: #2fbfa9;
+  --c: var(--teal);
 }
 @utility lbl-backend {
   --c: var(--accent);
@@ -272,7 +283,7 @@
   --c: var(--high);
 }
 @utility lbl-ai {
-  --c: #d465c9;
+  --c: var(--pink);
 }
 @utility lbl-devops {
   --c: var(--ok);
@@ -307,6 +318,12 @@
     scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h) + 12px);
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+  }
+  /* Keep focused elements clear of the fixed bottom nav on phones (WCAG 2.4.11). */
+  @media (max-width: 767.98px) {
+    html {
+      scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--bottomnav-h) + 12px);
+    }
   }
   body {
     min-height: 100%;
@@ -357,7 +374,7 @@
     height: 32px;
     padding: 0 28px 0 10px;
     border-radius: 9px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--control-border);
     background-color: var(--surface-2);
     font-size: 12.5px;
     font-weight: 650;
@@ -371,22 +388,22 @@
   }
   .switch {
     appearance: none;
-    width: 30px;
-    height: 18px;
+    width: 40px;
+    height: 24px;
     border-radius: 99px;
     background: var(--surface-3);
     position: relative;
     cursor: pointer;
     margin: 0;
-    border: 1px solid var(--line);
+    border: 1px solid var(--control-border);
   }
   .switch::after {
     content: '';
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: var(--text-3);
     transition: transform 0.15s;
@@ -396,17 +413,17 @@
     border-color: var(--accent);
   }
   .switch:checked::after {
-    transform: translateX(12px);
+    transform: translateX(16px);
     background: #fff;
   }
   .check {
     appearance: none;
     margin: 0;
     flex: none;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 7px;
-    border: 2px solid var(--line-strong);
+    border: 2px solid var(--control-border);
     display: grid;
     place-items: center;
     cursor: pointer;

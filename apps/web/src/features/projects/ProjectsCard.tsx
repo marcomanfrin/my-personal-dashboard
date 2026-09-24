@@ -1,6 +1,6 @@
 import { STATUS_RANK } from '@command/shared';
 import { Card } from '../../components/ui/Card';
-import { Lamp, Pill, ProgressBar } from '../../components/ui/primitives';
+import { Lamp, Pill, ProgressBar, SrOnly } from '../../components/ui/primitives';
 import { useDashboard } from '../../hooks/useDashboard';
 import { useSections } from '../../layout/sections';
 import { cn } from '../../lib/cn';
@@ -52,6 +52,7 @@ export function ProjectsCard({ className }: { className?: string }) {
                     'All tasks done'
                   )}
                 </span>
+                <SrOnly>, show in Gantt</SrOnly>
               </button>
             </li>
           );

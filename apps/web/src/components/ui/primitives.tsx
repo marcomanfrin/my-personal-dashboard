@@ -1,5 +1,5 @@
 import type { PrState, Priority } from '@command/shared';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 import { hue, initialsOf } from '../../lib/format';
 import { LEVEL_LABEL, STATE_ICON, STATE_LABEL } from '../../lib/labels';
@@ -9,11 +9,14 @@ import type { IconName } from './icons';
 /** Utility class that sets --c for a level (lvl-high, ...). */
 export const lvl = (level: Priority | 'upcoming') => `lvl-${level}`;
 
-/** A coloured status dot with a soft halo; `pulse` for critical things. */
-export function Lamp({ className, pulse }: { className?: string; pulse?: boolean }) {
+/**
+ * A coloured status dot with a soft halo; `pulse` for critical things. Pass `label`
+ * when the colour carries meaning, so it is not conveyed by colour alone.
+ */
+export function Lamp({ className, pulse, label }: { className?: string; pulse?: boolean; label?: string }) {
   return (
     <span
-      aria-hidden="true"
+      {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true })}
       className={cn(
         'size-2 flex-none rounded-full bg-c shadow-[0_0_0_3px_color-mix(in_srgb,var(--c)_18%,transparent)]',
         pulse && 'animate-pulse-lamp',
@@ -104,7 +107,7 @@ export function Button({ variant = 'default', size = 'md', icon, tip, className,
   );
 }
 
-type IconButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { icon: IconName; label: string; tip?: string };
+type IconButtonProps = ComponentProps<'button'> & { icon: IconName; label: string; tip?: string };
 
 export function IconButton({ icon, label, tip, className, children, ...rest }: IconButtonProps) {
   return (
@@ -159,7 +162,7 @@ export function ChipRail({ label, children, className }: { label: string; childr
     <div
       role="group"
       aria-label={label}
-      className={cn('scroll-fade -m-0.5 mb-2.5 flex gap-1.5 overflow-x-auto p-0.5', className)}
+      className={cn('scroll-fade -m-1 mb-1.5 flex gap-1.5 overflow-x-auto p-1', className)}
     >
       {children}
     </div>
@@ -199,9 +202,10 @@ export function Segmented<T extends string>({
           key={o.id}
           type="button"
           aria-pressed={o.id === value}
+          title={o.label}
           onClick={() => onChange(o.id)}
           className={cn(
-            'h-[26px] whitespace-nowrap rounded-[7px] px-2.5 text-[12.5px] font-bold text-fg-3',
+            'h-[26px] whitespace-nowrap rounded-[7px] px-2.5 text-[12.5px] font-bold text-fg-2',
             'aria-pressed:bg-surface aria-pressed:text-fg aria-pressed:shadow-[0_1px_3px_rgba(0,0,0,.12)]',
             buttonClassName,
           )}
