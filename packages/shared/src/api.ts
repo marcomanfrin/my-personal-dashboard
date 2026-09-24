@@ -42,6 +42,8 @@ export type StreamEvent =
       data: { resource: Resource; ids: string[]; origin: 'agent' | 'user'; deleted?: string[] };
     }
   | { type: 'agent.run'; data: { runId: string; agent: string; resource: Resource | null; status: AgentRunStatus } }
-  | { type: 'action.updated'; data: { id: string; resource: Resource; status: string } };
+  | { type: 'action.updated'; data: { id: string; resource: Resource; status: string } }
+  /** Saved from another tab or device: refetch GET /api/preferences. */
+  | { type: 'preferences.changed'; data: { at: string } };
 
 export type StreamEventType = StreamEvent['type'];

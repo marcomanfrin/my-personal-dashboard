@@ -11,3 +11,4 @@ export * from './agent';
 export * from './action';
 export * from './auth';
 export * from './registry';
+export * from './preferences';

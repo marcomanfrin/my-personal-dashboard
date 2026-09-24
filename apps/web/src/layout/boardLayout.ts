@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
+import type { BoardLayout, BoardSpan } from '@command/shared';
+import { useCallback, useMemo, type ComponentType } from 'react';
 import type { IconName } from '../components/ui/icons';
 import { AttentionPanel } from '../features/attention/AttentionPanel';
 import { CalendarCard } from '../features/calendar/CalendarCard';
@@ -9,10 +10,10 @@ import { MailCard } from '../features/mail/MailCard';
 import { ProjectsCard } from '../features/projects/ProjectsCard';
 import { RemindersCard } from '../features/reminders/RemindersCard';
 import { TrelloCard } from '../features/trello/TrelloCard';
-import { storage } from '../lib/storage';
+import { usePreference } from '../hooks/usePreference';
 
 /** Width on the 12-column grid from 1200px. */
-export type Span = 4 | 5 | 7 | 8 | 12;
+export type Span = BoardSpan;
 
 export interface Widget {
   /** Also the section id (anchor, collapsed state). */
@@ -61,12 +62,6 @@ const XL_SPAN: Record<Span, string> = {
 /** Grid classes for a widget: one column on phones, 2 from 768px, 12 from 1200px. */
 export const spanClass = (span: Span, wide: boolean) => `${wide ? 'md:col-span-2' : ''} ${XL_SPAN[span]}`;
 
-export interface BoardLayout {
-  order: string[];
-  /** Only the widths the user changed. */
-  spans: Record<string, Span>;
-}
-
 export interface PlacedWidget extends Widget {
   wide: boolean;
 }
@@ -97,11 +92,14 @@ export function placeWidgets(layout: BoardLayout): PlacedWidget[] {
   });
 }
 
-/** Board order and widths, remembered in this browser. */
+/** Board order and widths: a user preference, saved on the server. */
 export function useBoardLayout() {
-  const [layout, setLayout] = useState<BoardLayout>(() => sanitize(storage.get<Partial<BoardLayout> | null>(LAYOUT_KEY, null)));
-
-  useEffect(() => storage.set(LAYOUT_KEY, layout), [layout]);
+  const [stored, setStored] = usePreference('board', LAYOUT_KEY, DEFAULT_LAYOUT);
+  const layout = useMemo(() => sanitize(stored), [stored]);
+  const setLayout = useCallback(
+    (fn: (l: BoardLayout) => BoardLayout) => setStored((prev) => fn(sanitize(prev))),
+    [setStored],
+  );
 
   const move = useCallback(
     (id: string, to: number) =>
@@ -116,7 +114,7 @@ export function useBoardLayout() {
     (id: string, span: Span) => setLayout((l) => ({ ...l, spans: { ...l.spans, [id]: span } })),
     [setLayout],
   );
-  const reset = useCallback(() => setLayout(DEFAULT_LAYOUT), [setLayout]);
+  const reset = useCallback(() => setStored(DEFAULT_LAYOUT), [setStored]);
   const isDefault =
     layout.order.every((id, i) => id === DEFAULT_LAYOUT.order[i]) && Object.keys(layout.spans).length === 0;
   const widgets = useMemo(() => placeWidgets(layout), [layout]);

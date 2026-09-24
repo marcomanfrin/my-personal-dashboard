@@ -4,6 +4,7 @@ import { HttpError } from './client';
 export const queryKeys = {
   dashboard: ['dashboard'] as const,
   agents: ['agents'] as const,
+  preferences: ['preferences'] as const,
 };
 
 export const queryClient = new QueryClient({

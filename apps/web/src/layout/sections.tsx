@@ -1,8 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { storage } from '../lib/storage';
+import { usePreference } from '../hooks/usePreference';
 
 const COLLAPSED_KEY = 'cc-collapsed';
 const FLASH_MS = 1400;
+const NONE_COLLAPSED: Record<string, boolean> = {};
 
 interface SectionsState {
   collapsed: Record<string, boolean>;
@@ -20,16 +21,15 @@ const Ctx = createContext<SectionsState | null>(null);
 
 const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
-/** Collapsed cards (persisted), section navigation and the scroll spy for the nav highlight. */
+/** Collapsed cards (a user preference), section navigation and the scroll spy for the nav highlight. */
 export function SectionsProvider({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => storage.get(COLLAPSED_KEY, {}));
+  const [collapsed, setCollapsed] = usePreference('collapsed', COLLAPSED_KEY, NONE_COLLAPSED);
   const [active, setActive] = useState('overview');
   const [flashing, setFlashing] = useState<string | null>(null);
   const elements = useRef(new Map<string, HTMLElement>());
   const observer = useRef<IntersectionObserver | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  useEffect(() => storage.set(COLLAPSED_KEY, collapsed), [collapsed]);
 
   useEffect(() => {
     if (!('IntersectionObserver' in window)) return;

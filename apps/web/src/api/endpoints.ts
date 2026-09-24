@@ -4,6 +4,8 @@ import type {
   DashboardData,
   DashboardResponse,
   EmailPatch,
+  PreferencesPatch,
+  PreferencesResponse,
   GanttTaskPatch,
   IssuePatch,
   PullRequestPatch,
@@ -44,4 +46,7 @@ export const endpoints = {
   createReminder: (input: ReminderCreate) => api.post<Reminder>('/reminders', input),
   deleteReminder: (id: string) => api.delete(`/reminders/${id}`),
   recalcGantt: () => api.post<{ moved: Rescheduled[] }>('/gantt/recalc'),
+
+  preferences: () => api.get<PreferencesResponse>('/preferences'),
+  patchPreferences: (patch: PreferencesPatch) => api.patch<PreferencesResponse>('/preferences', patch),
 };

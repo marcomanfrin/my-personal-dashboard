@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { queryKeys } from '../api/queryClient';
 import { useSession } from '../auth/AuthGate';
+import { hasUnsavedPreferences } from './usePreference';
 
 export type LiveStatus = 'connecting' | 'live' | 'offline';
 
@@ -39,6 +40,11 @@ export function useLiveUpdates(): LiveStatus {
       invalidate();
     });
     for (const type of REFRESHING) es.addEventListener(type, invalidate);
+    // Saved in another tab or device. Our own save echoes back too: skip it while
+    // a newer local change is still queued, or the refetch would undo it.
+    es.addEventListener('preferences.changed', () => {
+      if (!hasUnsavedPreferences()) void qc.invalidateQueries({ queryKey: queryKeys.preferences });
+    });
     es.onerror = () => setStatus(es.readyState === EventSource.CLOSED ? 'offline' : 'connecting');
 
     return () => {

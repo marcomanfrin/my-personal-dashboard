@@ -48,6 +48,7 @@ Flussi chiave:
 | `POST /auth/login` | — | `{ email, password }` → `TokenResponse` + cookie refresh (rate limit) |
 | `POST /auth/refresh` · `POST /auth/logout` | cookie | ruota il refresh e dà un nuovo JWT · revoca e cancella il cookie |
 | `GET /auth/me` | user | account corrente |
+| `GET /preferences` · `PATCH /preferences` | user | preferenze dell'utente (`Preferences` in `@command/shared`: layout della board, widget collassati, sidebar); il PATCH sostituisce solo le chiavi inviate |
 | `GET /sources` | any | freschezza per risorsa |
 | `GET /<resource>`, `GET /<resource>/:id` | any | `emails` (`?category`), `events` (`?from&to`), `pulls`, `issues`, `reminders` (`?done`), `tasks` (`?column&board`), `projects`, `gantt` (`?assignee=me`) |
 | `PATCH /<resource>/:id` | user | campi modificabili: vedi `*Patch` in `@command/shared` (`events`, `projects` sono read-only) |
@@ -57,7 +58,7 @@ Flussi chiave:
 | `POST /agents/runs`, `PATCH /agents/runs/:id` | agent | apertura/chiusura run (stato, summary, errore) |
 | `GET /agents/me` · `GET /agents` | agent · user | identità agente · elenco agenti + run recenti |
 | `GET /actions` · `POST /actions/claim` · `PATCH /actions/:id` | any · agent · agent | outbox: lista, claim atomico (SKIP LOCKED, claim scaduti dopo 10 min), esito |
-| `GET /stream` | user (anche `?access_token=`) | SSE: `ready`, `data.changed`, `agent.run`, `action.updated` |
+| `GET /stream` | user (anche `?access_token=`) | SSE: `ready`, `data.changed`, `agent.run`, `action.updated`, `preferences.changed` |
 
 `GET /health` (fuori prefisso) → `{ ok }`, 503 se il DB non risponde. Errori sempre in forma
 `ApiError { error, message, issues? }`.

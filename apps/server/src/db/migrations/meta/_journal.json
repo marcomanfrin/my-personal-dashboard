@@ -29,6 +29,13 @@
       "when": 1790248571540,
       "tag": "0003_backfill_task_position",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790249476193,
+      "tag": "0004_user_preferences",
+      "breakpoints": true
     }
   ]
 }

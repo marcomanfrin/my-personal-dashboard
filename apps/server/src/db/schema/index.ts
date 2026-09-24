@@ -11,6 +11,7 @@ import { tasks } from './tasks';
 export * from './agents';
 export * from './actions';
 export * from './users';
+export * from './user-preferences';
 export { emails, events, ganttTasks, issues, projects, pulls, reminders, tasks };
 
 /** The table behind each resource. */

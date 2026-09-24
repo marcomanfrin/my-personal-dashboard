@@ -3,6 +3,7 @@ import { Brand } from '../components/ui/Brand';
 import { Icon } from '../components/ui/Icon';
 import { useDashboard } from '../hooks/useDashboard';
 import { cn } from '../lib/cn';
+import { usePreference } from '../hooks/usePreference';
 import { storage } from '../lib/storage';
 import { NAV, navTarget, type NavItem } from './nav';
 import { useSections } from './sections';
@@ -44,17 +45,15 @@ const applyCollapsed = (collapsed: boolean) => {
   else delete document.documentElement.dataset.sidebar;
 };
 
-/** Collapsed state of the full sidebar, mirrored on `<html data-sidebar>` so CSS can size the layout. */
+/**
+ * Collapsed state of the full sidebar (a user preference), mirrored on
+ * `<html data-sidebar>` so CSS can size the layout.
+ */
 function useSidebarCollapsed(): [boolean, () => void] {
-  const [collapsed, setCollapsed] = useState(() => {
-    const c = storage.get(COLLAPSED_KEY, false);
-    applyCollapsed(c); // before the first paint: no flash of the wrong width
-    return c;
-  });
-  useEffect(() => {
-    applyCollapsed(collapsed);
-    storage.set(COLLAPSED_KEY, collapsed);
-  }, [collapsed]);
+  const [collapsed, setCollapsed] = usePreference('sidebarCollapsed', COLLAPSED_KEY, false);
+  // Before the first paint (local copy): no flash of the wrong width.
+  useState(() => applyCollapsed(storage.get(COLLAPSED_KEY, false)));
+  useEffect(() => applyCollapsed(collapsed), [collapsed]);
   useEffect(() => () => applyCollapsed(false), []);
   return [collapsed, () => setCollapsed((c) => !c)];
 }

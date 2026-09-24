@@ -14,6 +14,7 @@ import { emailsRoutes } from './modules/emails/routes';
 import { eventsRoutes } from './modules/events/routes';
 import { ganttRoutes } from './modules/gantt/routes';
 import { ingestRoutes } from './modules/ingest/routes';
+import { preferencesRoutes } from './modules/preferences/routes';
 import { issuesRoutes } from './modules/issues/routes';
 import { projectsRoutes } from './modules/projects/routes';
 import { pullsRoutes } from './modules/pulls/routes';
@@ -37,6 +38,7 @@ export interface BuildOptions {
 
 const API_MODULES = [
   authRoutes,
+  preferencesRoutes,
   dashboardRoutes,
   emailsRoutes,
   eventsRoutes,
