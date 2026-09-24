@@ -1,0 +1,4 @@
+# LF everywhere: files end up in Linux containers (Dockerfiles, nginx.conf, scripts).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
