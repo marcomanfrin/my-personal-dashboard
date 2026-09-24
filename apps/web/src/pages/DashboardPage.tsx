@@ -75,7 +75,7 @@ export function DashboardPage() {
           >
             Skip to content
           </a>
-          <div className="relative z-1 grid min-h-screen grid-cols-[var(--sidebar-w)_minmax(0,1fr)]">
+          <div className="relative z-1 grid min-h-screen grid-cols-[var(--sidebar-w)_minmax(0,1fr)] transition-[grid-template-columns] duration-300 ease-[cubic-bezier(.2,.8,.2,1)]">
             <Sidebar />
             <div className="col-start-2 min-w-0">
               <header>

@@ -1,13 +1,24 @@
+import { useEffect, useState } from 'react';
 import { Brand } from '../components/ui/Brand';
 import { Icon } from '../components/ui/Icon';
-import { useDrawer } from '../drawer/DrawerContext';
 import { useDashboard } from '../hooks/useDashboard';
 import { cn } from '../lib/cn';
+import { storage } from '../lib/storage';
 import { NAV, navTarget, type NavItem } from './nav';
 import { useSections } from './sections';
 
 /** The link's accessible name: the label stays even where only the icon shows, plus the count. */
 const navLabel = (label: string, n: number, hot: boolean) => (n ? `${label}, ${n}${hot ? ' urgent' : ''}` : label);
+
+/**
+ * Sidebar geometry is the same in both states: 16px gutter + 44px items fill the 76px
+ * rail exactly, so icons never move while the width animates. Labels fade and are
+ * clipped by the sidebar edge instead of popping in and out.
+ */
+const railItem =
+  'relative flex h-10 w-full items-center gap-3 rounded-sm px-[13px] text-sm font-semibold text-fg-2 hover:bg-surface-2 hover:text-fg';
+const railLabel =
+  'whitespace-nowrap opacity-0 transition-opacity duration-150 nav-full:opacity-100 nav-full:delay-100';
 
 /** Visual badge only; its meaning is in the link's `navLabel`. */
 function Count({ n, hot, className }: { n: number; hot: boolean; className?: string }) {
@@ -26,6 +37,28 @@ function Count({ n, hot, className }: { n: number; hot: boolean; className?: str
   );
 }
 
+const COLLAPSED_KEY = 'cc-sidebar-collapsed';
+
+const applyCollapsed = (collapsed: boolean) => {
+  if (collapsed) document.documentElement.dataset.sidebar = 'collapsed';
+  else delete document.documentElement.dataset.sidebar;
+};
+
+/** Collapsed state of the full sidebar, mirrored on `<html data-sidebar>` so CSS can size the layout. */
+function useSidebarCollapsed(): [boolean, () => void] {
+  const [collapsed, setCollapsed] = useState(() => {
+    const c = storage.get(COLLAPSED_KEY, false);
+    applyCollapsed(c); // before the first paint: no flash of the wrong width
+    return c;
+  });
+  useEffect(() => {
+    applyCollapsed(collapsed);
+    storage.set(COLLAPSED_KEY, collapsed);
+  }, [collapsed]);
+  useEffect(() => () => applyCollapsed(false), []);
+  return [collapsed, () => setCollapsed((c) => !c)];
+}
+
 function useNavState() {
   const { data, now } = useDashboard();
   const { active, goTo } = useSections();
@@ -38,21 +71,23 @@ function useNavState() {
   return { current, countOf, onClick };
 }
 
-/** Hidden on phones, icon rail on tablets (768px), full sidebar from 1200px. */
+/**
+ * Hidden on phones, icon rail on tablets (768px), full sidebar from 1200px. From
+ * 1200px the user can collapse it to the rail; the choice is remembered.
+ */
 export function Sidebar() {
   const { current, countOf, onClick } = useNavState();
-  const { user } = useDashboard();
-  const { open } = useDrawer();
+  const [collapsed, toggleCollapsed] = useSidebarCollapsed();
 
   return (
     <aside
       aria-label="Sections"
       className={cn(
         'sticky top-[env(safe-area-inset-top,0px)] hidden h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] flex-col gap-1.5',
-        'border-r border-line bg-surface/55 px-3 py-[18px] backdrop-blur-md md:flex md:items-center xl:items-stretch',
+        'overflow-x-hidden overflow-y-auto border-r border-line bg-surface/55 px-4 py-[18px] backdrop-blur-md md:flex',
       )}
     >
-      <Brand className="px-0 pt-1 pb-[18px] xl:px-2" nameClassName="hidden xl:inline" />
+      <Brand className="px-[7px] pt-1 pb-[18px]" nameClassName={railLabel} />
       <nav className="flex flex-col gap-0.5">
         {NAV.map((x) => {
           const { n, hot } = countOf(x);
@@ -66,38 +101,40 @@ export function Sidebar() {
               aria-label={navLabel(x.label, n, hot)}
               data-tip-rail={x.label}
               className={cn(
-                'relative flex items-center gap-3 rounded-sm text-sm font-semibold text-fg-2 hover:bg-surface-2 hover:text-fg',
-                'size-11 justify-center p-0 xl:h-10 xl:w-auto xl:justify-start xl:px-2.5',
+                railItem,
                 isCurrent &&
-                  "bg-accent-soft text-accent-text before:absolute before:top-2.5 before:bottom-2.5 before:-left-4 before:w-[3px] before:rounded-r-[3px] before:bg-accent before:content-[''] xl:before:-left-3",
+                  "bg-accent-soft text-accent-text before:absolute before:top-2.5 before:bottom-2.5 before:-left-4 before:w-[3px] before:rounded-r-[3px] before:bg-accent before:content-['']",
               )}
             >
               <Icon name={x.icon} />
-              <span className="hidden xl:inline">{x.label}</span>
+              <span className={railLabel}>{x.label}</span>
+              {/* Rides the item's right edge: corner dot on the rail, pill at the end of the row when full. */}
               <Count
                 n={n}
                 hot={hot}
-                className="absolute top-[3px] right-px m-0 h-4 min-w-4 px-1 text-[10px] xl:static xl:ml-auto xl:h-5 xl:min-w-[22px] xl:px-1.5 xl:text-[11.5px]"
+                className={cn(
+                  'absolute top-[2px] right-px h-4 min-w-4 px-1 text-[10px] transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)]',
+                  'nav-full:top-2.5 nav-full:right-2 nav-full:h-5 nav-full:min-w-[22px] nav-full:px-1.5 nav-full:text-[11.5px]',
+                )}
               />
             </a>
           );
         })}
       </nav>
-      <div className="mt-auto flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={() => open('profile', 'me')}
-          aria-label={`${user.name}: profile and data sources`}
-          data-tip-rail="Profile and data sources"
-          className="flex w-full items-center justify-center gap-2.5 rounded-md border border-line bg-surface-2 p-1.5 xl:justify-start xl:p-2.5"
-        >
-          <Avatar initials={user.initials} />
-          <span className="hidden min-w-0 leading-tight xl:block">
-            <b className="block text-[13.5px]">{user.name}</b>
-            <span className="block truncate text-xs text-fg-3">{user.role}</span>
-          </span>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        aria-expanded={!collapsed}
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        data-tip-rail="Expand sidebar"
+        className={cn(railItem, 'mt-auto hidden flex-none xl:flex')}
+      >
+        <Icon
+          name="sidebar"
+          className={cn('transition-transform duration-300 ease-[cubic-bezier(.2,.8,.2,1)]', collapsed && 'rotate-180')}
+        />
+        <span className={railLabel}>Collapse</span>
+      </button>
     </aside>
   );
 }

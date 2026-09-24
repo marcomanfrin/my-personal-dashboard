@@ -113,7 +113,7 @@
   }
 }
 @media (min-width: 1200px) {
-  :root {
+  :root:not([data-sidebar='collapsed']) {
     --sidebar-w: 236px;
   }
 }
@@ -192,6 +192,15 @@
     }
     50% {
       box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 6%, transparent);
+    }
+  }
+}
+
+/* Full sidebar with labels: from 1200px, unless the user collapsed it to the icon rail. */
+@custom-variant nav-full {
+  @media (width >= 75rem) {
+    :root:not([data-sidebar='collapsed']) & {
+      @slot;
     }
   }
 }

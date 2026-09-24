@@ -9,8 +9,9 @@ interface Tip {
 }
 
 const hoverless = () => window.matchMedia?.('(hover: none)').matches ?? false;
-/** Rail tooltips only matter when the sidebar shows icons without labels. */
-const isRail = () => window.innerWidth >= 768 && window.innerWidth < 1200;
+/** Rail tooltips only matter when the sidebar shows icons without labels (tablets, or collapsed). */
+const isRail = () =>
+  window.innerWidth >= 768 && (window.innerWidth < 1200 || document.documentElement.dataset.sidebar === 'collapsed');
 
 /** Grace period to move the pointer from the element onto the tooltip (WCAG 1.4.13, hoverable). */
 const HIDE_DELAY_MS = 150;
