@@ -15,6 +15,20 @@
       "when": 1790238100217,
       "tag": "0001_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790248440833,
+      "tag": "0002_task_position",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790248571540,
+      "tag": "0003_backfill_task_position",
+      "breakpoints": true
     }
   ]
 }

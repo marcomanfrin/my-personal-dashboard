@@ -4,10 +4,14 @@ import {
   buildInsights,
   depConflicts,
   ganttStatus,
+  POSITION_STEP,
+  positionAt,
+  positionBetween,
   prLevel,
   prState,
   reminderState,
   rescheduleByDependencies,
+  sortByPosition,
   upcomingItems,
   type DashboardData,
   type Email,
@@ -173,5 +177,30 @@ describe('attention engine', () => {
     expect(out.kpis.find((k) => k.id === 'mail')).toMatchObject({ value: 1, level: 'critical' });
     expect(out.kpis.find((k) => k.id === 'overdue')).toMatchObject({ value: 1, level: 'high' });
     expect(out.projects[0]).toMatchObject({ key: 'HMI', health: 'delayed', openTasks: 1 });
+  });
+});
+
+describe('kanban positions', () => {
+  const col = (...ps: (number | null)[]) => ps.map((position, i) => ({ id: `c${i}`, position }));
+
+  it('sorts by position, unpositioned cards last in their incoming order', () => {
+    expect(sortByPosition(col(3, null, 1, null, 2)).map((c) => c.id)).toEqual(['c2', 'c4', 'c0', 'c1', 'c3']);
+  });
+
+  it('places a card between, above or below its neighbours', () => {
+    expect(positionBetween(100, 200)).toBe(150);
+    expect(positionBetween(100, null)).toBe(100 + POSITION_STEP);
+    expect(positionBetween(null, 100)).toBe(50);
+    expect(positionBetween()).toBe(POSITION_STEP);
+  });
+
+  it('inserts at an index of the shown column, staying positive and ordered', () => {
+    const c = col(100, 200, 300);
+    expect(positionAt(c, 0)).toBe(50);
+    expect(positionAt(c, 1)).toBe(150);
+    expect(positionAt(c, 3)).toBe(300 + POSITION_STEP);
+    expect(positionAt([], 0)).toBe(POSITION_STEP);
+    // Unpositioned neighbours are skipped over.
+    expect(positionAt(col(100, null, 300), 2)).toBe(200);
   });
 });

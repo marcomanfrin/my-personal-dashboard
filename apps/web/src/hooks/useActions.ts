@@ -1,9 +1,12 @@
 import {
   normalizeEmailPatch,
+  positionAt,
+  sortByPosition,
   type DashboardResponse,
   type MailCategory,
   type ReminderCreate,
   type TaskColumn,
+  type TaskPatch,
 } from '@command/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -114,12 +117,24 @@ export function useActions() {
         patch('issues', id, { acknowledged: true });
         toast.show('Acknowledged', () => patch('issues', id, { acknowledged: false }));
       },
-      moveTask(id: string, column: TaskColumn) {
+      /**
+       * Moves a card to `index` of `column` as shown (sorted, without the card itself);
+       * the end of the column when `index` is omitted. Same column = reorder.
+       */
+      moveTask(id: string, column: TaskColumn, index?: number) {
         const t = find('tasks', id);
-        if (!t || t.column === column) return;
-        const from = t.column;
-        patch('tasks', id, { column });
-        toast.show(`Moved to ${COLUMNS.find((c) => c.id === column)!.label}`, () => patch('tasks', id, { column: from }));
+        if (!t) return;
+        const tasks = qc.getQueryData<DashboardResponse>(queryKeys.dashboard)?.data.tasks ?? [];
+        const target = sortByPosition(tasks.filter((x) => x.column === column && x.id !== id));
+        const at = index ?? target.length;
+        if (t.column === column) {
+          const current = sortByPosition(tasks.filter((x) => x.column === column)).findIndex((x) => x.id === id);
+          if (current === at) return;
+        }
+        const previous: TaskPatch = { column: t.column, ...(t.position != null && { position: t.position }) };
+        patch('tasks', id, { column, position: positionAt(target, at) });
+        const label = COLUMNS.find((c) => c.id === column)!.label;
+        toast.show(t.column === column ? `Reordered in ${label}` : `Moved to ${label}`, () => patch('tasks', id, previous));
       },
       recalcGantt() {
         mutateRecalc(undefined, {

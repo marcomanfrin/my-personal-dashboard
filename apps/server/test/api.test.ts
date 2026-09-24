@@ -212,6 +212,28 @@ describe('user actions and the outbox', () => {
     ]);
   });
 
+  it('keeps cards in position order and protects a pending reorder from stale syncs', async () => {
+    const list = async () => (await t.inject({ method: 'GET', url: '/api/tasks?column=todo' })).json<Task[]>();
+    const before = await list();
+    expect(before.map((x) => x.position)).toEqual([...before.map((x) => x.position)].sort((a, b) => a! - b!));
+    const [first, second] = before;
+
+    // Drop the first card between the second and the third.
+    const between = (second!.position! + (before[2]?.position ?? second!.position! * 2)) / 2;
+    await t.inject({ method: 'PATCH', url: `/api/tasks/${first!.id}`, payload: { position: between } });
+    expect((await list()).map((x) => x.id).slice(0, 2)).toEqual([second!.id, first!.id]);
+
+    // An agent sync that has not applied the move yet keeps the user's order.
+    const ingest = await t.inject({
+      method: 'PUT',
+      url: '/api/ingest/tasks',
+      headers: t.agentAuth,
+      payload: { items: [stripMeta(first!)] },
+    });
+    expect(ingest.json<IngestResult>().protectedFields[first!.externalId]).toContain('position');
+    expect((await list()).find((x) => x.id === first!.id)!.position).toBe(between);
+  });
+
   it('ignores no-op patches and rejects empty ones', async () => {
     const m1 = await emailByExternal('m1');
     const before = (await t.inject({ method: 'GET', url: '/api/actions' })).json<Action[]>().length;

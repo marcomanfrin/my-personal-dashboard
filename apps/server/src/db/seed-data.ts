@@ -136,15 +136,15 @@ export function demoData(now = new Date()) {
   ];
 
   const tasks: TaskInput[] = [
-    { externalId: 't1', title: 'Implement API authentication', column: 'todo', board: 'Atix Backend', labels: ['backend'], due: onDay(2, 18), checklist: { done: 1, total: 5 } },
-    { externalId: 't2', title: 'Update Pellucida documentation', column: 'todo', board: 'Pellucida', labels: ['docs'], checklist: { done: 0, total: 3 } },
-    { externalId: 't3', title: 'Export alarm texts for translation', column: 'todo', board: 'HMI 5309', labels: ['hmi'], due: onDay(4, 18) },
-    { externalId: 't4', title: 'HMI refactoring: alarm manager', column: 'doing', board: 'HMI 5309', labels: ['hmi'], due: onDay(1, 18), checklist: { done: 3, total: 6 } },
-    { externalId: 't5', title: 'KUKA TCP client retry logic', column: 'doing', board: 'HMI 5309', labels: ['robotics'], checklist: { done: 2, total: 4 } },
-    { externalId: 't6', title: 'AI dashboard prototype', column: 'review', board: 'AI Strategy', labels: ['ai'] },
-    { externalId: 't7', title: 'sistec-skills marketplace README', column: 'review', board: 'Tooling', labels: ['docs'] },
-    { externalId: 't8', title: 'Set up CI/CD for atix-backend', column: 'done', board: 'Atix Backend', labels: ['devops'] },
-    { externalId: 't9', title: 'Docker Compose dev environment', column: 'done', board: 'Tooling', labels: ['devops'] },
+    { externalId: 't1', title: 'Implement API authentication', column: 'todo', position: 65536, board: 'Atix Backend', labels: ['backend'], due: onDay(2, 18), checklist: { done: 1, total: 5 } },
+    { externalId: 't2', title: 'Update Pellucida documentation', column: 'todo', position: 131072, board: 'Pellucida', labels: ['docs'], checklist: { done: 0, total: 3 } },
+    { externalId: 't3', title: 'Export alarm texts for translation', column: 'todo', position: 196608, board: 'HMI 5309', labels: ['hmi'], due: onDay(4, 18) },
+    { externalId: 't4', title: 'HMI refactoring: alarm manager', column: 'doing', position: 65536, board: 'HMI 5309', labels: ['hmi'], due: onDay(1, 18), checklist: { done: 3, total: 6 } },
+    { externalId: 't5', title: 'KUKA TCP client retry logic', column: 'doing', position: 131072, board: 'HMI 5309', labels: ['robotics'], checklist: { done: 2, total: 4 } },
+    { externalId: 't6', title: 'AI dashboard prototype', column: 'review', position: 65536, board: 'AI Strategy', labels: ['ai'] },
+    { externalId: 't7', title: 'sistec-skills marketplace README', column: 'review', position: 131072, board: 'Tooling', labels: ['docs'] },
+    { externalId: 't8', title: 'Set up CI/CD for atix-backend', column: 'done', position: 65536, board: 'Atix Backend', labels: ['devops'] },
+    { externalId: 't9', title: 'Docker Compose dev environment', column: 'done', position: 131072, board: 'Tooling', labels: ['devops'] },
   ];
 
   const projects: ProjectInput[] = [

@@ -4,7 +4,7 @@ import { tasks } from '../../db/schema';
 import { createResourceService, type ResourceServiceDeps } from '../../lib/resource-service';
 import { createTasksRepository } from './repository';
 
-/** Trello cards. The user can move them between columns. */
+/** Trello cards. The user can move them between columns and reorder them (`position`). */
 export function createTasksService(deps: ResourceServiceDeps) {
   const base = createResourceService<Task>('tasks', createTasksRepository, deps);
   return {

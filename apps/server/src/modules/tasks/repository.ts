@@ -4,4 +4,4 @@ import { tasks } from '../../db/schema';
 import { createResourceRepository } from '../../lib/resource-repository';
 
 export const createTasksRepository = (db: Db) =>
-  createResourceRepository<Task>(db, tasks, { column: tasks.updatedAt, dir: 'desc' });
+  createResourceRepository<Task>(db, tasks, { column: tasks.position, dir: 'asc' }); // nulls last

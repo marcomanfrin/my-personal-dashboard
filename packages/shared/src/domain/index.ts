@@ -6,3 +6,4 @@ export * from './attention';
 export * from './kpis';
 export * from './dashboard';
 export * from './email';
+export * from './tasks';
