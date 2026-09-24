@@ -23,11 +23,16 @@ una card, ack di una PR…).
 
 ## Come funziona
 
-```
- Agenti AI ──PUT /api/ingest/:resource──►┌──────────────┐◄──GET /api/dashboard──── Browser
-           ◄─POST /api/actions/claim─────│ Fastify API  │───SSE /api/stream──────► (React)
-                                         │  PostgreSQL  │◄──PATCH /api/<r>/:id────
-                                         └──────────────┘
+```mermaid
+flowchart LR
+  agents["Agenti AI<br>(connettori)"]
+  api["Fastify API"]
+  db[("PostgreSQL")]
+  browser["Browser<br>(React)"]
+
+  agents -- "PUT /api/ingest/:resource<br>POST /api/actions/claim<br>PATCH /api/actions/:id" --> api
+  api <--> db
+  api <-- "GET /api/dashboard<br>PATCH /api/&lt;resource&gt;/:id<br>SSE /api/stream" --> browser
 ```
 
 1. L'agente invia i record con `PUT /api/ingest/:resource` (upsert per `externalId`).
