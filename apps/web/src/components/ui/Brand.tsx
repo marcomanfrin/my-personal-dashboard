@@ -1,13 +1,17 @@
 import { cn } from '../../lib/cn';
-import { LOGO } from './icons';
 
+/** The Argus logo (apps/web/public/logo.png): a watchman with many eyes. */
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <span className={cn('grid size-[30px] flex-none place-items-center text-accent-text', className)}>
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[26px]">
-        {LOGO}
-      </svg>
-    </span>
+    <img
+      src="/logo.png"
+      alt=""
+      aria-hidden="true"
+      width={30}
+      height={30}
+      draggable={false}
+      className={cn('size-[30px] flex-none select-none', className)}
+    />
   );
 }
 

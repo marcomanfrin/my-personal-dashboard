@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Argus — brag</title>
+<script src="assets/gsap.min.js"></script>
+<script src="assets/rms.js"></script>
+<style>
+@font-face { font-family: "Manrope"; src: url("assets/fonts/Manrope.ttf") format("truetype"); font-weight: 200 800; }
+:root {
+  --bg: #0b0e1c; --surface: #131830; --surface-2: #191f3b; --surface-3: #222a50;
+  --line: rgba(160,172,235,.10); --line-strong: rgba(160,172,235,.19);
+  --text: #e8eaf8; --text-2: #a3a8c8; --text-3: #6d7398;
+  --accent: #8e7fff; --accent-soft: rgba(142,127,255,.15); --accent-text: #b3a8ff;
+  --crit: #ff5c6c; --high: #ff9a48; --med: #e9c350; --low: #62a3ff; --ok: #40d396;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "Manrope", sans-serif; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+.clip { position: absolute; inset: 0; overflow: hidden; }
+.abs { position: absolute; }
+
+/* ---------- desk ---------- */
+#desk { position: absolute; left: 0; top: 560px; width: 1920px; height: 1080px; }
+#band-edge { position: absolute; left: 0; right: 0; top: 558px; height: 1084px; border-top: 2px solid rgba(142,127,255,.35); border-bottom: 2px solid rgba(142,127,255,.35); pointer-events: none; }
+#screen { position: absolute; left: 0; top: 0; width: 1088px; height: 612px; overflow: hidden; background: #eef0f4; transform-origin: 0 0; }
+#cur2 { position: absolute; left: 0; top: 0; width: 34px; height: 44px; }
+
+/* browser chrome */
+#tabbar { position: absolute; left: 0; top: 0; width: 1088px; height: 40px; background: #dfe3ea; }
+.tabs { position: absolute; left: 8px; top: 6px; display: flex; gap: 3px; }
+.tab { height: 34px; width: 168px; background: #eef0f4; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 14px; font-weight: 600; color: #3c4043; }
+.tab i, .ftab i { display: block; width: 14px; height: 14px; border-radius: 4px; flex: none; }
+#ftabs { gap: 2px; }
+.ftab { height: 34px; width: 24px; background: #eef0f4; border-radius: 6px 6px 0 0; display: grid; place-items: center; }
+
+/* app windows */
+.app { position: absolute; background: #fff; border-radius: 10px; box-shadow: 0 16px 40px rgba(20,26,60,.28); overflow: hidden; color: #202124; font-size: 15px; }
+.app .bar { height: 32px; display: flex; align-items: center; padding: 0 12px; gap: 6px; font-size: 14px; font-weight: 700; color: #fff; }
+.app .bar b { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.55); display: block; }
+.app .bar span { margin-left: 8px; }
+#gmail { left: 0; top: 40px; width: 1088px; height: 532px; border-radius: 0; box-shadow: none; display: flex; }
+#gmail .side { width: 200px; padding: 16px; background: #f6f8fc; }
+#gmail .compose { background: #c2e7ff; color: #001d35; font-weight: 700; border-radius: 14px; padding: 12px 16px; width: 130px; margin-bottom: 14px; }
+#gmail .nav { padding: 6px 12px; border-radius: 12px; color: #202124; font-size: 15px; display: flex; justify-content: space-between; }
+#gmail .nav.on { background: #d3e3fd; font-weight: 800; }
+#gmail .list { flex: 1; }
+.mrow { display: flex; gap: 14px; padding: 0 18px; height: 50px; align-items: center; border-bottom: 1px solid #e8eaed; font-size: 15px; }
+.mrow .who { width: 150px; font-weight: 800; flex: none; }
+.mrow .sub { flex: 1; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.mrow .t { color: #444746; font-weight: 700; font-size: 14px; }
+
+.slack .bar { background: #3f0e40; }
+.slack .body { display: flex; height: 298px; }
+.slack .ch { width: 150px; background: #3f0e40; padding: 10px 12px; color: #f0e6f0; font-size: 14px; line-height: 1.9; }
+.slack .ch .on { background: #1264a3; color: #fff; border-radius: 6px; padding: 0 6px; }
+.slack .msgs { flex: 1; padding: 10px 14px; }
+.msg { margin-bottom: 12px; line-height: 1.35; }
+.msg b { display: block; font-size: 14px; }
+.teams .bar { background: #464eb8; }
+.teams .body { padding: 16px; }
+.meet { background: #eef0ff; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.btn { background: #464eb8; color: #fff; font-weight: 800; border-radius: 8px; padding: 8px 14px; font-size: 14px; }
+.trello { background: #0065a8; }
+.trello .bar { background: #004e82; }
+.trello .lists { display: flex; gap: 10px; padding: 12px; }
+.tlist { width: 158px; background: #ebecf0; border-radius: 8px; padding: 8px; }
+.tlist h4 { margin: 0 0 8px; font-size: 14px; color: #172b4d; }
+.tcard { background: #fff; border-radius: 6px; padding: 8px; font-size: 13px; margin-bottom: 6px; box-shadow: 0 1px 0 rgba(9,30,66,.25); color: #172b4d; }
+.yt .bar { background: #b3125d; }
+.yrow { display: flex; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #eee; font-size: 14px; align-items: center; }
+.yrow .id { font-weight: 800; color: #1a5fb4; width: 86px; flex: none; }
+.yrow .pr { margin-left: auto; font-weight: 800; font-size: 13px; }
+
+/* toasts */
+.toast { position: absolute; width: 300px; height: 66px; background: #fff; border-radius: 10px; box-shadow: 0 10px 28px rgba(20,26,60,.32); display: flex; gap: 10px; align-items: center; padding: 0 12px; color: #202124; }
+.toast i { width: 34px; height: 34px; border-radius: 8px; flex: none; display: block; }
+.toast b { display: block; font-size: 13px; color: #444746; }
+.toast span { display: block; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 230px; }
+
+/* taskbar */
+#taskbar { position: absolute; left: 0; top: 572px; width: 1088px; height: 40px; background: #1b1e2e; display: flex; align-items: center; justify-content: center; gap: 14px; }
+.tb { position: relative; width: 28px; height: 28px; border-radius: 7px; }
+.tb em { position: absolute; right: -12px; top: -8px; min-width: 22px; height: 18px; padding: 0 5px; border-radius: 9px; background: #c5221f; color: #fff; font-style: normal; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+#clock { position: absolute; right: 14px; top: 0; height: 40px; display: flex; align-items: center; color: #fff; font-size: 16px; font-weight: 700; }
+#clock span { position: absolute; right: 0; }
+
+/* the user */
+
+/* dim + argus */
+#dim { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
+#argus-wrap { position: absolute; left: 700px; top: 1500px; width: 320px; height: 320px; }
+.ag-badge { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 5px #d9a040, 0 24px 60px rgba(0,0,0,.55); }
+.ag-badge img { display: block; width: 100%; height: 100%; }
+.ag-ring { position: absolute; inset: 0; border-radius: 50%; border: 5px solid #e0a94a; opacity: 0; }
+#argus-shadow { position: absolute; left: 725px; top: 1790px; width: 270px; height: 32px; border-radius: 50%; background: rgba(142,127,255,.28); filter: blur(8px); }
+
+/* ---------- dashboard (native 1920x1080, scaled into the screen) ---------- */
+#dash { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: var(--bg); color: var(--text); opacity: 0; transform-origin: 0 0; }
+#dash .glow1 { position: absolute; left: 700px; top: -200px; width: 900px; height: 600px; border-radius: 50%; background: rgba(128,108,255,.12); filter: blur(80px); }
+#dash .glow2 { position: absolute; left: 1300px; top: 500px; width: 700px; height: 600px; border-radius: 50%; background: rgba(40,200,180,.06); filter: blur(80px); }
+#side { position: absolute; left: 0; top: 0; width: 300px; height: 1080px; background: #0e1226; border-right: 1px solid var(--line); padding: 30px 20px; }
+.brand { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 800; margin: 0 0 40px 14px; }
+.brand img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px #d9a040; }
+.nav { height: 54px; display: flex; align-items: center; gap: 16px; padding: 0 18px; border-radius: 12px; font-size: 19px; font-weight: 500; color: var(--text-2); margin-bottom: 4px; }
+.nav.on { background: var(--accent-soft); color: var(--text); }
+.nav i { width: 20px; height: 20px; border: 2px solid currentColor; border-radius: 5px; display: block; }
+.nav em { margin-left: auto; font-style: normal; font-size: 15px; font-weight: 700; min-width: 30px; height: 30px; border-radius: 15px; display: grid; place-items: center; background: rgba(255,92,108,.16); color: #ff8a96; }
+.nav em.n { background: var(--surface-3); color: var(--text-2); }
+#top { position: absolute; left: 300px; top: 0; right: 0; height: 78px; border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 40px 0 46px; }
+#top .date { font-size: 19px; font-weight: 500; }
+#search { margin-left: auto; width: 540px; height: 52px; border: 1px solid var(--line-strong); border-radius: 12px; display: flex; align-items: center; padding: 0 18px; gap: 12px; color: var(--text-2); font-size: 19px; }
+#search kbd { margin-left: auto; font-family: "Manrope", sans-serif; font-size: 14px; border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px 7px; }
+.bell { position: relative; width: 26px; height: 26px; border: 2px solid var(--text-2); border-radius: 8px 8px 4px 4px; margin: 0 34px 0 34px; }
+.bell em { position: absolute; right: -12px; top: -12px; width: 20px; height: 20px; border-radius: 50%; background: #c5221f; color: #fff; font-style: normal; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+.avatar { width: 52px; height: 52px; border-radius: 50%; background: #7d93ff; color: #0b0e1c; font-weight: 800; font-size: 22px; display: grid; place-items: center; }
+#hello { position: absolute; left: 346px; top: 108px; width: 1000px; }
+#hello h1 { margin: 0 0 12px; font-size: 46px; font-weight: 800; letter-spacing: -.02em; }
+#hello p { margin: 0; font-size: 21px; color: var(--text-2); line-height: 1.45; position: relative; }
+#hello strong { color: var(--text); font-weight: 800; }
+.card { position: absolute; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+#att { left: 346px; top: 290px; width: 860px; height: 720px; padding: 26px; }
+#att h2, .card h2 { margin: 0; font-size: 22px; font-weight: 700; }
+.tiles { display: flex; gap: 14px; margin-top: 22px; }
+.tile { position: relative; width: 262px; height: 96px; border: 1px solid var(--line-strong); border-radius: 14px; padding: 12px 18px; }
+.tile .num { display: flex; align-items: center; gap: 12px; font-size: 38px; font-weight: 800; height: 48px; }
+.tile .num i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+.tile .lbl { font-size: 18px; color: var(--text-2); font-weight: 500; }
+.swap { position: relative; display: inline-block; }
+.swap .b { position: absolute; left: 0; top: 0; opacity: 0; }
+.levels { display: flex; gap: 6px; margin: 18px 0 8px; }
+.levels i { display: block; height: 7px; border-radius: 4px; transform-origin: 0 50%; }
+.row { position: relative; height: 80px; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid var(--line); }
+.row .ic { width: 42px; height: 42px; border-radius: 10px; flex: none; display: grid; place-items: center; }
+.row .ic svg { width: 22px; height: 22px; }
+.row .tt { font-size: 20px; font-weight: 700; position: relative; }
+.row .ss { font-size: 17px; color: var(--text-2); margin-top: 3px; }
+.row .mt { margin-left: auto; font-size: 17px; font-weight: 700; }
+.strike { position: absolute; left: 0; top: 52%; height: 2px; width: 100%; background: var(--text-2); transform-origin: 0 50%; transform: scaleX(0); }
+.more { margin-top: 20px; color: var(--accent-text); font-size: 19px; font-weight: 700; }
+#kpis { position: absolute; left: 1230px; top: 290px; width: 650px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.kpi { position: relative; height: 156px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+.kpi .k-ic { width: 20px; height: 20px; border: 2px solid var(--med); border-radius: 5px; }
+.kpi .k-dot { position: absolute; right: 18px; top: 20px; width: 12px; height: 12px; border-radius: 50%; }
+.kpi .k-n { font-size: 42px; font-weight: 800; margin-top: 12px; line-height: 1.1; }
+.kpi .k-l { font-size: 17px; color: var(--text-2); font-weight: 600; }
+#cal { left: 1230px; top: 632px; width: 650px; height: 378px; padding: 24px 26px; }
+#cal .sub { color: var(--text-2); font-size: 17px; margin-top: 4px; }
+.ev { display: flex; gap: 22px; margin-top: 22px; align-items: center; }
+.ev .tm { width: 70px; font-size: 20px; font-weight: 700; }
+.ev .en { font-size: 20px; font-weight: 700; }
+.ev .ek { font-size: 16px; color: var(--text-2); margin-top: 2px; }
+.ev .bar2 { width: 4px; height: 52px; border-radius: 2px; }
+#cursor { position: absolute; left: 0; top: 0; width: 34px; height: 44px; opacity: 0; }
+#done-toast { position: absolute; left: 1410px; top: 990px; width: 470px; height: 64px; background: var(--surface-3); border: 1px solid var(--line-strong); border-radius: 14px; display: flex; align-items: center; gap: 14px; padding: 0 20px; font-size: 19px; font-weight: 700; opacity: 0; box-shadow: 0 18px 50px rgba(0,0,0,.5); }
+#done-toast u { text-decoration: none; margin-left: auto; color: var(--accent-text); }
+
+/* ---------- captions ---------- */
+#caps { position: absolute; left: 60px; right: 60px; top: 0; height: 560px; }
+.cap { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 92px; line-height: 1.08; font-weight: 800; letter-spacing: -.03em; color: var(--text); opacity: 0; text-wrap: balance; }
+.cap em { font-style: normal; color: var(--accent-text); }
+#cap-pill { position: absolute; left: 60px; right: 60px; top: 150px; text-align: center; text-wrap: balance; font-size: 92px; line-height: 1.08; font-weight: 800; letter-spacing: -.03em; opacity: 0; }
+#flash { position: absolute; inset: 0; background: #000; opacity: 0; }
+#amb { position: absolute; left: 50%; top: 50%; width: 1100px; height: 1500px; margin: -750px 0 0 -550px; border-radius: 50%; background: radial-gradient(closest-side, rgba(142,127,255,.22), rgba(142,127,255,0)); opacity: 0; pointer-events: none; }
+
+/* ---------- punchline + lockup ---------- */
+.stage { background: var(--bg); display: grid; place-items: center; }
+.pl-wrap { text-align: center; position: relative; }
+.pl-kicker { font-size: 64px; font-weight: 700; color: var(--text-2); margin-bottom: 10px; }
+.pl-row { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.pl-old { position: relative; font-size: 190px; font-weight: 800; color: var(--text-2); letter-spacing: -.03em; }
+.pl-old .strike { height: 12px; background: var(--crit); border-radius: 6px; top: 55%; }
+.pl-new { font-size: 240px; font-weight: 800; color: var(--accent-text); letter-spacing: -.04em; }
+.lk { display: flex; flex-direction: column; align-items: center; }
+.lk-row { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.lk-logo { width: 240px; height: 240px; border-radius: 50%; box-shadow: 0 0 0 5px #d9a040, 0 0 80px rgba(217,160,64,.25); }
+.lk-name { font-size: 190px; font-weight: 800; letter-spacing: -.03em; }
+.lk-tag { font-size: 64px; font-weight: 600; color: var(--text-2); margin-top: 30px; width: 860px; text-align: center; line-height: 1.25; }
+.lk-tag b { display: block; color: var(--text); font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="26">
+
+  <!-- ================= DESK (chaos → Argus → board) ================= -->
+  <section id="s-desk" class="clip" data-start="0" data-duration="19.92" data-track-index="0">
+    <div id="desk">
+      
+
+      <div id="screen">
+        <!-- the Argus board, native size, shrunk into the screen -->
+        <div id="dash">
+          <div class="glow1"></div><div class="glow2"></div>
+          <aside id="side">
+            <div class="brand"><img src="assets/argus-badge.jpg" alt="">Argus</div>
+            <div class="nav on"><i></i>Overview</div>
+            <div class="nav"><i></i>Mail<em>4</em></div>
+            <div class="nav"><i></i>Calendar</div>
+            <div class="nav"><i></i>GitHub<em>6</em></div>
+            <div class="nav"><i></i>Reminders<em class="n">3</em></div>
+            <div class="nav"><i></i>Personal Gantt</div>
+            <div class="nav"><i></i>Trello</div>
+            <div class="nav"><i></i>Projects</div>
+          </aside>
+          <header id="top">
+            <div class="date">Monday, September 28</div>
+            <div id="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search mail, PRs, tasks, events<kbd>Ctrl K</kbd></div>
+            <div class="bell"><em>8</em></div>
+            <div class="avatar">M</div>
+          </header>
+          <div id="hello">
+            <h1>Good morning, Marco</h1>
+            <p>Monday, September 28. You have <strong><span class="swap" id="sw-things"><span class="a">8 things</span><span class="b">7 things</span></span></strong> that need your attention today. Next up: <strong>Team stand-up</strong>, in 55m.</p>
+          </div>
+
+          <section id="att" class="card">
+            <h2>Attention required</h2>
+            <div class="tiles">
+              <div class="tile" id="t0"><div class="num"><i style="background:var(--crit)"></i><span id="n0">0</span></div><div class="lbl">Urgent</div></div>
+              <div class="tile" id="t1"><div class="num"><i style="background:var(--high)"></i><span class="swap" id="sw-need"><span class="a" id="n1">0</span><span class="b">5</span></span></div><div class="lbl">Need action</div></div>
+              <div class="tile" id="t2"><div class="num"><i style="background:var(--accent)"></i><span id="n2">0</span></div><div class="lbl">Upcoming, 48h</div></div>
+            </div>
+            <div class="levels"><i style="width:74px;background:var(--crit)"></i><i style="width:220px;background:var(--high)"></i><i style="width:320px;background:var(--med)"></i><i style="width:186px;background:var(--accent)"></i></div>
+            <div id="rows">
+              <div class="row" id="r0"><div class="ic" style="background:rgba(255,92,108,.14);color:var(--crit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 2 5 5 5 9l-2 4H9l-2-4c0-4 2-7 5-9zM9 16l-2 4M15 16l2 4"/><circle cx="12" cy="10" r="1.6"/></svg></div><div><div class="tt">Production deploy failed: image push timed out</div><div class="ss">GitHub: sistec/hmi-5309</div></div><div class="mt" style="color:var(--crit)">56 min ago</div></div>
+              <div class="row" id="r1"><div class="ic" style="background:rgba(255,92,108,.14);color:var(--crit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div><div><div class="tt">Line 3 HMI keeps losing the PLC connection</div><div class="ss">Mail: Luca Bortolan, Sistec AM</div></div><div class="mt" style="color:var(--crit)">In 2h 14m</div></div>
+              <div class="row" id="r2"><div class="ic" style="background:rgba(255,154,72,.14);color:var(--high)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg></div><div><div class="tt">SLA escalation module is past its end date</div><div class="ss">Plan: Atix Backend, 60% done</div></div><div class="mt" style="color:var(--high)">Delayed</div></div>
+              <div class="row" id="r3"><div class="ic" id="r3ic" style="background:rgba(255,154,72,.14);color:var(--high)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path id="r3chk" d="m8 12 3 3 5-6"/></svg></div><div><div class="tt">Submit August expense report<i class="strike" id="r3strike"></i></div><div class="ss">Reminder: Work</div></div><div class="mt" style="color:var(--high)">Overdue</div></div>
+              <div class="row" id="r4"><div class="ic" style="background:rgba(255,154,72,.14);color:var(--high)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M6 8.2V20M18 15.8V9a3 3 0 0 0-3-3h-4"/></svg></div><div><div class="tt">Review #248: MES order sync over OPC UA</div><div class="ss">GitHub: sistec/hmi-5309#248</div></div><div class="mt" style="color:var(--high)">2h ago</div></div>
+            </div>
+            <div class="more" id="more">Show all 17</div>
+          </section>
+
+          <div id="kpis">
+            <div class="kpi"><div class="k-ic"></div><i class="k-dot" style="background:var(--med)"></i><div class="k-n">2</div><div class="k-l">Tasks due today</div></div>
+            <div class="kpi"><div class="k-ic" style="border-color:var(--crit)"></div><i class="k-dot" style="background:var(--crit)"></i><div class="k-n">4</div><div class="k-l">Emails to act on</div></div>
+            <div class="kpi"><div class="k-ic"></div><i class="k-dot" style="background:var(--med)"></i><div class="k-n">3</div><div class="k-l">PRs to review</div></div>
+            <div class="kpi"><div class="k-ic" style="border-color:var(--text-2)"></div><div class="k-n">2</div><div class="k-l">Meetings, next 24h</div></div>
+            <div class="kpi"><div class="k-ic" style="border-color:var(--high)"></div><i class="k-dot" style="background:var(--high)"></i><div class="k-n">2</div><div class="k-l">Overdue tasks</div></div>
+            <div class="kpi"><div class="k-ic" style="border-color:var(--text-2)"></div><div class="k-n">5</div><div class="k-l">Active projects</div></div>
+          </div>
+
+          <section id="cal" class="card">
+            <h2>Calendar</h2><div class="sub">3 left today</div>
+            <div class="ev"><div class="tm">09:00</div><i class="bar2" style="background:var(--accent)"></i><div><div class="en">Team stand-up</div><div class="ek">Meeting · Teams</div></div></div>
+            <div class="ev"><div class="tm">11:30</div><i class="bar2" style="background:var(--high)"></i><div><div class="en">Line 3 retro</div><div class="ek">Meeting · Room B</div></div></div>
+            <div class="ev"><div class="tm">15:00</div><i class="bar2" style="background:var(--low)"></i><div><div class="en">Study: neural networks</div><div class="ek">Focus block</div></div></div>
+          </section>
+
+          <div id="done-toast"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#40d396" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Marked as done<u>Undo</u></div>
+          <svg id="cursor" viewBox="0 0 24 32"><path d="M2 2v24l6.5-6 4.5 10 4-1.8-4.4-9.8H21z" fill="#fff" stroke="#0b0e1c" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+
+        <!-- chaos layer -->
+        <div id="chaos">
+          <div id="gmail" class="app">
+            <div class="side">
+              <div class="compose">Compose</div>
+              <div class="nav on">Inbox <span id="inbox-n">128</span></div>
+              <div class="nav">Starred</div><div class="nav">Snoozed</div><div class="nav">Sent</div><div class="nav">Drafts <span>12</span></div>
+            </div>
+            <div class="list">
+              <div class="mrow"><div class="who">Luca Bortolan</div><div class="sub">RE: RE: RE: Line 3 HMI keeps losing the PLC connection</div><div class="t">08:52</div></div>
+              <div class="mrow"><div class="who">GitHub</div><div class="sub">[sistec/hmi-5309] Production deploy failed</div><div class="t">08:47</div></div>
+              <div class="mrow"><div class="who">Atix PMO</div><div class="sub">SLA escalation module: end date passed</div><div class="t">08:31</div></div>
+              <div class="mrow"><div class="who">HR Portal</div><div class="sub">Reminder: submit your August expense report</div><div class="t">08:10</div></div>
+              <div class="mrow"><div class="who">Calendar</div><div class="sub">Invitation: Team stand-up @ 09:00</div><div class="t">07:58</div></div>
+              <div class="mrow"><div class="who">Trello</div><div class="sub">3 cards were moved to Review</div><div class="t">07:40</div></div>
+              <div class="mrow"><div class="who">YouTrack</div><div class="sub">HMI-5309 was assigned to you</div><div class="t">07:22</div></div>
+              <div class="mrow"><div class="who">Giulia Rossi</div><div class="sub">Can you review #248 before 10?</div><div class="t">07:05</div></div>
+              <div class="mrow"><div class="who">Newsletter</div><div class="sub">Your weekly digest is here</div><div class="t">06:00</div></div>
+              <div class="mrow"><div class="who">Luca Bortolan</div><div class="sub">Line 3 is down again, call me</div><div class="t">Sun</div></div>
+            </div>
+          </div>
+
+          <div class="app slack sort" id="w-slack" style="left:60px;top:70px;width:520px;height:330px" data-lv="0">
+            <div class="bar"><b></b><b></b><b></b><span>Slack</span></div>
+            <div class="body">
+              <div class="ch"># general<br><span class="on"># prod-alerts</span><br># hmi-line3<br># random<br>@ Luca B.</div>
+              <div class="msgs">
+                <div class="msg"><b>deploy-bot</b>x Production deploy failed: image push timed out</div>
+                <div class="msg"><b>Luca B.</b>@marco is prod down?? Line 3 is stuck</div>
+                <div class="msg"><b>Giulia R.</b>@marco can you look at #248 before 10?</div>
+              </div>
+            </div>
+          </div>
+          <div class="app teams sort" id="w-teams" style="left:540px;top:100px;width:500px;height:300px" data-lv="1">
+            <div class="bar"><b></b><b></b><b></b><span>Teams</span></div>
+            <div class="body">
+              <div class="meet"><div><b>Meeting now: Team stand-up</b><div style="font-size:14px;color:#444746">Started 2 min ago · 6 people</div></div><div class="btn">Join</div></div>
+              <div class="msg"><b>Luca Bortolan</b>Marco, are you joining the call?</div>
+              <div class="msg"><b>Atix PMO</b>Can we move the SLA review to 11:30?</div>
+            </div>
+          </div>
+          <div class="app trello sort" id="w-trello" style="left:170px;top:220px;width:530px;height:320px" data-lv="1">
+            <div class="bar"><b></b><b></b><b></b><span>Trello · HMI Line 3</span></div>
+            <div class="lists">
+              <div class="tlist"><h4>To do</h4><div class="tcard">Alarm log export</div><div class="tcard">PLC reconnect backoff</div><div class="tcard">Update operator manual</div></div>
+              <div class="tlist"><h4>Doing</h4><div class="tcard">OPC UA order sync</div><div class="tcard">Recipe editor v2</div></div>
+              <div class="tlist"><h4>Review</h4><div class="tcard">Login audit trail</div><div class="tcard">Batch report PDF</div><div class="tcard">HMI-5309 hotfix</div></div>
+            </div>
+          </div>
+          <div class="app yt sort" id="w-yt" style="left:500px;top:250px;width:540px;height:290px" data-lv="2">
+            <div class="bar"><b></b><b></b><b></b><span>YouTrack · HMI</span></div>
+            <div class="yrow"><span class="id">HMI-5309</span>Line 3 PLC reconnect loop<span class="pr" style="color:#c5221f">Critical</span></div>
+            <div class="yrow"><span class="id">HMI-5288</span>MES order sync over OPC UA<span class="pr" style="color:#b45309">Major</span></div>
+            <div class="yrow"><span class="id">HMI-5270</span>Alarm log export to CSV<span class="pr" style="color:#444746">Normal</span></div>
+            <div class="yrow"><span class="id">HMI-5261</span>Operator manual screenshots<span class="pr" style="color:#444746">Normal</span></div>
+            <div class="yrow"><span class="id">HMI-5244</span>SLA escalation module<span class="pr" style="color:#b45309">Major</span></div>
+          </div>
+
+          <div class="toast sort" style="left:770px;top:52px" data-lv="0"><i style="background:#3f0e40"></i><div><b>Slack · #prod-alerts</b><span>Luca: @marco is prod down??</span></div></div>
+          <div class="toast sort" style="left:770px;top:126px" data-lv="0"><i style="background:#0f6cbd"></i><div><b>Outlook</b><span>RE: RE: RE: Line 3 HMI</span></div></div>
+          <div class="toast sort" style="left:40px;top:410px" data-lv="1"><i style="background:#464eb8"></i><div><b>Teams</b><span>Call starting in 2 min</span></div></div>
+          <div class="toast sort" style="left:560px;top:300px" data-lv="1"><i style="background:#b3125d"></i><div><b>YouTrack</b><span>HMI-5309 assigned to you</span></div></div>
+          <div class="toast sort" style="left:770px;top:200px" data-lv="0"><i style="background:#24292f"></i><div><b>GitHub</b><span>Deploy failed: push timed out</span></div></div>
+          <div class="toast sort" style="left:300px;top:470px" data-lv="2"><i style="background:#0065a8"></i><div><b>Trello</b><span>Card moved to Review</span></div></div>
+          <div class="toast sort" style="left:640px;top:460px" data-lv="2"><i style="background:#1a73e8"></i><div><b>Calendar</b><span>Team stand-up · now</span></div></div>
+          <div class="toast sort" style="left:100px;top:110px" data-lv="1"><i style="background:#3f0e40"></i><div><b>Slack · Giulia R.</b><span>Review #248 before 10?</span></div></div>
+          <div class="toast sort" style="left:770px;top:274px" data-lv="1"><i style="background:#0f6cbd"></i><div><b>HR Portal</b><span>Expense report overdue</span></div></div>
+          <div class="toast sort" style="left:380px;top:190px" data-lv="2"><i style="background:#464eb8"></i><div><b>Teams</b><span>Missed call · Luca B.</span></div></div>
+          <div class="toast sort" style="left:60px;top:300px" data-lv="2"><i style="background:#3f0e40"></i><div><b>Slack</b><span>3 new mentions</span></div></div>
+          <div class="toast sort" style="left:720px;top:380px" data-lv="1"><i style="background:#b3125d"></i><div><b>YouTrack</b><span>SLA breach in 1h</span></div></div>
+        </div>
+
+        <div id="tabbar">
+          <div class="tabs" id="ltabs">
+            <div class="tab"><i style="background:#ea4335"></i>Inbox (128)</div>
+            <div class="tab"><i style="background:#0f6cbd"></i>Outlook</div>
+            <div class="tab"><i style="background:#3f0e40"></i>Slack</div>
+            <div class="tab"><i style="background:#464eb8"></i>Teams</div>
+            <div class="tab"><i style="background:#0065a8"></i>Trello</div>
+            <div class="tab"><i style="background:#b3125d"></i>YouTrack</div>
+          </div>
+          <div class="tabs" id="ftabs"></div>
+        </div>
+
+        <div id="taskbar">
+          <div class="tb" style="background:#ea4335"><em id="b0">128</em></div>
+          <div class="tb" style="background:#3f0e40"><em id="b1">3</em></div>
+          <div class="tb" style="background:#464eb8"><em id="b2">1</em></div>
+          <div class="tb" style="background:#0065a8"><em id="b3">2</em></div>
+          <div class="tb" style="background:#b3125d"><em id="b4">2</em></div>
+          <div class="tb" style="background:#24292f"><em id="b5">4</em></div>
+          <div id="clock"><span id="clk">09:00</span><span id="clk2" style="opacity:0">09:05</span></div>
+        </div>
+      </div>
+
+      <div id="dim"></div>
+      <svg id="cur2" viewBox="0 0 24 32"><path d="M2 2v24l6.5-6 4.5 10 4-1.8-4.4-9.8H21z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+
+
+    </div>
+      <div id="band-edge" style="top:558px"></div>
+      <!-- Argus -->
+      <div id="argus-shadow"></div>
+      <div id="argus-wrap"><div id="argus-bob" style="width:320px;height:320px">
+        <i class="ag-ring"></i><i class="ag-ring"></i><div class="ag-badge"><img src="assets/argus-badge.jpg" alt=""></div>
+      </div></div>
+  </section>
+
+  <!-- ================= PUNCHLINE ================= -->
+  <section id="s-punch" class="clip stage" data-start="19.92" data-duration="3.5" data-track-index="1">
+    <div class="pl-wrap">
+      <div class="pl-kicker" id="pl-k">Sapere cosa fare:</div>
+      <div class="pl-row">
+        <div class="pl-old" id="pl-old">5 ore<i class="strike" id="pl-strike"></i></div>
+        <div class="pl-new" id="pl-new">5 minuti</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOCKUP ================= -->
+  <section id="s-lock" class="clip stage" data-start="23.42" data-duration="2.58" data-track-index="2">
+    <div class="lk">
+      <div class="lk-row" id="lk-row">
+        <img class="lk-logo" src="assets/argus-badge.jpg" alt="">
+        <div class="lk-name">Argus</div>
+      </div>
+      <div class="lk-tag" id="lk-tag">Gli agenti leggono. <b>Tu decidi.</b></div>
+    </div>
+  </section>
+
+  <!-- persistent overlays -->
+  <div id="amb"></div>
+  <div id="caps">
+    <div class="cap" id="c1" data-layout-allow-overlap data-layout-allow-occlusion>Lunedì, 09:00.</div>
+    <div class="cap" id="c2" data-layout-allow-overlap data-layout-allow-occlusion>Dove guardi prima?</div>
+    <div class="cap" id="c3" data-layout-allow-overlap data-layout-allow-occlusion>Sono già le <em>14:00</em>.</div>
+    <div class="cap" id="c4" data-layout-allow-overlap data-layout-allow-occlusion>Poi arriva <em>Argus</em>.</div>
+    <div class="cap" id="c5" data-layout-allow-overlap data-layout-allow-occlusion>Legge tutto. Mette in ordine.</div>
+    <div class="cap" id="c6" data-layout-allow-overlap data-layout-allow-occlusion>Alle 09:05 è già tutto qui.</div>
+  </div>
+  <div id="cap-pill" data-layout-allow-overlap data-layout-allow-occlusion>Tutto in un unico posto.</div>
+  <div id="flash"></div>
+
+  <!-- ================= AUDIO ================= -->
+  <audio id="bgm" src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3" data-start="7.4" data-duration="18.6" data-media-start="3.0" data-track-index="10" data-volume="1"></audio>
+  <audio id="p1" src="assets/sfx/impactGlass_light_001.ogg" data-start="0.5" data-duration="1" data-track-index="11" data-volume="0.6"></audio>
+  <audio id="p2" src="assets/sfx/impactMetal_light_002.ogg" data-start="1.0" data-duration="1" data-track-index="12" data-volume="0.55"></audio>
+  <audio id="p3" src="assets/sfx/select_008.ogg" data-start="1.2" data-duration="1" data-track-index="13" data-volume="0.55"></audio>
+  <audio id="p4" src="assets/sfx/impactGlass_light_002.ogg" data-start="1.4" data-duration="1" data-track-index="14" data-volume="0.6"></audio>
+  <audio id="p5" src="assets/sfx/impactPlate_light_000.ogg" data-start="1.8" data-duration="1" data-track-index="15" data-volume="0.45"></audio>
+  <audio id="p6" src="assets/sfx/impactGlass_light_001.ogg" data-start="2.2" data-duration="1" data-track-index="16" data-volume="0.6"></audio>
+  <audio id="p7" src="assets/sfx/select_008.ogg" data-start="2.4" data-duration="1" data-track-index="17" data-volume="0.55"></audio>
+  <audio id="p8" src="assets/sfx/impactMetal_light_002.ogg" data-start="2.6" data-duration="1" data-track-index="18" data-volume="0.55"></audio>
+  <audio id="p9" src="assets/sfx/impactGlass_light_002.ogg" data-start="3.0" data-duration="1" data-track-index="19" data-volume="0.6"></audio>
+  <audio id="p10" src="assets/sfx/select_008.ogg" data-start="3.2" data-duration="1" data-track-index="20" data-volume="0.55"></audio>
+  <audio id="p11" src="assets/sfx/impactPlate_light_000.ogg" data-start="3.3" data-duration="1" data-track-index="21" data-volume="0.45"></audio>
+  <audio id="p12" src="assets/sfx/glitch_002.ogg" data-start="3.4" data-duration="1" data-track-index="22" data-volume="0.5"></audio>
+  <audio id="p13" src="assets/sfx/impactGlass_light_001.ogg" data-start="3.6" data-duration="1" data-track-index="23" data-volume="0.6"></audio>
+  <audio id="p14" src="assets/sfx/impactMetal_light_002.ogg" data-start="3.9" data-duration="1" data-track-index="24" data-volume="0.55"></audio>
+  <audio id="p15" src="assets/sfx/select_008.ogg" data-start="4.0" data-duration="1" data-track-index="25" data-volume="0.55"></audio>
+  <audio id="p16" src="assets/sfx/impactGlass_light_002.ogg" data-start="4.2" data-duration="1" data-track-index="26" data-volume="0.6"></audio>
+  <audio id="p17" src="assets/sfx/impactPlate_light_000.ogg" data-start="4.5" data-duration="1" data-track-index="27" data-volume="0.45"></audio>
+  <audio id="s-err" src="assets/sfx/error_005.ogg" data-start="7.05" data-duration="1" data-track-index="28" data-volume="0.6"></audio>
+  <audio id="s-stop" src="assets/sfx/impactSoft_heavy_003.ogg" data-start="7.4" data-duration="1" data-track-index="29" data-volume="0.75"></audio>
+  <audio id="f1" src="assets/sfx/footstep_wood_000.ogg" data-start="7.92" data-duration="0.5" data-track-index="30" data-volume="0.55"></audio>
+  <audio id="f2" src="assets/sfx/footstep_wood_002.ogg" data-start="8.17" data-duration="0.5" data-track-index="31" data-volume="0.55"></audio>
+  <audio id="f3" src="assets/sfx/footstep_wood_000.ogg" data-start="8.42" data-duration="0.5" data-track-index="32" data-volume="0.55"></audio>
+  <audio id="f4" src="assets/sfx/footstep_wood_002.ogg" data-start="8.67" data-duration="0.5" data-track-index="33" data-volume="0.55"></audio>
+  <audio id="s-eyes" src="assets/sfx/impactGlass_light_001.ogg" data-start="9.8" data-duration="1" data-track-index="34" data-volume="0.6"></audio>
+  <audio id="c-s1" src="assets/sfx/card-slide-1.ogg" data-start="10.2" data-duration="1" data-track-index="35" data-volume="0.6"></audio>
+  <audio id="c-s2" src="assets/sfx/card-slide-1.ogg" data-start="10.75" data-duration="1" data-track-index="36" data-volume="0.55"></audio>
+  <audio id="c-s3" src="assets/sfx/card-slide-1.ogg" data-start="11.3" data-duration="1" data-track-index="37" data-volume="0.5"></audio>
+  <audio id="s-user" src="assets/sfx/drop_002.ogg" data-start="12.2" data-duration="1" data-track-index="38" data-volume="0.6"></audio>
+  <audio id="f5" src="assets/sfx/footstep_wood_000.ogg" data-start="13.2" data-duration="0.3" data-track-index="39" data-volume="0.45"></audio>
+  <audio id="f6" src="assets/sfx/footstep_wood_002.ogg" data-start="13.45" data-duration="0.3" data-track-index="47" data-volume="0.4"></audio>
+  <audio id="s-row1" src="assets/sfx/drop_001.ogg" data-start="15.42" data-duration="1" data-track-index="40" data-volume="0.55"></audio>
+  <audio id="s-row2" src="assets/sfx/drop_001.ogg" data-start="16.42" data-duration="1" data-track-index="41" data-volume="0.5"></audio>
+  <audio id="s-click" src="assets/sfx/mouseclick1.ogg" data-start="17.42" data-duration="0.6" data-track-index="42" data-volume="0.75"></audio>
+  <audio id="s-toast" src="assets/sfx/click_003.ogg" data-start="17.55" data-duration="0.6" data-track-index="43" data-volume="0.6"></audio>
+  <audio id="s-punch" src="assets/sfx/impactSoft_medium_001.ogg" data-start="19.92" data-duration="1" data-track-index="44" data-volume="0.7"></audio>
+  <audio id="s-new" src="assets/sfx/impactPlate_light_000.ogg" data-start="21.92" data-duration="1" data-track-index="45" data-volume="0.55"></audio>
+  <audio id="s-logo" src="assets/sfx/impactBell_heavy_000.ogg" data-start="23.42" data-duration="2" data-track-index="46" data-volume="0.7"></audio>
+  <audio id="s-strike" src="assets/sfx/click_003.ogg" data-start="21.42" data-duration="0.3" data-track-index="48" data-volume="0.6"></audio>
+</div>
+
+<script>
+(function () {
+  // favicon-only tabs that flood the tab bar (built synchronously, deterministic colors)
+  var colors = ["#ea4335", "#0f6cbd", "#3f0e40", "#464eb8", "#0065a8", "#b3125d", "#24292f", "#1a73e8", "#34a853", "#fbbc04"];
+  var ftabs = document.getElementById("ftabs");
+  for (var i = 0; i < 42; i++) {
+    var t = document.createElement("div");
+    t.className = "ftab";
+    t.innerHTML = '<i style="background:' + colors[(i * 7) % colors.length] + '"></i>';
+    ftabs.appendChild(t);
+  }
+
+  // act 1 is deliberately a pile of overlapping mock apps: the background windows are clutter,
+  // the toasts are meant to land on top of them
+  document.querySelectorAll("#gmail *, #chaos .app *, #tabbar *").forEach(function (el) { el.setAttribute("data-layout-ignore", ""); });
+  document.querySelectorAll("#chaos .toast *").forEach(function (el) {
+    el.setAttribute("data-layout-allow-overlap", ""); el.setAttribute("data-layout-allow-occlusion", "");
+  });
+
+  var S = 1088 / 1920;          // dashboard → screen scale
+  var Z = 1920 / 1088;           // screen → frame zoom
+  var tl = gsap.timeline({ paused: true });
+  gsap.set("#dash", { scale: S });
+  gsap.set("#screen", { scale: Z });
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function counter(el, from, to, start, dur, ease) {
+    var o = { v: from };
+    tl.to(o, { v: to, duration: dur, ease: ease || "none", onUpdate: function () { el.textContent = Math.round(o.v); } }, start);
+  }
+  function capIn(id, tin, tout) {
+    tl.fromTo(id, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, tin);
+    tl.to(id, { opacity: 0, y: -16, duration: 0.25, ease: "power2.in" }, tout);
+  }
+
+  // ===== ACT 1 — chaos (no music, only pings) =====
+  capIn("#c1", 0.15, 2.75);
+  capIn("#c2", 3.6, 5.5);
+  capIn("#c3", 5.75, 7.1);
+
+  var toasts = gsap.utils.toArray("#chaos .toast");
+  var tt = [0.5, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0, 3.3, 3.6, 3.9, 4.2, 4.5];
+  toasts.forEach(function (el, i) {
+    tl.fromTo(el, { opacity: 0, scale: 0.7, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "back.out(2)" }, tt[i]);
+  });
+  var wins = [["#w-slack", 1.2, -1.5], ["#w-teams", 2.4, 1.2], ["#w-trello", 3.2, -2], ["#w-yt", 4.0, 1.8]];
+  wins.forEach(function (w) {
+    tl.fromTo(w[0], { opacity: 0, scale: 0.85, rotation: 0 }, { opacity: 1, scale: 1, rotation: w[2], duration: 0.32, ease: "back.out(1.6)" }, w[1]);
+  });
+  // tab explosion
+  tl.to("#ltabs", { opacity: 0, duration: 0.2 }, 3.4);
+  tl.fromTo("#ftabs .ftab", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.18, stagger: 0.035, ease: "back.out(2)" }, 3.4);
+  // clock racing 09:00 → 14:00 → 14:07
+  var clk = document.getElementById("clk"), cm = { m: 540 };
+  function drawClock() { var m = Math.round(cm.m); clk.textContent = pad(Math.floor(m / 60)) + ":" + pad(m % 60); }
+  tl.to(cm, { m: 840, duration: 4.8, ease: "power2.in", onUpdate: drawClock }, 1.0);
+  tl.to(cm, { m: 847, duration: 1.4, ease: "none", onUpdate: drawClock }, 5.8);
+  // badges climbing
+  counter(document.getElementById("b0"), 128, 214, 0.5, 6.6);
+  counter(document.getElementById("inbox-n"), 128, 214, 0.5, 6.6);
+  counter(document.getElementById("b1"), 3, 41, 0.8, 6.3);
+  counter(document.getElementById("b2"), 1, 12, 1.2, 5.9);
+  counter(document.getElementById("b3"), 2, 9, 1.6, 5.5);
+  counter(document.getElementById("b4"), 2, 17, 2.0, 5.1);
+  counter(document.getElementById("b5"), 4, 23, 2.4, 4.7);
+  // the user's cursor darts between windows and never lands anywhere
+  tl.set("#cur2", { x: 960, y: 520, opacity: 1 }, 0);
+  // camera: a 1080-wide window onto the 1920-wide screen
+  tl.set("#desk", { x: -420 }, 0);
+  tl.to("#desk", { x: -560, duration: 3.3, ease: "sine.inOut" }, 0);
+  tl.to("#desk", { x: -840, duration: 2.6, ease: "sine.inOut" }, 3.4);
+  tl.to("#desk", { x: -300, duration: 1.2, ease: "power2.inOut" }, 10.1);
+  tl.to("#desk", { x: -236, duration: 1.0, ease: "power2.inOut" }, 14.0);
+  tl.to("#desk", { x: -810, duration: 0.7, ease: "power2.inOut" }, 17.9);
+  var cp = [[1350,180,0.5],[700,330,0.45],[1300,420,0.4],[820,640,0.4],[1420,300,0.35],[1000,760,0.35],[1700,560,0.3],[1100,260,0.3],[1800,250,0.25],[1250,700,0.25],[1650,420,0.2],[1400,760,0.2],[1750,380,0.2],[1500,650,0.2]];
+  var ct = 0.9;
+  cp.forEach(function (c) { tl.to("#cur2", { x: c[0], y: c[1], duration: c[2], ease: "power2.inOut" }, ct); ct += c[2] + 0.08; });
+  tl.set("#cur2", { opacity: 0 }, 7.4);
+  // overload shake
+  tl.to("#screen", { keyframes: [{ x: -10, duration: 0.05 }, { x: 9, duration: 0.05 }, { x: -7, duration: 0.05 }, { x: 6, duration: 0.05 }, { x: -3, duration: 0.05 }, { x: 0, duration: 0.05 }], ease: "none" }, 7.05);
+
+  // ===== STOP =====
+  tl.set("#flash", { opacity: 1 }, 7.4);
+  tl.set("#dim", { opacity: 0.55 }, 7.4);
+  tl.to("#flash", { opacity: 0, duration: 0.3, ease: "power1.out" }, 7.55);
+
+  // ===== ACT 2 — Argus arrives =====
+  capIn("#c4", 7.8, 9.6);
+  tl.set("#argus-wrap", { x: 480 }, 0);
+  tl.set("#argus-shadow", { x: 480 }, 0);
+  tl.to(["#argus-wrap", "#argus-shadow"], { x: 0, duration: 1.0, ease: "none" }, 7.8);
+  tl.to("#argus-bob", { keyframes: [
+      { y: -18, rotation: -4, duration: 0.125 }, { y: 0, rotation: 0, duration: 0.125 },
+      { y: -18, rotation: 4, duration: 0.125 }, { y: 0, rotation: 0, duration: 0.125 },
+      { y: -18, rotation: -4, duration: 0.125 }, { y: 0, rotation: 0, duration: 0.125 },
+      { y: -18, rotation: 4, duration: 0.125 }, { y: 0, rotation: 0, duration: 0.125 } ],
+    transformOrigin: "50% 100%", ease: "sine.inOut" }, 7.8);
+  // looks around
+  tl.to(".ag-badge", { rotation: -10, duration: 0.2, ease: "power2.out" }, 9.0);
+  tl.to(".ag-badge", { rotation: 10, duration: 0.25, ease: "power2.inOut" }, 9.35);
+  tl.to(".ag-badge", { rotation: 0, duration: 0.2, ease: "power2.inOut" }, 9.7);
+  // a hundred eyes open
+  // a hundred eyes: the scan rings sweep out over the screen
+  tl.fromTo(".ag-ring", { scale: 1, opacity: 0.9 }, { scale: 2.6, opacity: 0, duration: 0.9, stagger: 0.25, ease: "power2.out" }, 9.8);
+  tl.to("#dim", { opacity: 0, duration: 0.3, ease: "power1.out" }, 9.85);
+  tl.to(".ag-badge", { scale: 1.08, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out" }, 10.05);
+  capIn("#c5", 10.15, 12.2);
+
+  // sorting: every window and toast flies into its attention level
+  var targets = [[284.5, 232], [439.7, 232], [595, 232]];
+  var sortEls = gsap.utils.toArray("#chaos .sort");
+  sortEls.forEach(function (el, i) {
+    var lv = +el.getAttribute("data-lv");
+    var cx = parseFloat(el.style.left) + el.offsetWidth / 2, cy = parseFloat(el.style.top) + el.offsetHeight / 2;
+    tl.to(el, { x: targets[lv][0] - cx, y: targets[lv][1] - cy, scale: 0.12, rotation: 0, opacity: 0, duration: 0.55, ease: "power3.in" }, 10.2 + i * 0.09);
+  });
+  tl.to("#gmail", { opacity: 0, duration: 0.4 }, 10.9);
+  tl.to("#dash", { opacity: 1, duration: 0.6, ease: "power1.out" }, 10.6);
+  tl.to("#tabbar", { opacity: 0, duration: 0.3 }, 11.4);
+  tl.set("#rows, #more", { opacity: 0 }, 0);
+  counter(document.getElementById("n0"), 0, 2, 10.5, 1.2);
+  counter(document.getElementById("n1"), 0, 6, 10.5, 1.4);
+  counter(document.getElementById("n2"), 0, 7, 10.5, 1.5);
+  tl.fromTo("#att .levels i", { scaleX: 0 }, { scaleX: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" }, 11.4);
+
+  // the user arrives, 09:05, taskbar is quiet
+  tl.set("#taskbar .tb em", { opacity: 0 }, 12.2);
+  tl.set("#clk", { opacity: 0 }, 12.2);
+  tl.set("#clk2", { opacity: 1 }, 12.2);
+  tl.to(".ag-badge", { keyframes: [{ rotation: -12, duration: 0.15 }, { rotation: 8, duration: 0.15 }, { rotation: -12, duration: 0.15 }, { rotation: 0, duration: 0.2 }], ease: "sine.inOut" }, 12.45);
+  capIn("#c6", 12.35, 13.75);
+  // Argus hops off to the right and leaves the board clear
+  tl.to(["#argus-wrap", "#argus-shadow"], { x: 480, duration: 0.8, ease: "power1.in" }, 13.1);
+  tl.to("#argus-bob", { keyframes: [
+      { y: -18, rotation: 4, duration: 0.1 }, { y: 0, rotation: 0, duration: 0.1 },
+      { y: -18, rotation: -4, duration: 0.1 }, { y: 0, rotation: 0, duration: 0.1 },
+      { y: -18, rotation: 4, duration: 0.1 }, { y: 0, rotation: 0, duration: 0.1 },
+      { y: -18, rotation: -4, duration: 0.1 }, { y: 0, rotation: 0, duration: 0.1 } ],
+    transformOrigin: "50% 100%", ease: "sine.inOut" }, 13.1);
+  tl.to("#taskbar", { opacity: 0, duration: 0.3 }, 13.9);
+  // slow push on the board while it fills in
+
+
+  // ===== ACT 3 — the board =====
+  tl.set("#rows, #more", { opacity: 1 }, 15.3);
+  gsap.utils.toArray("#rows .row").forEach(function (el, i) {
+    // beat-grid: rows on half beats 15.42 → 16.42
+    tl.fromTo(el, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 15.42 + i * 0.25);
+  });
+  tl.fromTo("#more", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 16.7);
+  // cursor marks the expense report as done
+  tl.fromTo("#cursor", { opacity: 0, x: 1250, y: 900 }, { opacity: 1, x: 1250, y: 900, duration: 0.1 }, 16.5);
+  tl.to("#cursor", { x: 392, y: 772, duration: 0.8, ease: "power2.inOut" }, 16.6);
+  tl.to("#cursor", { scale: 0.85, duration: 0.07, yoyo: true, repeat: 1, transformOrigin: "10% 10%" }, 17.4); // beat 17.42
+  tl.to("#r3ic", { backgroundColor: "rgba(64,211,150,.18)", color: "#40d396", duration: 0.2 }, 17.45);
+  tl.to("#r3strike", { scaleX: 1, duration: 0.3, ease: "power2.out" }, 17.5);
+  tl.set("#sw-need .a, #sw-things .a", { opacity: 0 }, 17.5);
+  tl.set("#sw-need .b, #sw-things .b", { opacity: 1 }, 17.5);
+  tl.fromTo("#done-toast", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(1.8)" }, 17.55);
+  tl.to("#r3", { opacity: 0, x: 60, duration: 0.35, ease: "power2.in" }, 18.0);
+  tl.to("#r4", { y: -80, duration: 0.35, ease: "power3.inOut" }, 18.3);
+  tl.to("#cursor", { opacity: 0, duration: 0.3 }, 18.3);
+  tl.fromTo("#cap-pill", { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 18.1);
+  tl.to("#cap-pill", { opacity: 0, duration: 0.2 }, 19.7);
+  tl.to("#done-toast", { opacity: 0, duration: 0.2 }, 19.6);
+
+  // ===== ACT 4 — punchline =====
+  tl.fromTo("#pl-k", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 19.95);
+  tl.fromTo("#pl-old", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 20.0);
+  // "5 ore" starts centred on its own, then makes room when "5 minuti" lands (measured once at setup)
+  var plRow = document.querySelector(".pl-row"), plOld = document.getElementById("pl-old");
+  var dx = plRow.offsetWidth / 2 - (plOld.offsetLeft - plRow.offsetLeft + plOld.offsetWidth / 2);
+  var dy = plRow.offsetHeight / 2 - (plOld.offsetTop - plRow.offsetTop + plOld.offsetHeight / 2);
+  tl.set("#pl-old", { x: dx, y: dy }, 0);
+  tl.to("#pl-old", { x: 0, y: 0, duration: 0.35, ease: "power3.inOut" }, 21.72);
+  tl.to("#pl-strike", { scaleX: 1, duration: 0.25, ease: "power2.inOut" }, 21.42); // "5 ore" reads clean for ~1.4s first
+  tl.to("#pl-old", { opacity: 0.45, duration: 0.25 }, 21.6);
+  tl.fromTo("#pl-new", { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 21.92); // beat-locked: 21.92s (track 17.52)
+
+  // ===== lockup =====
+  tl.fromTo("#lk-row", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.7)" }, 23.42); // beat-locked: 23.42s (track 19.02)
+  tl.fromTo("#lk-tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 23.7);
+
+  // ===== audio =====
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.34, duration: 0.4 }, 7.4);
+  tl.to("#bgm", { volume: 0, duration: 1.0 }, 25.0);
+
+  // audio-reactive: ambient glow breathes with the music RMS from the board onward
+  var R = window.MUSIC_RMS || [];
+  var amb = document.getElementById("amb");
+  var F0 = Math.round((14.4 - 7.4) * 30), af = { f: F0 };
+  tl.to(af, { f: R.length - 1, duration: (R.length - 1 - F0) / 30, ease: "none", onUpdate: function () {
+    var v = R[Math.round(af.f)] || 0;
+    amb.style.opacity = (0.25 + v * 0.75).toFixed(3);
+    amb.style.transform = "scale(" + (0.95 + v * 0.08).toFixed(3) + ")";
+  } }, 14.4);
+  tl.fromTo("#amb", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+
+  window.__timelines["main"] = tl;
+})();
+</script>
+</body>
+</html>
