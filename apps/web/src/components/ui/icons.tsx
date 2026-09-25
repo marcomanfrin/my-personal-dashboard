@@ -225,18 +225,3 @@ export const ICONS = {
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof ICONS;
-
-/** The brand mark: an A whose crossbar is a pupil, for Argus the watchman. Stroked, 24x24. */
-export const LOGO = (
-  <>
-    <path
-      d="M4 21.5 12 2.5l8 19M7.1 14.5h1.6M15.3 14.5h1.6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="12" cy="14.5" r="2.6" />
-  </>
-);
