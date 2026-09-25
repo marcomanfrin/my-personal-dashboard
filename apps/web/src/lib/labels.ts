@@ -8,9 +8,21 @@ import type {
   PrState,
   Priority,
   PullRequestStatus,
+  Resource,
   TaskColumn,
 } from '@argus/shared';
 import type { IconName } from '../components/ui/icons';
+
+export const RESOURCE_LABEL: Record<Resource, string> = {
+  emails: 'Mail',
+  events: 'Calendar',
+  pulls: 'Pull requests',
+  issues: 'Errors & issues',
+  reminders: 'Reminders',
+  tasks: 'Trello',
+  projects: 'Projects',
+  gantt: 'Plan',
+};
 
 export const LEVEL_LABEL: Record<Priority, string> = {
   critical: 'Critical',

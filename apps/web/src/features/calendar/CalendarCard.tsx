@@ -22,6 +22,7 @@ export function CalendarCard({ className }: { className?: string }) {
   return (
     <Card
       id="calendar"
+      sources={['events']}
       title="Calendar"
       icon="calendar"
       className={className}

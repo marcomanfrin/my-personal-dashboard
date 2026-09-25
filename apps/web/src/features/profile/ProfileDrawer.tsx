@@ -1,4 +1,4 @@
-import type { Resource, SourceStatus } from '@argus/shared';
+import type { SourceStatus } from '@argus/shared';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '../../api/endpoints';
 import { queryKeys } from '../../api/queryClient';
@@ -11,17 +11,7 @@ import { useDashboard } from '../../hooks/useDashboard';
 import { useTheme } from '../../hooks/useTheme';
 import { cn } from '../../lib/cn';
 import { relPast } from '../../lib/format';
-
-const RESOURCE_LABEL: Record<Resource, string> = {
-  emails: 'Mail',
-  events: 'Calendar',
-  pulls: 'Pull requests',
-  issues: 'Errors & issues',
-  reminders: 'Reminders',
-  tasks: 'Trello',
-  projects: 'Projects',
-  gantt: 'Plan',
-};
+import { RESOURCE_LABEL } from '../../lib/labels';
 
 const LIVE_TEXT = { live: 'Live', connecting: 'Connecting…', offline: 'Offline' };
 

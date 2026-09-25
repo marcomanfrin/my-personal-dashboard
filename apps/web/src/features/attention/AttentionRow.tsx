@@ -16,17 +16,17 @@ export function AttentionRow({ item }: { item: AttentionItem }) {
         type="button"
         onClick={() => openRecord(item.ref.resource, item.ref.id)}
         className={cn(
-          '-mx-1.5 flex w-[calc(100%+12px)] items-center gap-3 rounded-[10px] px-1.5 py-2.5 hover:bg-surface-2',
+          '-mx-1.5 flex w-[calc(100%+12px)] items-center gap-3 rounded-md px-1.5 py-3 hover:bg-surface-2',
           lvl(item.level),
         )}
       >
-        <span className="grid size-[30px] flex-none place-items-center rounded-sm bg-c/12 text-c">
+        <span className="grid size-8 flex-none place-items-center rounded-sm bg-c/12 text-c">
           <Icon name={attentionIconFor(item, data)} size="sm" />
         </span>
         <span className="min-w-0 flex-1">
           <SrOnly>{ATTENTION_LEVEL_LABEL[item.level]}:</SrOnly>
-          <b className="block truncate text-sm font-[650]">{attentionTitle(item, data)}</b>
-          <span className="block truncate text-[12.5px] text-fg-3">
+          <b className="block truncate text-[15px] font-[650]">{attentionTitle(item, data)}</b>
+          <span className="block truncate text-[13px] text-fg-3">
             {item.source}: {attentionContext(item)}
           </span>
         </span>

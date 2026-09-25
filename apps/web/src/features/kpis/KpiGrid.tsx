@@ -1,7 +1,7 @@
 import type { KpiId } from '@argus/shared';
 import { Icon } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/icons';
-import { Lamp, lvl } from '../../components/ui/primitives';
+import { lvl } from '../../components/ui/primitives';
 import { LEVEL_LABEL } from '../../lib/labels';
 import { useDashboard } from '../../hooks/useDashboard';
 import { useSections } from '../../layout/sections';
@@ -34,16 +34,15 @@ export function KpiGrid({ className }: { className?: string }) {
             }}
             aria-label={`${k.value} ${t.label}${t.sub ? `, ${t.sub}` : ''}${k.level ? `, ${LEVEL_LABEL[k.level].toLowerCase()} priority` : ''}. Go to section`}
             className={cn(
-              'relative isolate flex min-h-[104px] flex-col justify-between gap-2.5 overflow-hidden rounded-[15px] border border-line bg-surface p-3.5 shadow-card hover:border-line-strong',
-              k.level &&
-                `${lvl(k.level)} before:absolute before:inset-0 before:-z-10 before:bg-[radial-gradient(160px_110px_at_100%_0%,color-mix(in_srgb,var(--c)_22%,transparent),transparent_70%)] before:content-['']`,
+              'relative flex min-h-[92px] flex-col justify-between gap-2 overflow-hidden rounded-lg border border-line bg-surface p-3.5 shadow-card hover:border-line-strong',
+              // A priority shows as one line of its colour along the top edge.
+              k.level && `${lvl(k.level)} before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-c before:content-['']`,
             )}
           >
-            <span className="flex items-center justify-between text-fg-3">
-              <Icon name={t.icon} size="sm" className={k.level ? 'text-c' : undefined} />
-              {k.level && <Lamp />}
+            <span className="flex items-center justify-between gap-2">
+              <span className="text-[30px] leading-none font-bold tracking-[-.03em]">{k.value}</span>
+              <Icon name={t.icon} size="sm" className={k.level ? 'text-c' : 'text-fg-3'} />
             </span>
-            <span className="text-[32px] leading-none font-extrabold tracking-[-.04em]">{k.value}</span>
             <span className="text-[12.5px] leading-[1.3] font-[650] text-fg-2">
               {t.label}
               {t.sub && <small className="block text-[11.5px] font-semibold text-fg-3">{t.sub}</small>}

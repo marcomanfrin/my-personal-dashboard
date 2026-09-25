@@ -23,6 +23,7 @@ export function ProjectsCard({ className }: { className?: string }) {
   return (
     <Card
       id="projects"
+      sources={['projects']}
       title="Projects"
       icon="folder"
       className={className}

@@ -178,7 +178,7 @@ export function TrelloCard({ className }: { className?: string }) {
   const indicator = isNoop(dropAt, dragging) ? null : dropAt;
 
   return (
-    <Card id="trello" title="Trello tasks" icon="kanban" className={className} sub={<><b>{open}</b> open cards</>}>
+    <Card id="trello" sources={['tasks']} title="Trello tasks" icon="kanban" className={className} sub={<><b>{open}</b> open cards</>}>
       <span id={DRAG_HINT_ID} className="sr-only">
         Drag to another column or position to move it, or open the card for move options.
       </span>

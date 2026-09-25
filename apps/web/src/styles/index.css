@@ -5,107 +5,103 @@
    the Tailwind theme below (bg-surface, text-fg-2, border-line, ...).
    ========================================================================= */
 :root {
-  /* Light theme: a tinted canvas, white cards and tinted cells so every layer reads apart. */
-  --bg: #dfe3ed;
-  --bg-glow-1: rgba(106, 88, 240, 0.06);
-  --bg-glow-2: rgba(15, 168, 148, 0.04);
-  --surface: #ffffff;
-  --surface-2: #eef0f6;
-  --surface-3: #e1e4ee;
-  --line: rgba(20, 26, 60, 0.13);
-  --line-strong: rgba(20, 26, 60, 0.22);
-  --text: #121630;
-  --text-2: #464c6c;
-  --text-3: #5c6280;
-  --accent: #5641dc;
-  --accent-soft: rgba(101, 82, 236, 0.12);
-  --accent-text: #4b39d6;
+  /* Light theme: a cool grey-green canvas, near-white panels and tinted cells so every layer
+     reads apart. Petrol is the interface colour; everything else stays neutral. */
+  --bg: #e4eae8;
+  --surface: #f8faf9;
+  --surface-2: #edf2f0;
+  --surface-3: #e0e7e5;
+  --line: rgba(15, 42, 46, 0.12);
+  --line-strong: rgba(15, 42, 46, 0.22);
+  --text: #0f2a2e;
+  --text-2: #3d5357;
+  --text-3: #53686b;
+  --accent: #0e5f73;
+  --accent-soft: rgba(14, 95, 115, 0.11);
+  --accent-text: #0c5566;
   --on-accent: #ffffff;
-  --crit: #b01a31;
-  --high: #944a0a;
-  --med: #7a5c00;
+  --crit: #b3261e;
+  --high: #92530a;
+  --med: #735900;
   --low: #2159b8;
-  --g-blue: #4a67e8;
-  --dep: #d9687c;
-  --ok: #096b49;
-  --blocked: #62578c;
-  --teal: #086b5c;
+  --g-blue: #3f6fd6;
+  --dep: #c95a6e;
+  --ok: #17693f;
+  --blocked: #5f5a82;
+  --violet: #6c4bb0;
   --pink: #973090;
   /* Form control outlines: at least 3:1 against the card (WCAG 1.4.11). */
-  --control-border: rgba(20, 26, 60, 0.55);
-  --shadow: 0 1px 2px rgba(20, 26, 60, 0.07), 0 6px 18px rgba(20, 26, 60, 0.07);
-  --shadow-pop: 0 10px 40px rgba(20, 26, 60, 0.16);
-  --av-fg-l: 38%;
-  --scrim: rgba(12, 15, 30, 0.35);
+  --control-border: rgba(15, 42, 46, 0.55);
+  /* Panels sit flat on the canvas; only floating layers (drawers, menus) cast a shadow. */
+  --shadow: 0 1px 0 rgba(15, 42, 46, 0.04);
+  --shadow-pop: 0 12px 36px rgba(15, 42, 46, 0.16);
+  --av-fg-l: 36%;
+  --scrim: rgba(8, 22, 24, 0.35);
   --topbar-h: 60px;
   --bottomnav-h: 64px;
   --sidebar-w: 0px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0b0e1c;
-    --bg-glow-1: rgba(128, 108, 255, 0.14);
-    --bg-glow-2: rgba(40, 200, 180, 0.07);
-    --surface: #131830;
-    --surface-2: #191f3b;
-    --surface-3: #222a50;
-    --line: rgba(160, 172, 235, 0.1);
-    --line-strong: rgba(160, 172, 235, 0.19);
-    --text: #e8eaf8;
-    --text-2: #a3a8c8;
-    --text-3: #9095ba;
-    --accent: #8e7fff;
-    --accent-soft: rgba(142, 127, 255, 0.15);
-    --accent-text: #b3a8ff;
-    --on-accent: #0b0e1c;
-    --crit: #ff5c6c;
-    --high: #ff9a48;
-    --med: #e9c350;
-    --low: #62a3ff;
-    --g-blue: #7d93ff;
+    --bg: #0a1719;
+    --surface: #10232a;
+    --surface-2: #152c33;
+    --surface-3: #1c3840;
+    --line: rgba(170, 205, 205, 0.1);
+    --line-strong: rgba(170, 205, 205, 0.19);
+    --text: #e3edeb;
+    --text-2: #a6b9b7;
+    --text-3: #8ea3a2;
+    --accent: #5bb8cc;
+    --accent-soft: rgba(91, 184, 204, 0.14);
+    --accent-text: #86cfdd;
+    --on-accent: #06191d;
+    --crit: #ff6b5e;
+    --high: #f0a04b;
+    --med: #e2c257;
+    --low: #6ea6ff;
+    --g-blue: #7d9dff;
     --dep: #f07d92;
-    --ok: #40d396;
-    --blocked: #a298d0;
-    --teal: #2fbfa9;
+    --ok: #4fcf8e;
+    --blocked: #a49fcc;
+    --violet: #b598f0;
     --pink: #d465c9;
-    --control-border: rgba(160, 172, 235, 0.6);
-    --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.18);
+    --control-border: rgba(170, 205, 205, 0.6);
+    --shadow: 0 1px 0 rgba(255, 255, 255, 0.025) inset;
     --shadow-pop: 0 18px 50px rgba(0, 0, 0, 0.5);
     --av-fg-l: 74%;
-    --scrim: rgba(4, 6, 14, 0.6);
+    --scrim: rgba(2, 8, 10, 0.6);
   }
 }
 :root[data-theme='dark'] {
-  --bg: #0b0e1c;
-  --bg-glow-1: rgba(128, 108, 255, 0.14);
-  --bg-glow-2: rgba(40, 200, 180, 0.07);
-  --surface: #131830;
-  --surface-2: #191f3b;
-  --surface-3: #222a50;
-  --line: rgba(160, 172, 235, 0.1);
-  --line-strong: rgba(160, 172, 235, 0.19);
-  --text: #e8eaf8;
-  --text-2: #a3a8c8;
-  --text-3: #9095ba;
-  --accent: #8e7fff;
-  --accent-soft: rgba(142, 127, 255, 0.15);
-  --accent-text: #b3a8ff;
-  --on-accent: #0b0e1c;
-  --crit: #ff5c6c;
-  --high: #ff9a48;
-  --med: #e9c350;
-  --low: #62a3ff;
-  --g-blue: #7d93ff;
+  --bg: #0a1719;
+  --surface: #10232a;
+  --surface-2: #152c33;
+  --surface-3: #1c3840;
+  --line: rgba(170, 205, 205, 0.1);
+  --line-strong: rgba(170, 205, 205, 0.19);
+  --text: #e3edeb;
+  --text-2: #a6b9b7;
+  --text-3: #8ea3a2;
+  --accent: #5bb8cc;
+  --accent-soft: rgba(91, 184, 204, 0.14);
+  --accent-text: #86cfdd;
+  --on-accent: #06191d;
+  --crit: #ff6b5e;
+  --high: #f0a04b;
+  --med: #e2c257;
+  --low: #6ea6ff;
+  --g-blue: #7d9dff;
   --dep: #f07d92;
-  --ok: #40d396;
-  --blocked: #a298d0;
-  --teal: #2fbfa9;
+  --ok: #4fcf8e;
+  --blocked: #a49fcc;
+  --violet: #b598f0;
   --pink: #d465c9;
-  --control-border: rgba(160, 172, 235, 0.6);
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.18);
+  --control-border: rgba(170, 205, 205, 0.6);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.025) inset;
   --shadow-pop: 0 18px 50px rgba(0, 0, 0, 0.5);
   --av-fg-l: 74%;
-  --scrim: rgba(4, 6, 14, 0.6);
+  --scrim: rgba(2, 8, 10, 0.6);
 }
 @media (min-width: 768px) {
   :root {
@@ -123,7 +119,7 @@
    set by the lvl-* / st-* / cat-* / lbl-* utilities (bg-c/12, text-c, ...).
    ========================================================================= */
 @theme inline {
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+  --font-sans: 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
   --color-canvas: var(--bg);
@@ -153,10 +149,11 @@
   --shadow-card: var(--shadow);
   --shadow-pop: var(--shadow-pop);
 
-  --radius-xs: 6px;
-  --radius-sm: 9px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  /* Two working radii: rows and controls (sm/md), panels (lg). */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 
   --breakpoint-xs: 25rem; /* 400px */
   --breakpoint-ms: 35rem; /* 560px */
@@ -166,7 +163,9 @@
   --animate-fade: fade 0.2s ease;
   --animate-sheet: sheet 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-slide: slide 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-pulse-lamp: pulse-lamp 2.4s ease-in-out infinite;
+  /* Draws the eye a few times, then rests: nothing on the board moves forever. */
+  --animate-pulse-lamp: pulse-lamp 2.4s ease-in-out 3;
+  --animate-blink: blink 0.45s ease-in-out;
   --animate-lift: lift 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes fade {
@@ -184,6 +183,12 @@
     from {
       transform: translateX(40px);
       opacity: 0;
+    }
+  }
+  /* A source eye when fresh data lands. */
+  @keyframes blink {
+    50% {
+      transform: scaleY(0.1);
     }
   }
   /* A Kanban card picked up for dragging: tilts and rises. */
@@ -280,7 +285,7 @@
   --c: var(--accent);
 }
 @utility cat-focus {
-  --c: var(--teal);
+  --c: var(--violet);
 }
 @utility cat-personal {
   --c: var(--text-3);
@@ -292,7 +297,7 @@
   --c: var(--high);
 }
 @utility lbl-hmi {
-  --c: var(--teal);
+  --c: var(--violet);
 }
 @utility lbl-backend {
   --c: var(--accent);
@@ -354,16 +359,6 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: 'tnum' 1;
     overflow-x: hidden;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background:
-      radial-gradient(900px 500px at 12% -10%, var(--bg-glow-1), transparent 70%),
-      radial-gradient(700px 500px at 100% 0%, var(--bg-glow-2), transparent 70%);
   }
   button {
     cursor: pointer;

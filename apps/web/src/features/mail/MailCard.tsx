@@ -20,6 +20,7 @@ export function MailCard({ className }: { className?: string }) {
   return (
     <Card
       id="mail"
+      sources={['emails']}
       title="Mail triage"
       icon="mail"
       className={className}

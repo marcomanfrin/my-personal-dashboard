@@ -9,9 +9,10 @@ React frontend reads the data from the server and displays it; user actions (mar
 move card…) are saved on the server and queued so the source's agent can propagate them to the
 real system.
 
-`demo.html` is the **UX/functional reference**: design system, widgets, priority logic
-("attention engine"), KPIs. It must not be modified; when implementing a widget or a domain rule,
-start from there.
+`demo.html` is the **UX/functional reference**: widgets, priority logic ("attention engine"),
+KPIs. It must not be modified; when implementing a widget or a domain rule, start from there. The
+visual identity has since moved on from it: palette, typeface, radii and shadows live in
+`apps/web/src/styles/index.css`, which is now the reference for the look.
 
 ## Architecture
 
@@ -78,7 +79,7 @@ apps/server/          @argus/server — Fastify 5 + Drizzle + PostgreSQL
   src/modules/<m>/    routes.ts · service.ts · repository.ts
   test/               vitest + app.inject on PGlite (in-process Postgres, no Docker)
 apps/web/             @argus/web — React 19 + Vite + Tailwind v4 + TanStack Query
-  src/styles/         index.css: demo.html tokens → Tailwind theme (bg-surface, text-fg-2, bg-c/12…)
+  src/styles/         index.css: design tokens → Tailwind theme (bg-surface, text-fg-2, bg-c/12…)
   src/auth/           session.ts (in-memory JWT, single-flight and proactive refresh), AuthGate
   src/api/            client (Bearer + retry after refresh on 401), endpoints, queryClient
   src/hooks/          useDashboard (data + insights computed in the browser), useActions (optimistic
@@ -121,7 +122,10 @@ demo.html             UX reference, do not touch
   time show up immediately. SSE → query invalidation (300 ms debounce). Every user action goes
   through `useActions` (optimistic patch, rollback on error, Undo = PATCH with the previous values).
   Small presentational components, UI state local to the widget; UI copy in English like the demo.
-- **Style**: Tailwind v4 with the demo's CSS tokens (light/dark theme via variables, no `dark:`).
+- **Style**: Tailwind v4 with the tokens in `index.css` (light/dark theme via variables, no `dark:`).
+  Petrol accent for the interface only, neutrals everywhere else; panels are flat (border, no
+  shadow), only floating layers cast one; no looping animations. Source freshness is the Argus eye
+  (`layout/SourceEyes.tsx`): pass `sources` to `Card`.
   Per-element signal color with `--c`: classes `lvl-*`, `st-*`, `cat-*`, `lbl-*` + `text-c`,
   `bg-c/12`. Classes built at runtime must be added to the `@source inline(...)` safelist in
   `index.css`. Custom CSS only where Tailwind is not enough (select, switch, checkbox, Gantt clip).

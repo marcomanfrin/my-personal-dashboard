@@ -137,6 +137,7 @@ export function GanttCard({ className }: { className?: string }) {
   return (
     <Card
       id="gantt"
+      sources={['gantt']}
       title="Personal Gantt"
       icon="gantt"
       className={className}

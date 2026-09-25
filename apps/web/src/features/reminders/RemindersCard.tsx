@@ -21,6 +21,7 @@ export function RemindersCard({ className }: { className?: string }) {
   return (
     <Card
       id="reminders"
+      sources={['reminders']}
       title="Reminders"
       icon="checkSquare"
       className={className}

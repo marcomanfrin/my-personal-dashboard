@@ -9,6 +9,7 @@ import { fmtLong } from '../lib/format';
 import { Avatar } from './Navigation';
 import { NotificationsMenu } from './NotificationsMenu';
 import { SearchBox } from './SearchBox';
+import { SourceStrip } from './SourceEyes';
 
 export function Topbar() {
   const { now, user } = useDashboard();
@@ -37,6 +38,7 @@ export function Topbar() {
         }}
       />
       <IconButton ref={searchButton} icon="search" label="Search" className="md:hidden" onClick={() => setSearchOpen(true)} />
+      <SourceStrip className="hidden lg:flex" />
       <NotificationsMenu />
       <IconButton icon={theme === 'dark' ? 'sun' : 'moon'} label={`Switch to ${next} mode`} tip={`Switch to ${next} mode`} onClick={toggle} />
       <button type="button" aria-label="Profile and data sources" data-tip="Profile and data sources" onClick={() => open('profile', 'me')}>

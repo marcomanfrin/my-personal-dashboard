@@ -77,7 +77,7 @@ export function AttentionPanel({ className }: { className?: string }) {
       )}
     >
       <div className="mb-3.5 flex items-center justify-between gap-2.5">
-        <h2 id="att-title" tabIndex={-1} className="text-[15.5px] font-[750]">
+        <h2 id="att-title" tabIndex={-1} className="text-lg font-[750] tracking-[-.01em]">
           Attention required
         </h2>
         {filter !== 'all' && (

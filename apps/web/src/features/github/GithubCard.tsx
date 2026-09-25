@@ -18,6 +18,7 @@ export function GithubCard({ className }: { className?: string }) {
   return (
     <Card
       id="github"
+      sources={['pulls', 'issues']}
       title="GitHub"
       icon="git"
       className={className}

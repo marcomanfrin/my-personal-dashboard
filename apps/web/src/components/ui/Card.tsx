@@ -1,5 +1,7 @@
+import type { Resource } from '@argus/shared';
 import type { ReactNode } from 'react';
 import { useSection } from '../../layout/sections';
+import { SourceEyes } from '../../layout/SourceEyes';
 import { cn } from '../../lib/cn';
 import { Icon } from './Icon';
 import type { IconName } from './icons';
@@ -9,6 +11,8 @@ export interface CardProps {
   id: string;
   title: string;
   icon: IconName;
+  /** Resources that feed the widget: their freshness shows as an eye next to the title. */
+  sources?: Resource[];
   sub?: ReactNode;
   /** Controls in the header; hidden while collapsed. */
   tools?: ReactNode;
@@ -17,7 +21,7 @@ export interface CardProps {
 }
 
 /** A dashboard widget: header with icon, title, subtitle, tools and a collapse toggle. */
-export function Card({ id, title, icon, sub, tools, className, children }: CardProps) {
+export function Card({ id, title, icon, sources, sub, tools, className, children }: CardProps) {
   const { collapsed, toggle, flashing, ref } = useSection(id);
   return (
     <section
@@ -37,13 +41,14 @@ export function Card({ id, title, icon, sub, tools, className, children }: CardP
         )}
       >
         <div className="flex min-w-0 flex-[1_1_200px] items-center gap-2.5">
-          <span className="grid size-8 flex-none place-items-center rounded-[10px] border border-line bg-surface-2 text-fg-2">
-            <Icon name={icon} />
-          </span>
+          <Icon name={icon} className="flex-none self-start text-fg-3 mt-px" />
           <div>
-            <h2 id={`${id}-title`} tabIndex={-1} className="text-[15.5px] leading-tight font-[750] tracking-[-.01em]">
-              {title}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 id={`${id}-title`} tabIndex={-1} className="text-[15.5px] leading-tight font-[750] tracking-[-.01em]">
+                {title}
+              </h2>
+              {sources && <SourceEyes resources={sources} />}
+            </div>
             {sub && <p className="text-[12.5px] font-semibold text-fg-3 [&_b]:text-fg-2">{sub}</p>}
           </div>
         </div>
