@@ -7,7 +7,8 @@ The agents explore the sources with their connectors (Gmail/Outlook, Google/Outl
 GitHub, Trello, company planning, …) and **write the data to the server through a REST API**. The
 React frontend reads the data from the server and displays it; user actions (mark as done, ack,
 move card…) are saved on the server and queued so the source's agent can propagate them to the
-real system.
+real system. The other way round, the user can **delegate work to agents** (*jobs*: reply to this
+mail, do this card, review this PR…), review the agent's draft and let it act.
 
 `demo.html` is the **UX/functional reference**: design system, widgets, priority logic
 ("attention engine"), KPIs. It must not be modified; when implementing a widget or a domain rule,
@@ -19,12 +20,14 @@ start from there.
  AI agents (connectors)                        Browser
    │  PUT /api/ingest/:resource                  ▲  GET /api/dashboard, /api/<resource>
    │  POST/PATCH /api/agents/runs                │  PATCH /api/<resource>/:id  (user actions)
-   │  POST /api/actions/claim, PATCH /:id        │  GET /api/stream  (SSE: data.changed …)
+   │  POST /api/actions/claim, PATCH /:id        │  POST /api/jobs, /api/jobs/:id/approve…
+   │  POST /api/jobs/claim, PATCH /:id           │  GET /api/stream  (SSE: data.changed …)
    ▼                                             │
  ┌──────────────────────── apps/server (Fastify) ────────────────────────┐
  │ routes → service → repository ── Drizzle ──► PostgreSQL                │
  │                 └─► events-bus ──► SSE                                  │
  │ `actions` table = outbox of user actions, consumed by the agents       │
+ │ `jobs` table = work delegated to agents, with draft review             │
  └────────────────────────────────────────────────────────────────────────┘
           ▲ types, zod schemas, domain logic: packages/shared
 ```

@@ -5,7 +5,8 @@
 A personal dashboard fed by **AI agents**. The agents read your sources (mail, calendar, GitHub,
 Trello, company planning…) and write the data to the server through a REST API; the browser shows
 it all on a single board and sends your actions back to the sources (mark as done, move a card,
-ack a PR…).
+ack a PR…). You can also delegate work to the agents (reply to a mail, carry out a card, review a
+PR…): they draft, you review, they act.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/dashboard-dark.png">
@@ -13,7 +14,7 @@ ack a PR…).
 </picture>
 
 - **Widgets**: attention (what needs you right now), KPIs, mail, calendar, GitHub (PRs and
-  issues), reminders, Trello Kanban, company Gantt, projects.
+  issues), reminders, Trello Kanban, company Gantt, projects, agent jobs.
 - **Live**: every write reaches the browser over SSE, no reload needed.
 - **Reversible actions**: optimistic updates with Undo; changes go into a queue (`actions`) that
   the source's agent applies to the real system.
@@ -93,6 +94,8 @@ docker compose exec server node dist/scripts/agent-token.js github pulls,issues
 ```
 
 Resources: `emails`, `events`, `pulls`, `issues`, `reminders`, `tasks`, `projects`, `gantt`.
+Scopes also decide which delegated jobs an agent can claim: jobs on those resources, plus the
+`free` ones that have no target.
 An agent can only write to the resources in its scope.
 
 A typical cycle:
