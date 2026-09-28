@@ -5,6 +5,7 @@ import { useDrawer } from '../../drawer/DrawerContext';
 import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
 import { dueText } from '../../lib/format';
+import { JobBadge } from '../jobs/JobStatus';
 
 export function TaskLabel({ label }: { label: string }) {
   return (
@@ -23,6 +24,7 @@ export function KanbanCardBody({ task: t }: { task: Task }) {
           <TaskLabel key={l} label={l} />
         ))}
         <Tag>{t.board}</Tag>
+        <JobBadge recordId={t.id} />
       </span>
       <span className={cn('text-[13.5px] leading-[1.35] font-[650]', done && 'text-fg-3 line-through')}>{t.title}</span>
       {(t.due || t.checklist) && (

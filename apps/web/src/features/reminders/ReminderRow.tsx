@@ -1,22 +1,25 @@
 import { reminderState, type Reminder } from '@argus/shared';
-import { Lamp, lvl } from '../../components/ui/primitives';
+import { IconButton, Lamp, lvl } from '../../components/ui/primitives';
+import { delegateTarget, useDrawer } from '../../drawer/DrawerContext';
 import { Tag } from '../../components/ui/primitives';
 import { useActions } from '../../hooks/useActions';
 import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
 import { dueText } from '../../lib/format';
 import { LEVEL_LABEL } from '../../lib/labels';
+import { JobBadge } from '../jobs/JobStatus';
 
 export function ReminderRow({ reminder: r }: { reminder: Reminder }) {
   const { now } = useDashboard();
   const { toggleReminder } = useActions();
+  const { open } = useDrawer();
   const st = reminderState(r, now);
   const text = dueText(r.due, r.hasTime, now);
   const due = st === 'overdue' ? `Overdue, ${text.toLowerCase()}` : text;
   const inputId = `rem-${r.id}`;
 
   return (
-    <li className="flex items-center gap-3 rounded-[10px] px-1.5 py-[9px] hover:bg-surface-2 [&+&]:border-t [&+&]:border-line">
+    <li className="group flex items-center gap-3 rounded-[10px] px-1.5 py-[9px] hover:bg-surface-2 [&+&]:border-t [&+&]:border-line">
       <input type="checkbox" className="check" id={inputId} checked={r.done} onChange={() => toggleReminder(r.id)} />
       <div className="min-w-0 flex-1">
         <label
@@ -35,8 +38,18 @@ export function ReminderRow({ reminder: r }: { reminder: Reminder }) {
             {due}
           </span>
           <Tag>{r.category}</Tag>
+          <JobBadge recordId={r.id} />
         </div>
       </div>
+      {!r.done && (
+        <IconButton
+          icon="bot"
+          label={`Delegate “${r.title}” to an agent`}
+          tip="Delegate to an agent"
+          onClick={() => open('delegate', delegateTarget('reminders', r.id))}
+          className="size-8 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+        />
+      )}
       {r.priority !== 'normal' && !r.done && (
         <span data-tip={`${LEVEL_LABEL[r.priority]} priority`} className={lvl(r.priority)}>
           <Lamp label={`${LEVEL_LABEL[r.priority]} priority`} />

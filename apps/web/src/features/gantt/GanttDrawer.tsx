@@ -4,6 +4,7 @@ import { DrawerView } from '../../drawer/DrawerShell';
 import { useDashboard } from '../../hooks/useDashboard';
 import { fmtLong } from '../../lib/format';
 import { STATUS_LABEL } from '../../lib/labels';
+import { DelegateSection } from '../jobs/DelegateSection';
 
 export function GanttDrawer({ task: t }: { task: GanttTask }) {
   const { data, now } = useDashboard();
@@ -46,6 +47,11 @@ export function GanttDrawer({ task: t }: { task: GanttTask }) {
       <div className={`st-${st}`}>
         <ProgressBar value={t.progress} height="h-2" />
       </div>
+      <DelegateSection
+        resource="gantt"
+        recordId={t.id}
+        presets={['Update the progress from the tickets', 'Flag the risks to the deadline']}
+      />
     </DrawerView>
   );
 }

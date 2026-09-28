@@ -25,6 +25,7 @@ beforeEach(() => {
     'POST /api/auth/refresh': () => ({ status: 200, body: tokenResponse() }),
     'GET /api/dashboard': () => ({ status: 200, body: fixture }),
     'GET /api/agents': () => ({ status: 200, body: { agents: [], runs: [] } }),
+    'GET /api/jobs': () => ({ status: 200, body: [] }),
   };
   vi.stubGlobal(
     'fetch',
@@ -111,6 +112,48 @@ describe('app', () => {
     expect(within(dialog).getByRole('button', { name: 'Mark review done' })).toBeTruthy();
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('delegates a record to an agent from its drawer and shows the job', async () => {
+    let jobs: unknown[] = [];
+    routes['GET /api/jobs'] = () => ({ status: 200, body: jobs });
+    routes['POST /api/jobs'] = (init) => {
+      const body = JSON.parse(String(init.body)) as { resource: string; recordId: string; instruction: string };
+      const now = new Date().toISOString();
+      const job = {
+        id: '7b0c2f4e-9a51-4d7e-8f3c-2b6a1d9e0c11',
+        kind: 'record',
+        resource: body.resource,
+        recordId: body.recordId,
+        externalId: 'x',
+        title: 'MES order sync over OPC UA',
+        instruction: body.instruction,
+        requiresApproval: true,
+        status: 'pending',
+        draft: null,
+        feedback: null,
+        result: null,
+        agentId: null,
+        agentName: null,
+        createdBy: 'user',
+        createdAt: now,
+        updatedAt: now,
+        finishedAt: null,
+      };
+      jobs = [job];
+      return { status: 201, body: job };
+    };
+    render(<App />);
+    const github = await screen.findByRole('region', { name: 'GitHub' });
+    fireEvent.click(within(github).getByText('MES order sync over OPC UA'));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Summarise the changes' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Delegate' }));
+
+    await within(dialog).findByText('Agent on it');
+    const post = calls.find((c) => c.method === 'POST' && c.url === '/api/jobs');
+    expect(post?.body).toMatchObject({ kind: 'record', resource: 'pulls', instruction: 'Summarise the changes', requiresApproval: true });
+    expect(within(dialog).getByText('Queued')).toBeTruthy();
   });
 
   it('shows the login page without a session and signs in', async () => {

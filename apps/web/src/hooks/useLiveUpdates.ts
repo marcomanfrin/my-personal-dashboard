@@ -1,4 +1,4 @@
-import type { AgentRunStatus, StreamEventType } from '@argus/shared';
+import type { AgentRunStatus, JobStatus, StreamEventType } from '@argus/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { queryKeys } from '../api/queryClient';
@@ -8,7 +8,7 @@ import { hasUnsavedPreferences } from './usePreference';
 
 export type LiveStatus = 'connecting' | 'live' | 'offline';
 
-const REFRESHING: StreamEventType[] = ['data.changed', 'agent.run', 'action.updated'];
+const REFRESHING: StreamEventType[] = ['data.changed', 'agent.run', 'action.updated', 'job.updated'];
 /** Agents write in bursts: coalesce a burst into one refetch. */
 const DEBOUNCE_MS = 300;
 
@@ -29,6 +29,7 @@ export function useLiveUpdates(): LiveStatus {
       timer = setTimeout(() => {
         void qc.invalidateQueries({ queryKey: queryKeys.dashboard });
         void qc.invalidateQueries({ queryKey: queryKeys.agents });
+        void qc.invalidateQueries({ queryKey: queryKeys.jobs });
       }, DEBOUNCE_MS);
     };
 
@@ -45,6 +46,12 @@ export function useLiveUpdates(): LiveStatus {
     es.addEventListener('agent.run', (e) => {
       const status = (JSON.parse((e as MessageEvent<string>).data) as { status?: AgentRunStatus }).status;
       if (status) emitReaction(status === 'running' ? 'syncing' : status === 'success' ? 'synced' : 'syncFailed');
+    });
+    // A draft to review: worth a nudge, the agent is waiting on the user.
+    es.addEventListener('job.updated', (e) => {
+      const status = (JSON.parse((e as MessageEvent<string>).data) as { status?: JobStatus }).status;
+      if (status === 'awaiting_approval') emitReaction('synced');
+      if (status === 'failed') emitReaction('syncFailed');
     });
     // Saved in another tab or device. Our own save echoes back too: skip it while
     // a newer local change is still queued, or the refetch would undo it.

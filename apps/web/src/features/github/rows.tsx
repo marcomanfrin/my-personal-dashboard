@@ -8,6 +8,7 @@ import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
 import { ageShort, relPast } from '../../lib/format';
 import { ISSUE_ICON, STATE_LABEL } from '../../lib/labels';
+import { JobBadge } from '../jobs/JobStatus';
 import { repoName } from './filters';
 
 /** Shared layout: state icon, title + meta, badges (below on phones, right-aligned from 640px). */
@@ -18,7 +19,9 @@ function GhRow({
   meta,
   side,
   onOpen,
+  recordId,
 }: {
+  recordId: string;
   state: PrState;
   icon: IconName;
   title: string;
@@ -43,6 +46,7 @@ function GhRow({
         <span className="min-w-0 flex-1 sm:flex sm:flex-col">
           <span className="block text-sm leading-[1.35] font-[650]">{title}</span>
           <span className="mt-0.5 block text-[12.5px] text-fg-3">{meta}</span>
+          <JobBadge recordId={recordId} className="mt-1" />
         </span>
         <span className="mt-[7px] flex basis-full flex-wrap gap-1.5 pl-[42px] sm:mt-0 sm:max-w-[45%] sm:flex-none sm:basis-auto sm:justify-end sm:pl-0">
           {side}
@@ -76,6 +80,7 @@ export function PrRow({ pr: p }: { pr: PullRequest }) {
 
   return (
     <GhRow
+      recordId={p.id}
       state={prState(p)}
       icon="pr"
       title={p.title}
@@ -107,6 +112,7 @@ export function IssueRow({ issue: i }: { issue: Issue }) {
   const { open } = useDrawer();
   return (
     <GhRow
+      recordId={i.id}
       state={i.state}
       icon={ISSUE_ICON[i.kind]}
       title={i.title}

@@ -5,6 +5,7 @@ import { AttentionPanel } from '../features/attention/AttentionPanel';
 import { CalendarCard } from '../features/calendar/CalendarCard';
 import { GanttCard } from '../features/gantt/GanttCard';
 import { GithubCard } from '../features/github/GithubCard';
+import { JobsCard } from '../features/jobs/JobsCard';
 import { KpiGrid } from '../features/kpis/KpiGrid';
 import { MailCard } from '../features/mail/MailCard';
 import { ProjectsCard } from '../features/projects/ProjectsCard';
@@ -39,6 +40,7 @@ export const WIDGETS: Widget[] = [
   { id: 'gantt', title: 'Personal Gantt', icon: 'gantt', Component: GanttCard, span: 12, collapsible: true },
   { id: 'trello', title: 'Trello tasks', icon: 'kanban', Component: TrelloCard, span: 8, collapsible: true },
   { id: 'projects', title: 'Projects', icon: 'folder', Component: ProjectsCard, span: 4, wide: true, collapsible: true },
+  { id: 'agents', title: 'Agent jobs', icon: 'bot', Component: JobsCard, span: 12, collapsible: true },
 ];
 
 /** The widths offered in the layout editor: the demo's own widths, so pairs fill a row (7+5, 8+4). */

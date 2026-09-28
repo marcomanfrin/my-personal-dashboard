@@ -37,6 +37,13 @@ Key flows:
   `actions` (`{ changes, previous }`). Undo = PATCH with the previous values.
 - **Action consumption**: the agent calls `POST /api/actions/claim { resource, limit }`, applies the
   change to the real system, then `PATCH /api/actions/:id { status: 'done'|'failed', result }`.
+- **Delegated jobs** (`jobs` table, the reverse of ingest): the user hands a record (or a free-form
+  request) to an agent with an instruction, `POST /api/jobs`. The agent claims it (`POST /api/jobs/claim`
+  → `claimed`), posts a draft (`PATCH /api/jobs/:id { status: 'awaiting_approval', draft }`); the user
+  approves (optionally editing the draft), revises (feedback → back to `pending`) or rejects; the next
+  claim returns approved jobs as `executing`, and the agent reports `done`/`failed`. Without
+  `requiresApproval` the agent may act right after the claim. `task.do` moves its card to Doing on
+  claim and Done on completion; `email.reply` marks the mail done (both through the normal outbox).
 - **Live**: every write emits an event on the events-bus, forwarded over SSE; the frontend
   refetches the indicated resource.
 
@@ -58,7 +65,10 @@ Key flows:
 | `POST /agents/runs`, `PATCH /agents/runs/:id` | agent | open/close a run (status, summary, error) |
 | `GET /agents/me` · `GET /agents` | agent · user | agent identity · list of agents + recent runs |
 | `GET /actions` · `POST /actions/claim` · `PATCH /actions/:id` | any · agent · agent | outbox: list, atomic claim (SKIP LOCKED, claims expire after 10 min), outcome |
-| `GET /stream` | user (also `?access_token=`) | SSE: `ready`, `data.changed`, `agent.run`, `action.updated`, `preferences.changed` |
+| `GET /jobs` (`?status&active&recordId`), `GET /jobs/:id` | any | delegated jobs; agents see only those their scopes cover (plus untargeted ones) |
+| `POST /jobs` · `POST /jobs/:id/approve\|revise\|reject\|cancel` | user | delegate (`JobCreate`) · review the draft, cancel before execution |
+| `POST /jobs/claim` · `PATCH /jobs/:id` | agent | claim (`{ kinds?, limit }`, SKIP LOCKED, 10 min expiry) · report draft or outcome (`JobReport`) |
+| `GET /stream` | user (also `?access_token=`) | SSE: `ready`, `data.changed`, `agent.run`, `action.updated`, `job.updated`, `preferences.changed` |
 
 `GET /health` (outside the prefix) → `{ ok }`, 503 if the DB does not respond. Errors always have
 the shape `ApiError { error, message, issues? }`.
@@ -82,12 +92,14 @@ apps/web/             @argus/web — React 19 + Vite + Tailwind v4 + TanStack Qu
   src/auth/           session.ts (in-memory JWT, single-flight and proactive refresh), AuthGate
   src/api/            client (Bearer + retry after refresh on 401), endpoints, queryClient
   src/hooks/          useDashboard (data + insights computed in the browser), useActions (optimistic
-                      mutations + toast with Undo), useLiveUpdates (SSE), useNow, useTheme
+                      mutations + toast with Undo), useJobs (delegated jobs + review actions),
+                      useLiveUpdates (SSE), useNow, useTheme
   src/components/     ui/ (Card, Pill, Chip, Segmented, Icon…), feedback/ (Toast, Tooltip)
   src/layout/         Sidebar/BottomNav, Topbar, SearchBox, NotificationsMenu, Greeting, sections
   src/drawer/         DrawerContext, DrawerShell (focus trap, Esc), DrawerHost
   src/features/<w>/   one widget per folder: attention, kpis, mail, calendar, github,
-                      reminders, trello, gantt, projects, profile (card, rows, drawer)
+                      reminders, trello, gantt, projects, profile, jobs (card, rows, drawer);
+                      jobs/DelegateSection is the "hand it to an agent" block every record drawer uses
   test/               vitest + jsdom + Testing Library, fake fetch/EventSource
 .github/workflows/    ci (test + compose smoke test, edge images on main) · release (v* tag → images
                       on ghcr.io + GitHub release) · images (reusable) · codeql · dependency-review

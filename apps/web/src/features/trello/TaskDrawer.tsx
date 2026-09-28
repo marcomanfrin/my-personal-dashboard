@@ -5,6 +5,7 @@ import { useActions } from '../../hooks/useActions';
 import { useDashboard } from '../../hooks/useDashboard';
 import { dueText } from '../../lib/format';
 import { COLUMNS } from '../../lib/labels';
+import { DelegateSection } from '../jobs/DelegateSection';
 import { TaskLabel } from './KanbanCard';
 
 export function TaskDrawer({ task: t }: { task: Task }) {
@@ -28,6 +29,24 @@ export function TaskDrawer({ task: t }: { task: Task }) {
           ],
         ]}
       />
+      {t.column !== 'done' && (
+        <>
+          {t.column === 'todo' && (
+            <DrawerSection title="Who does it">
+              <Button icon="play" onClick={() => moveTask(t.id, 'doing')}>
+                I'll do it
+              </Button>
+            </DrawerSection>
+          )}
+          <DelegateSection
+            resource="tasks"
+            recordId={t.id}
+            kind="task.do"
+            title={t.column === 'todo' ? 'Or hand it to an agent' : 'Hand it to an agent'}
+            presets={['Do it and report back', 'Prepare it, I finish it']}
+          />
+        </>
+      )}
       <DrawerSection title={`Position in ${COLUMNS.find((c) => c.id === t.column)!.label}`}>
         <div className="flex items-center gap-2">
           <Button size="sm" disabled={index <= 0} onClick={() => moveTask(t.id, t.column, index - 1)}>

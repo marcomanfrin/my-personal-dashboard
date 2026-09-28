@@ -7,6 +7,7 @@ import { useActions } from '../../hooks/useActions';
 import { useDashboard } from '../../hooks/useDashboard';
 import { relPast } from '../../lib/format';
 import { ISSUE_ICON, PR_STATUS_TEXT } from '../../lib/labels';
+import { DelegateSection } from '../jobs/DelegateSection';
 
 function OpenOnGithub({ url }: { url?: string | null }) {
   if (!url) return null;
@@ -77,6 +78,15 @@ export function PrDrawer({ pr: p }: { pr: PullRequest }) {
           </CheckRow>
         )}
       </DrawerSection>
+      <DelegateSection
+        resource="pulls"
+        recordId={p.id}
+        presets={
+          p.reviewRequested
+            ? ['Review it and draft my comments', 'Summarise the changes']
+            : ['Find out why the checks fail', 'Summarise the changes']
+        }
+      />
     </DrawerView>
   );
 }
@@ -116,6 +126,11 @@ export function IssueDrawer({ issue: i }: { issue: Issue }) {
         ]}
       />
       <Prose>{i.detail}</Prose>
+      <DelegateSection
+        resource="issues"
+        recordId={i.id}
+        presets={['Investigate the cause', 'Draft a fix', 'Write a reply to the reporter']}
+      />
     </DrawerView>
   );
 }

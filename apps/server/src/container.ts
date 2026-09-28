@@ -6,6 +6,7 @@ import { createAuthService } from './modules/auth/service';
 import { createUsersService } from './modules/auth/users';
 import { createDashboardService } from './modules/dashboard/service';
 import { createIngestService } from './modules/ingest/service';
+import { createJobsService } from './modules/jobs/service';
 import { createPreferencesService } from './modules/preferences/service';
 import { createResourceServices } from './modules/resources';
 import { EventBus } from './plugins/events-bus';
@@ -24,6 +25,7 @@ export function createContainer(db: Db, config: Config) {
     users: createUsersService({ db }),
     resources,
     actions: createActionsService({ db, bus }),
+    jobs: createJobsService({ db, bus, resources }),
     preferences: createPreferencesService({ db, bus }),
     ingest: createIngestService({ db, bus, agents }),
     dashboard: createDashboardService({ db, config, resources, agents }),

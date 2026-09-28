@@ -5,6 +5,7 @@ import { DrawerView, Prose } from '../../drawer/DrawerShell';
 import { useDashboard } from '../../hooks/useDashboard';
 import { fmtDuration, fmtLong, fmtTime } from '../../lib/format';
 import { CAT_LABEL } from '../../lib/labels';
+import { DelegateSection } from '../jobs/DelegateSection';
 
 export function EventDrawer({ event: e }: { event: CalendarEvent }) {
   const { now } = useDashboard();
@@ -43,6 +44,13 @@ export function EventDrawer({ event: e }: { event: CalendarEvent }) {
         ]}
       />
       {e.notes && <Prose>{e.notes}</Prose>}
+      {ms(e.end) > now.getTime() && (
+        <DelegateSection
+          resource="events"
+          recordId={e.id}
+          presets={['Prepare a brief for it', 'Propose a new time', 'Decline politely']}
+        />
+      )}
     </DrawerView>
   );
 }

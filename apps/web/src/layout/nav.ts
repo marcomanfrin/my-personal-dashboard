@@ -43,6 +43,7 @@ export const NAV: NavItem[] = [
   { id: 'gantt', label: 'Personal Gantt', short: 'Plan', icon: 'gantt' },
   { id: 'trello', label: 'Trello', icon: 'kanban' },
   { id: 'projects', label: 'Projects', icon: 'folder' },
+  { id: 'agents', label: 'Agent jobs', icon: 'bot' },
 ];
 
 /** The KPI tiles belong to the overview for navigation purposes. */

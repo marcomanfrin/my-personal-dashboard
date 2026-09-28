@@ -17,6 +17,9 @@ ack a PR…).
 - **Live**: every write reaches the browser over SSE, no reload needed.
 - **Reversible actions**: optimistic updates with Undo; changes go into a queue (`actions`) that
   the source's agent applies to the real system.
+- **Delegation to agents**: from any widget, hand a record to an agent with an instruction (reply
+  to this mail, do this card, review this PR…). The agent drafts, you approve or send it back with
+  feedback, then it acts on the real system. The *Agent jobs* widget shows the queue.
 - **Per-user preferences**: board layout, hidden or collapsed widgets and the sidebar are saved on
   the server and follow the user across devices.
 - Light/dark theme, desktop and mobile layouts.
@@ -32,7 +35,7 @@ flowchart LR
   db[("PostgreSQL")]
   browser["Browser<br>(React)"]
 
-  agents -- "PUT /api/ingest/:resource<br>POST /api/actions/claim<br>PATCH /api/actions/:id" --> api
+  agents -- "PUT /api/ingest/:resource<br>POST /api/actions/claim · /api/jobs/claim<br>PATCH /api/actions/:id · /api/jobs/:id" --> api
   api <--> db
   api <-- "GET /api/dashboard<br>PATCH /api/&lt;resource&gt;/:id<br>SSE /api/stream" --> browser
 ```
@@ -44,6 +47,9 @@ flowchart LR
    `actions`.
 4. The agent claims the actions (`POST /api/actions/claim`), applies them to the source and reports
    the outcome (`PATCH /api/actions/:id`).
+5. Delegated work goes the same way in `jobs`: the user creates a job (`POST /api/jobs`), the agent
+   claims it, posts a draft, the user approves it (or sends it back / rejects it) and the agent,
+   claiming it again, carries it out and reports the outcome.
 
 ## Quick start (Docker)
 
@@ -114,7 +120,15 @@ curl -X POST $API/actions/claim -H "$AUTH" -H 'content-type: application/json' \
 curl -X PATCH $API/actions/<id> -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "status": "done" }'
 
-# 4. close the run
+# 4. carry out delegated jobs: claim, draft, then (once approved) act and report
+curl -X POST $API/jobs/claim -H "$AUTH" -H 'content-type: application/json' -d '{ "limit": 5 }'
+curl -X PATCH $API/jobs/<id> -H "$AUTH" -H 'content-type: application/json' \
+  -d '{ "status": "awaiting_approval", "draft": { "body": "Proposed reply…" } }'
+# … after the user approves, the next claim returns it as "executing":
+curl -X PATCH $API/jobs/<id> -H "$AUTH" -H 'content-type: application/json' \
+  -d '{ "status": "done", "result": "Reply sent" }'
+
+# 5. close the run
 curl -X PATCH $API/agents/runs/<id> -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "status": "success", "summary": "1 reminder synced" }'
 ```
@@ -126,7 +140,11 @@ Good to know:
   (`*Input` for ingest, `*Patch` for the fields the user can edit).
 - Fields with a user action still in the queue are not overwritten by ingest: the response lists
   them in `protectedFields`.
-- A claimed action that is not completed within 10 minutes becomes available again.
+- A claimed action that is not completed within 10 minutes becomes available again. Same for jobs.
+- Jobs: `claimed` = new work (draft it, or act if `requiresApproval` is false), `executing` = approved
+  (use `draft` as the user left it, then act). `feedback` carries the user's notes when a draft is sent
+  back. Kinds are in `JOB_KINDS` (`@argus/shared`): `task.do`, `email.reply` (always reviewed),
+  `record` (any resource) and `free` (no target, any agent).
 
 The full endpoint list is in [CLAUDE.md](CLAUDE.md#api-prefix-api).
 

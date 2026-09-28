@@ -7,6 +7,7 @@ import { useDashboard } from '../../hooks/useDashboard';
 import { cn } from '../../lib/cn';
 import { dueText, relPast } from '../../lib/format';
 import { MAIL_CAT_LABEL } from '../../lib/labels';
+import { JobBadge } from '../jobs/JobStatus';
 
 export function MailRow({ email: e }: { email: Email }) {
   const { now } = useDashboard();
@@ -46,6 +47,7 @@ export function MailRow({ email: e }: { email: Email }) {
               </span>
             )}
             {e.attachments.length > 0 && <Tag icon="clip">{e.attachments.length}</Tag>}
+            <JobBadge recordId={e.id} />
           </span>
         </span>
       </button>

@@ -4,7 +4,11 @@ import { useActions } from '../hooks/useActions';
 import { useSections } from '../layout/sections';
 import { emitReaction } from '../lib/reactions';
 
-export type DrawerType = 'email' | 'event' | 'pr' | 'issue' | 'task' | 'gantt' | 'profile';
+export type DrawerType =
+  'email' | 'event' | 'pr' | 'issue' | 'task' | 'gantt' | 'profile' | 'job' | 'delegate';
+
+/** Id of a `delegate` drawer: the record to hand to an agent. */
+export const delegateTarget = (resource: Resource, id: string) => `${resource}:${id}`;
 export interface DrawerTarget {
   type: DrawerType;
   id: string;

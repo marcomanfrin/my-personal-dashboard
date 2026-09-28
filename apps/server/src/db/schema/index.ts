@@ -10,6 +10,7 @@ import { tasks } from './tasks';
 
 export * from './agents';
 export * from './actions';
+export * from './jobs';
 export * from './users';
 export * from './user-preferences';
 export { emails, events, ganttTasks, issues, projects, pulls, reminders, tasks };

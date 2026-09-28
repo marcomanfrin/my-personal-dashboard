@@ -14,6 +14,7 @@ import { emailsRoutes } from './modules/emails/routes';
 import { eventsRoutes } from './modules/events/routes';
 import { ganttRoutes } from './modules/gantt/routes';
 import { ingestRoutes } from './modules/ingest/routes';
+import { jobsRoutes } from './modules/jobs/routes';
 import { preferencesRoutes } from './modules/preferences/routes';
 import { issuesRoutes } from './modules/issues/routes';
 import { projectsRoutes } from './modules/projects/routes';
@@ -51,6 +52,7 @@ const API_MODULES = [
   ingestRoutes,
   agentsRoutes,
   actionsRoutes,
+  jobsRoutes,
   streamRoutes,
 ];
 

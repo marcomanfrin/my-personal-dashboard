@@ -4,10 +4,13 @@ import type {
   EventCategory,
   GanttStatus,
   IssueKind,
+  JobKind,
+  JobStatus,
   MailCategory,
   PrState,
   Priority,
   PullRequestStatus,
+  Resource,
   TaskColumn,
 } from '@argus/shared';
 import type { IconName } from '../components/ui/icons';
@@ -102,3 +105,47 @@ export function attentionIcon(item: AttentionItem, issueKind?: IssueKind): IconN
       return 'dot';
   }
 }
+
+export const JOB_STATUS_LABEL: Record<JobStatus, string> = {
+  pending: 'Queued',
+  claimed: 'Agent working',
+  awaiting_approval: 'Needs your review',
+  approved: 'Approved',
+  executing: 'Carrying out',
+  done: 'Done',
+  failed: 'Failed',
+  rejected: 'Rejected',
+  cancelled: 'Cancelled',
+};
+
+/** Signal colour of a job status (st-* utilities, already in the safelist). */
+export const JOB_STATUS_CLASS: Record<JobStatus, string> = {
+  pending: 'st-pending',
+  claimed: 'st-pending',
+  awaiting_approval: 'st-warning',
+  approved: 'st-pending',
+  executing: 'st-pending',
+  done: 'st-success',
+  failed: 'st-error',
+  rejected: 'st-done',
+  cancelled: 'st-done',
+};
+
+export const JOB_KIND_LABEL: Record<JobKind, string> = {
+  'task.do': 'Trello card',
+  'email.reply': 'Email reply',
+  record: 'Request',
+  free: 'Request',
+};
+
+/** A record of each resource, in words: "the email", "the card"… */
+export const RESOURCE_NOUN: Record<Resource, string> = {
+  emails: 'email',
+  events: 'event',
+  pulls: 'pull request',
+  issues: 'issue',
+  reminders: 'reminder',
+  tasks: 'card',
+  projects: 'project',
+  gantt: 'Gantt task',
+};

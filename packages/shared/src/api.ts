@@ -1,5 +1,6 @@
 import type { AgentRunStatus } from './schemas/agent';
 import type { Resource } from './schemas/common';
+import type { JobKind, JobStatus } from './schemas/job';
 import type { DashboardInsights } from './domain/dashboard';
 import type { DashboardData } from './domain/types';
 
@@ -43,6 +44,8 @@ export type StreamEvent =
     }
   | { type: 'agent.run'; data: { runId: string; agent: string; resource: Resource | null; status: AgentRunStatus } }
   | { type: 'action.updated'; data: { id: string; resource: Resource; status: string } }
+  /** A delegated job was created or changed status: refetch GET /api/jobs. */
+  | { type: 'job.updated'; data: { id: string; kind: JobKind; status: JobStatus } }
   /** Saved from another tab or device: refetch GET /api/preferences. */
   | { type: 'preferences.changed'; data: { at: string } };
 

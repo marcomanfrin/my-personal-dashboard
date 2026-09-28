@@ -9,6 +9,7 @@ export * from './project';
 export * from './gantt-task';
 export * from './agent';
 export * from './action';
+export * from './job';
 export * from './auth';
 export * from './registry';
 export * from './preferences';

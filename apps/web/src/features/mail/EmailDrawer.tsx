@@ -4,6 +4,7 @@ import { Avatar, Button, Kv, LevelPill } from '../../components/ui/primitives';
 import { useDrawer } from '../../drawer/DrawerContext';
 import { DrawerSection, DrawerView, Prose } from '../../drawer/DrawerShell';
 import { useActions } from '../../hooks/useActions';
+import { DelegateSection } from '../jobs/DelegateSection';
 import { fmtLong, fmtTime } from '../../lib/format';
 import { MAIL_CAT_LABEL } from '../../lib/labels';
 
@@ -66,6 +67,16 @@ export function EmailDrawer({ email: e }: { email: Email }) {
             ))}
           </div>
         </DrawerSection>
+      )}
+      {!e.done && (
+        <DelegateSection
+          resource="emails"
+          recordId={e.id}
+          kind="email.reply"
+          title="Reply with an agent"
+          cta="Draft reply"
+          presets={['Confirm', 'Decline politely', 'Ask for more details', 'Say I will get back to them']}
+        />
       )}
       {e.url && (
         <a href={e.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] font-bold text-accent-text hover:underline">
