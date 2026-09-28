@@ -2,6 +2,7 @@ import type { Resource } from '@argus/shared';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useActions } from '../hooks/useActions';
 import { useSections } from '../layout/sections';
+import { emitReaction } from '../lib/reactions';
 
 export type DrawerType = 'email' | 'event' | 'pr' | 'issue' | 'task' | 'gantt' | 'profile';
 export interface DrawerTarget {
@@ -46,6 +47,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
       lastFocus.current = from;
       fallbackFocus.current = from?.closest('section')?.querySelector<HTMLElement>('h2[tabindex]') ?? null;
       if (type === 'email') markEmailRead(id);
+      emitReaction(type === 'profile' ? 'profile' : 'opened');
       setCurrent({ type, id });
     },
     [markEmailRead],

@@ -1,8 +1,9 @@
-import type { StreamEventType } from '@argus/shared';
+import type { AgentRunStatus, StreamEventType } from '@argus/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { queryKeys } from '../api/queryClient';
 import { useSession } from '../auth/AuthGate';
+import { emitReaction } from '../lib/reactions';
 import { hasUnsavedPreferences } from './usePreference';
 
 export type LiveStatus = 'connecting' | 'live' | 'offline';
@@ -40,6 +41,11 @@ export function useLiveUpdates(): LiveStatus {
       invalidate();
     });
     for (const type of REFRESHING) es.addEventListener(type, invalidate);
+    // An agent at work: the greeting avatar follows its runs.
+    es.addEventListener('agent.run', (e) => {
+      const status = (JSON.parse((e as MessageEvent<string>).data) as { status?: AgentRunStatus }).status;
+      if (status) emitReaction(status === 'running' ? 'syncing' : status === 'success' ? 'synced' : 'syncFailed');
+    });
     // Saved in another tab or device. Our own save echoes back too: skip it while
     // a newer local change is still queued, or the refetch would undo it.
     es.addEventListener('preferences.changed', () => {

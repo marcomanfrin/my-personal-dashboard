@@ -56,6 +56,8 @@ describe('app', () => {
     render(<App />);
     expect(await screen.findByText('Attention required')).toBeTruthy();
     expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(/, Marco$/);
+    // The greeting avatar renders as decoration, hidden from assistive tech.
+    expect(document.querySelector('[data-animation] > .bs-avatar svg')).toBeTruthy();
 
     // KPIs are computed in the browser from the data.
     expect(screen.getByLabelText(/^4 Emails to act on/)).toBeTruthy();
@@ -89,8 +91,11 @@ describe('app', () => {
     expect(screen.getByLabelText(/^3 Emails to act on/)).toBeTruthy();
     const patch = calls.find((c) => c.method === 'PATCH');
     expect(patch?.body).toEqual({ done: true, read: true, category: 'archived' });
+    // The greeting avatar reacts to the action, and to its undo.
+    expect(document.querySelector('[data-animation]')?.getAttribute('data-animation')).toBe('happy');
 
     fireEvent.click(await screen.findByRole('button', { name: 'Undo' }));
+    expect(document.querySelector('[data-animation]')?.getAttribute('data-animation')).toBe('confused');
     await waitFor(() => {
       const undo = calls.filter((c) => c.method === 'PATCH')[1];
       expect(undo?.body).toEqual({ done: false, read: false, category: 'urgent' });

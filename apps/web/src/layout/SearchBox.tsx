@@ -4,6 +4,7 @@ import { useDrawer } from '../drawer/DrawerContext';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useDashboard } from '../hooks/useDashboard';
 import { cn } from '../lib/cn';
+import { emitReaction } from '../lib/reactions';
 import { search } from '../lib/search';
 
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -124,6 +125,7 @@ export function SearchBox({
           onChange={(e) => {
             setQuery(e.target.value);
             setActive(0);
+            if (e.target.value.trim()) emitReaction('searching');
           }}
           onFocus={() => setFocused(true)}
           onKeyDown={onKeyDown}
