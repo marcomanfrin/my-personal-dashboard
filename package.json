@@ -22,10 +22,10 @@
     "dev:web": "npm run dev -w @argus/web"
   },
   "devDependencies": {
-    "concurrently": "^10.0.5",
-    "prettier": "^3.3.0",
+    "concurrently": "^10.0.6",
+    "prettier": "^3.9.10",
     "typescript": "^7.0.2",
-    "vite": "^8.3.0"
+    "vite": "^8.3.4"
   },
   "overrides": {
     "esbuild": "^0.28.2"
